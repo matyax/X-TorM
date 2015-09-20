@@ -1,0 +1,195 @@
+Privado:/query $$1
+Publicidad: say $logo v $+ $xversion by MaTyAs666 - 12Http://11www.xtorm-script.cjb.net
+-
+$iif($ialchan($address($snick($chan,1),2),$chan,0) >= 2,$ialchan($address($snick($chan,1),2),$chan,0) Clones  )
+.$ialchan($address($snick($chan,1),2),$chan,1).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,1).nick
+.$ialchan($address($snick($chan,1),2),$chan,2).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,2).nick
+.$ialchan($address($snick($chan,1),2),$chan,3).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,4).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,5).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,6).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,7).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,8).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+.$ialchan($address($snick($chan,1),2),$chan,9).nick: do-xwhois $ialchan($address($snick($chan,1),2),$chan,3).nick
+$iif($me isop $chan,C@ntr@l,$style(2) C@ntr@l)
+.Acciones especiales
+..Fuera clones de $$1: _kicklones $chan $1
+..MassDeop: massdeop $chan
+..MassKick: masskick $chan
+..MassBan: massban $chan
+.Dar @p: {
+  if (!$2) { mode $chan +o $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer mode $chan +o $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+.Quitar @p: {
+  if (!$2) { mode $chan -o $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer mode $chan -o $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+.-
+.Dar voz : {
+  if (!$2) { mode $chan +v $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {    .timer -m 1 %timer mode $chan +v $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+.Quitar voz: {
+  if (!$2) { mode $chan -v $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer mode $chan -v $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+.-
+.Patear: {
+  if (!$2) { kick $chan $$1 | return }
+  else {
+    var %t = 1,%timer 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer echo kick $chan $ [ $+ [ %t ] ] | inc %t | inc %timer 250
+    }
+  }
+}
+.Patear con razón: { 
+  if (!$2) { kick $chan $$1 $$?="Razon?" | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer kick $chan $ [ $+ [ %t ] ] $$?="Razon para el nick $ [ $+ [ %t ] ] $+ ?" | inc %t | inc %timer 200
+    }
+  }
+}
+.Patear/banear: { 
+  if (!$2) { mode $chan -o $$1 | mode $chan +b $$1 | kick $chan $$1 $$?="¿Razón?" | return }
+  else {
+    var %t = 1
+    while ( $ [ $+ [ %t ] ] ) {
+      mode $chan -o $ [ $+ [ %t ] ] | mode $chan +b $ [ $+ [ %t ] ] | kick $chan $ [ $+ [ %t ] ] $$?="¿Razón para $ [ $+ [ %t ] ] $+ ?"
+      inc %t
+    }
+  }
+}
+.Ban nick(s): {
+  if (!$2) { mode $chan -o $$1 | mode $chan +b $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer mode $chan -o $ [ $+ [ %t ] ]
+      .timer -m 1 %timer mode $chan +b $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+.$iif( $ialchan($gettok($address($snick($chan),2),2,33),$active ,0) > 1,Patear clones [ $ialchan($gettok($address($snick($chan),2),2,33),$active ,0) ])
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,1).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,1).nick Fuera Clones - $logo
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,2).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,2).nick Fuera Clones - $logo
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,3).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,3).nick Fuera Clones - $logo
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,4).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,4).nick Fuera Clones - $logo
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,5).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,5).nick Fuera Clones - $logo
+.. $ialchan($gettok($address($snick($chan),2),2,33),$active ,5).nick:/ kick  # $ialchan($gettok($address($snick($chan),2),2,33),$active ,6).nick Fuera Clones - $logo
+.Ban temporal
+..1 minuto: mode $chan -o $$1 | ban -u60 $chan $$1  | .timer 1 2 kick # $$1 Afuera por 1 minuto - $logo
+..5 minutos: mode $chan -o $$1 | ban -u300 $chan $$1 | .timer 1 2 kick # $$1 Afuera por 5 minutos - $logo
+..10 minutos: mode $chan -o $$1 | ban -u600 $chan $$1 | .timer 1 2 kick # $$1 Afuera por 10 minutos - $logo
+..30 minutos: mode $chan -o $$1 | ban -u1800 $chan $$1  | .timer 1 2 kick # $$1 Afuera por 30 minutos - $logo
+.Banear máscara
+..*!user@host.domain: mode $chan -o $$1 | ban  # $$1 0
+..-
+..*!*user@host.domain: mode $chan -o $$1 | ban # $$1 1
+..-
+..*!*@host.domain: mode $chan -o $$1 | ban # $$1 2
+..-
+..*!*user@*.domain: mode $chan -o $$1 | ban # $$1 3
+..-
+..*!*@*.domain: mode $chan -o $$1 | ban # $$1 4
+..-
+..nick!user@host.domain: mode $chan -o $$1 | ban # $$1 5
+..-
+..nick!*user@host.domain: mode $chan -o $$1 | ban # $$1 6
+..-
+..nick!*@host.domain: mode $chan -o $$1 | ban # $$1 7
+..-
+..nick!*user@*.domain: mode $chan -o $$1 | ban # $$1 8
+..-
+..nick!*@*.domain: mode $chan -o $$1 | ban # $$1 9
+.-
+.Sacar ban(s): {
+  if (!$2) { mode $chan -b $$1 | return }
+  else {
+    var %t = 1,%timer = 200
+    while ( $ [ $+ [ %t ] ] ) {
+      .timer -m 1 %timer mode $chan -b $ [ $+ [ %t ] ] | inc %t | inc %timer 200
+    }
+  }
+}
+-
+Whois: whois $$1
+XWhois: do-xwhois $$1
+CTCP
+.Ping:ctcp $$1 ping
+.Finger:ctcp $$1 finger
+.Version:ctcp $$1 version
+.Script:ctcp $$1 script
+.Page:ctcp $$1 page
+.Time:ctcp $$1 time
+.Userinfo:ctcp $$1 userinfo
+.ClientInfo:ctcp $$1 clientinfo
+Envios (DCC)
+.Mandar archivo: dcc send $$1
+.DCC Chat:/dcc chat $$1
+Control de ignores
+.Borrar lista: ignore -r
+.-
+.Ignorar Temporalmente
+..Ignorar Privados:ignore -pu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar Mensajes al canal:ignore -cu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ingnorar Noticias:ignore -nu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar Ctcp's:ignore -tu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar Codigos De Control:ignore -ku $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar DCCs:ignore -iu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar Invitaciones:ignore -iu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+..-
+..Ignorar Totalmente:ignore -pcntikdu $+ $$?="Por cuanto tiempo lo ignoraras?(en seg.)" $$1
+.-
+.Ignorar
+..Ignorar Privados:ignore -p $$1..-
+..Ignorar Mensajes al canal:ignore -c $$1
+..-
+..Ingnorar Noticias:ignore -n $$1
+..-
+..Ignorar Ctcp's:ignore -t $$1
+..-
+..Ignorar Codigos De Control:ignore -k $$1
+..-
+..Ignorar Invitaciones:ignore -i $$1
+..-
+..Ignorar DCCs:ignore -i $$1
+..-
+..Ignorar Totalmente:ignore -pcntikd $$1
+.-
+.Designorar:ignore -r $$1
+-
+Chistes y textos
+.Estupido: say 12 $$1 $read Sistema\Textos\estupido.txt
+.Tonto: say  $$1 $read Sistema\Textos\tonto.txt
+.Tu madre: say 4 $$1 $read Sistema\Textos\tumadre.txt
+.-
+.Piropos: say 6 $$1 $+  $read Sistema\Textos\piropos.txt

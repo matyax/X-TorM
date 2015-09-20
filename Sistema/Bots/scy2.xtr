@@ -1,0 +1,183 @@
+;------------------------------------------------------------------
+;      Menús de Scytale/Kripton  v1.0  -   X-CRiPt 
+;-----------------------------------------------------------------
+menu Nicklist {
+  $iif(irc-hispano.net isin $server,%bot)
+  .Dar Op :mensaje %bot op # $1
+  .Quitar Op :mensaje %bot deop # $1
+  .Dar Op a todos (450): mensaje %bot opall #
+  .Quitar Op a todos (450): mensaje %bot deopall #
+  .-
+  .Kickear (100): mensaje %bot kick # $1
+  .Kickear a todos (450): mensaje %bot kickall #
+  .-
+  .Banear (200): mensaje %bot ban # $1
+  .Banear Nick (250): mensaje %bot nickban # $1
+  .Kick-Ban (250): mensaje %bot kickban # $1
+  .Quitar Ban (250): mensaje %bot unban # $1
+  .-
+  .Invitar a un canal (100): mensaje %bot invite #$$?="¿A qué canal? (sin #)" $1
+  .Registrar Usuario (450)
+  ..Máscara Automática: mensaje %bot adduser # $1 $address( $1 , 4) $$?*="¿Password?" $$?="¿Level?" $$?="¿Protección? Escribe 1 para SI, 0 para NO"
+  ..-
+  ..Especificar Máscara : mensaje %bot adduser # $1 $$?="¿Máscara? $$?*="¿Password?" $$?="¿Level?" $$?="¿Protección? Escribe 1 para SI, 0 para NO"
+  .Borrar Usuario (450): mensaje %bot deluser # $1
+  .Suspender (400): mensaje %bot suspend # $1 $$?="¿Razón?"
+  .Quitar Suspenso (400): mensaje %bot unsuspend # $1 $$?="¿Razón?" 
+  .-
+  .Modificar Usuario (400)
+  ..Añadir Máscara: mensaje %bot moduser # addmask $$1 $$?="¿Máscara que quieres añadir?"
+  ..Borrar Máscara: mensaje %bot moduser # delmask $$1 $$?="¿Máscara que quieres borrar?"
+  ..Protección
+  ...on:mensaje %bot moduser # protect $$1 on
+  ...off: mensaje %bot moduser # protect $$1 off
+  ..Cambiar Nivel: mensaje %bot moduser # level $$1 $$?="Introduce Nuevo level"
+  ..Nuevo IDNick: mensaje %bot moduser # newidnick $$1 $$?="¿Nuevo IDNick?"
+  ..Nuevo Password: mensaje %bot moduser # passwd $$1 $$?*="Introduce nuevo password" $!
+  .Modificar CService (700)
+  ..Añadir Máscara: mensaje %bot csmod addmask $1 $$?="¿Qué máscara quieres añadir?"
+  ..Borrar Máscara: mensaje %bot csmod delmask $1 $$?="¿Qué máscara quieres borrar?"
+  ..Cambiar Level: mensaje %bot csmod level $1 $$?="Introduce nuevo level"
+  ..Cambiar Password: mensaje %bot csmod passwd $1 $$?*="Introduce nuevo password" $!
+  .-
+  .Acceso a canal
+  ..Al canal $active:mensaje %bot access # $1
+  ..A otro canal: mensaje %bot access #$$?="¿Canal?(sin #)" $1
+  .Comprobar si es CService : mensaje %bot verify $1
+  .-
+  .Añadir CService (700) : mensaje %bot addcsadmin $1 $$?="¿Máscara?" $$?*="Password para el nuevo Cservice" $$?="¿Level?"
+  .Comprobar registro (501): mensaje %bot isauthed # $1
+  .-
+  .Control de Canales
+  ..Autentificarse
+  ...Configurar
+  ....$gettok(%authchan,1,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",1,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",1,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",1,44)
+  ....$gettok(%authchan,2,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",2,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",2,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",2,44)
+  ....$gettok(%authchan,3,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",3,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",3,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",3,44)
+  ....$gettok(%authchan,4,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",4,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",4,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",4,44)
+  ....$gettok(%authchan,5,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",5,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",5,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",5,44)
+  ....$gettok(%authchan,6,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",6,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",6,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",6,44)
+  ....$gettok(%authchan,7,44): %authchan = $puttok(%authchan,#$$?="Escribe el nombre del canal(sin #)",7,44) | %authchan.id = $puttok(%authchan.id,$$?="Escribe el IDNick con el que estas registrado",7,44) | %authchan.pass = $puttok(%authchan.pass,$$?*="Escribe el password",7,44)
+  ....-
+  ....Password Cservice: set %cs.pass $$?*="Introduce tu password de CService"
+  ...-
+  ...$gettok(%authchan,1,44): auth 1
+  ...$gettok(%authchan,2,44):  auth 2
+  ...$gettok(%authchan,3,44): auth 3 
+  ...$gettok(%authchan,4,44): auth 4
+  ...$gettok(%authchan,5,44): auth 5
+  ...$gettok(%authchan,6,44): auth 6
+  ...$gettok(%authchan,7,44): auth 7
+  ...-
+  ...Otro: mensaje %bot auth #$$?="¿Canal? (sin #)" $$?*="¿Password?"
+  ...Borrar entrada: scy.del
+  ...-
+  ...CService AUTH (501): if ( %cs.pass != $null ) { mensaje %bot csauth $me %cs.pass } | else { echo 2 -es *** Debes especificar antes el password en %bot -> Autentificarse -> Configurar -> Password CService }
+  ..DesAutentificarse
+  ...$gettok(%authchan,1,44): mensaje %bot deauth $gettok(%authchan,1,44) 
+  ...$gettok(%authchan,2,44): mensaje %bot deauth $gettok(%authchan,2,44) 
+  ...$gettok(%authchan,3,44): mensaje %bot deauth $gettok(%authchan,3,44) 
+  ...$gettok(%authchan,4,44): mensaje %bot deauth $gettok(%authchan,4,44) 
+  ...$gettok(%authchan,5,44): mensaje %bot deauth $gettok(%authchan,5,44) 
+  ...$gettok(%authchan,6,44): mensaje %bot deauth $gettok(%authchan,6,44) 
+  ...$gettok(%authchan,7,44): mensaje %bot deauth $gettok(%authchan,7,44) 
+  ...-
+  ...Otro: mensaje %bot deauth #$$?="¿Canal? (sin #)"
+  ...-
+  ...CService DEAUTH (501): mensaje %bot csdeauth
+  ..-
+  ..Cambiar password de canal: {
+    set %chng.chan $active
+    set %chng.opa $$?*="Introduce password antiguo"
+    set %chng.npa $$?*="Introduce nuevo password"
+    mensaje %bot passwd %chng.chan $me %chng.opa %chng.npa %chng.npa
+    cambiapass
+  }
+  ..-
+  ..Opciones del Canal
+  ...Ver Valores Actuales (501): mensaje %bot cinfo #
+  ...-
+  ...Mensaje de Bienvenida (300): mensaje %bot chanopt # welcome $$?="Escribe el nuevo Mensaje de Bienvenida"
+  ...Topic por defecto (400):  mensaje %bot chanopt # deftopic $$?="Introduce nuevo topic por defecto"
+  ...Nivel mínimo para banear (400)
+  ....100:  mensaje %bot chanopt # banlevel 100
+  ....200:  mensaje %bot chanopt # banlevel 200
+  ....300:  mensaje %bot chanopt # banlevel 300
+  ....400:  mensaje %bot chanopt # banlevel 400
+  ....-
+  ....Otro:  mensaje %bot chanopt # banlevel $$?="Escribe el mínimo level (0-400)"
+  ...Descripción del canal (400) : mensaje %bot chanopt # description $$?="Introduce nueva descripción"
+  ...Modos por Defecto (400)
+  .... +nt :  mensaje %bot chanopt # defmodes +nt
+  .... +int:  mensaje %bot chanopt # defmodes +int
+  .... +sp:  mensaje %bot chanopt # defmodes +sp
+  ....-
+  .... Otro:  mensaje %bot chanopt # defmodes $$?="Introduce Modos por defecto. ej: +nts"
+  ...Solo Autentificados tienen Op (450)
+  ....on: mensaje %bot chanopt # strictop on
+  ....off:  mensaje %bot chanopt # strictop off
+  ...No Ops (450)
+  ....on:  mensaje %bot chanopt # noops on
+  ....off:  mensaje %bot chanopt # noops off
+  ...Sólo Banea %bot (450)
+  ....on:  mensaje %bot chanopt # noban on
+  ....off:  mensaje %bot chanopt # noban off
+  ...Mínimo Level para cambiar modos (450)
+  ....100:  mensaje %bot chanopt # chmodeslevel 100
+  ....200:  mensaje %bot chanopt # chmodeslevel 200
+  ....300:  mensaje %bot chanopt # chmodeslevel 300
+  ....400:  mensaje %bot chanopt # chmodeslevel 400
+  ....-
+  ....Otro:  mensaje %bot chanopt # chmodeslevel $$?="Escribe el mínimo level (0-400)"
+  ...Al dejar solo el canal (500)
+  ....%bot se queda dentro: mensaje %bot chanopt # stay on
+  ....%bot sale del canal:  mensaje %bot chanopt # stay off
+  ...Auto-Op IRCops (500)
+  ....on:  mensaje %bot chanopt # operop on
+  ....off:  mensaje %bot chanopt # operop off
+  ...Auto-Op CServices (500)
+  ....on:  mensaje %bot chanopt # csoperop on
+  ....off:  mensaje %bot chanopt # csoperop off
+  ...Cambiar Web del canal (500):  mensaje %bot chanopt # description $$?="Introduce nueva dirección Web"
+  ...Mostrar uso de %bot (500)
+  ....on:  mensaje %bot chanopt # issued on
+  ....off:  mensaje %bot chanopt # issued off
+  ...Datos Del Admin (500/600)
+  ....Nick del Admin (500):  mensaje %bot chanopt # ownernick $$?="Introduce nuevo nick"
+  ....Nombre Del Admin (600): mensaje %bot chanopt # ownername $$?="Introduce nuevo nombre completo"
+  ....E-Mail Del Admin (600): mensaje %bot chanopt # owneremail $$?="Introduce nuevo e-mail"
+  ..-
+  ..Información del Canal: mensaje %bot chaninfo #
+  ..Lista de Bans: mensaje %bot banlist #
+  ..Cambiar Topic (200): mensaje %bot topic # $$?="Escribe el Topic"
+  ..Borrar Bans (300): mensaje %bot clearbans #
+  ..Resetear Canal (350): mensaje %bot resetchan #
+  ..Borrar modos y Bans (400): mensaje %bot clearme #
+  ..Ver Usuarios Autentificados (450): mensaje %bot Alist #
+  ..-
+  ..Buscar patrón en (501)
+  ...Nombre del Admin: mensaje %bot search ownername $$?="¿qué patron quieres buscar?"
+  ...Email del Admin: mensaje %bot search owneremail $$?="¿qué patron quieres buscar?"
+  ...IDNick del Admin: mensaje %bot search ownernick $$?="¿qué patron quieres buscar?"
+  ...Descripción del canal: mensaje %bot search description $$?="¿qué patron quieres buscar?"
+  ...Topic por defecto: mensaje %bot search deftopic $$?="¿qué patron quieres buscar?"
+  ...Welcome de %bot: mensaje %bot search welcome $$?="¿qué patron quieres buscar?"
+  ..Buscar Máscara (501): mensaje %bot searchmask $$?="¿Qué máscara quieres buscar?"
+  ..Registrar Canal (700)
+  ...Registar canal $active:mensaje %bot addchan # $$?="IDNick del Admin" $$?="Máscara del Admin" $$?*="Password del Admin" $$?="Modos por defecto. ej: +nt" $$?="E-mail del Admin" $$?="Nombre y apellido(s) del Admin"
+  ...Registrar otro canal: mensaje %bot addchan #$$?="Nombre del canal (sin #)" $$?="IDNick del Admin" $$?="Máscara del Admin" $$?*="Password del Admin" $$?="Modos por defecto. ej: +nt" $$?="E-mail del Admin" $$?="Nombre y apellido(s) del Admin"
+  ..Borrar Canal (800)
+  ...Borrar canal $active: mensaje %bot #
+  ...Borrar otro canal: mensaje %bot #$$?="¿Qué Canal quieres borrar? (sin #)"
+  ..Renombrar Canal (800)
+  ...Renombrar canal $active:mensaje %bot renchan # #$$?="Nuevo nombre del canal (sin #)"
+  ...Renombrar otro canal: mensaje %bot renchan #$$?="Nombre actual del canal (sin #)" #$$?="Nuevo nombre del canal (sin #)"
+  .Control del Server
+  ..Ver los Créditos: mensaje %bot credits
+  ..Mostrar los comandos: mensaje %bot showcommands
+  ..Ver mi máscara: mensaje %bot whoami
+  ..Ver otra máscara: mensaje %bot whois $$?="¿De quién?"
+  ..Lista de CServices (500): mensaje %bot admin
+  ..Rendimiento (501): mensaje %bot load
+  ..Mensaje del día - MOTD (600): mensaje %bot motd $$?="Escribe el nuevo Mensaje del día"
+}

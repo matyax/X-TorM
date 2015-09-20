@@ -1,0 +1,271 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                        utilidades2.xtr - Utilidades
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+alias ayuda {
+  if ($window(@Ayudað)) { window -a @Ayudað | return }
+  ventana @Ayudað 576 305 | titulo @Ayudað Ayuda del X-TorM - /Ayuda
+  texto cent @Ayudað 40 Bienvenido al sistema de ayuda del X-TorM
+  lista @Ayudað 10 80 150 159 | lista @Ayudað 170 65 390 220
+  $cuad(@Ayudað,10,66,132,15,Temas de ayuda).norm
+  setv tmp.@Ayudað @Ayudað 170 65 390 15 1 0 @Ayuda return
+  setv but.@Ayudað 10 264 150 20 Web del Script_run -n www.x-torm.com.ar/â
+  did-lista firstf $mircdirsistema\textos\ayuda\welcome.txt tmp.@Ayudað
+  setv tmp.ayudasel $mircdirsistema\textos\ayuda\welcome.txt
+  window -hl @Ayuda2 | clear -l @Ayuda2
+  aline @Ayuda2 Conectarse | aline @Ayuda2 Entrar a un canal | aline @Ayuda2 Comandos en mIRC
+  aline @Ayuda2 Modos de escritura | aline @Ayuda2 Apariencia del script | aline @Ayuda2 Sonidos del script
+  aline @Ayuda2 Modo Bunker | aline @Ayuda2 Barra de utiles | aline @Ayuda2 Cambio de fuentes | aline @Ayuda2 Otros temas
+  setv tmp2.@Ayudað @Ayudað 10 80 150 11 1 0 @Ayuda2 sel-ayuda 
+  do_but @Ayudað but.@Ayudað 
+  did-lista not nada tmp2.@Ayudað
+  window -wa @Ayudað
+}
+alias sel-ayuda { 
+  var %tmp = $mircdirsistema\textos\ayuda\ $+ $$1 $+ .txt
+  if ($exists(%tmp) == $true) did-lista firstf %tmp tmp.@Ayudað
+}
+menu @Ayudað {
+  mouse { if ($mouse.key == 1) { refresco-lista firstf $%(tmp.ayudasel) tmp.@Ayudað | refresco-lista not nada tmp2.@Ayudað } }
+  sclick { refresco-lista firstf $%(tmp.ayudasel) tmp.@Ayudað | refresco-lista not nada tmp2.@Ayudað }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias do-xwhois { .disable #whois | .enable #xwhois | whois xwhois $$1 | xwhois }
+dialog xwhois {
+  title "X-Whois - /xwhois nick"
+  size -1 -1 160 197
+  option dbu
+  ;whois normal
+  box "", 2, 5 0 150 75
+  text "Nick: ", 3, 10 7 27 8, right
+  edit "", 4, 39 6 50 10, read, autohs
+  text "Nombre: ", 5, 10 18 27 8, right
+  edit "", 6, 39 17 84 10, read, autohs
+  text "Dirección: ", 7, 10 29 27 8, right
+  edit "", 8, 39 28 84 10, read, autohs
+  text "Script: ", 9, 73 40 17 8, right
+  edit "", 10, 91 39 32 10, read, autohs
+  text "Idle: ", 11, 10 40 27 8, right
+  edit "", 12, 39 39 32 10, read, autohs
+  text "Away: ", 13, 10 51 27 8, right
+  edit "", 14, 39 50 112 10, read, autohs
+  text "Servidor:", 15, 10 62 27 8, right
+  edit "", 16, 39 61 112 10, read, autohs
+  ;
+  tab "General", 17, 5 77 149 47
+  box "", 18, 26 97 107 16, tab 17
+  button "DNS", 19, 27 101 35 11, tab 17
+  button "Actualizar", 20, 62 101 35 11, tab 17
+  button "Cambiar", 21, 97 101 35 11, tab 17
+  ;
+  tab "Canales", 22
+  list 23, 7 95 68 25, tab 22 size
+  button "Entrar", 24, 77 102 37 11, tab 22
+  button "Entrar a todos", 25, 114 102 37 11, tab 22
+  box "", 27, 76 98 76 16, tab 22
+  ;
+  tab "Extra", 28
+  ;29 al  32 libres
+  box "", 35, 61 105 39 16, tab 28
+  combo 33, 54 94 51 50, tab 28 drop
+  button "CTCP", 34, 62 109 37 11, tab 28
+  ;
+  box "Resultados", 36, 5 125 150 58
+  list 37, 9 133 142 46, size
+  button "OK", 38, 61 185 37 11, cancel
+}
+on 1:dialog:xwhois:*:*: {
+  if ($devent == init) {
+    did -a $dname 33 Version | did -a $dname 33 Ping | did -a $dname 33 Page
+    did -a $dname 33 Finger | did -a $dname 33 Script | did -a $dname 33 Time | did -a $dname 33 Userinfo | did -a $dname 33 Clientinfo
+  }
+  if ($devent == sclick) {
+    if ($did == 19) { set %dns xwhois | dns $did(4).text }
+    if ($did == 20) { .disable #whois | .enable #xwhois | whois xwhois $$did(4).text | did -a $dname 37 Estado $+ $chr(9) $+ Actualizando info de $did(4).text }
+    if ($did == 21) { .disable #whois | .enable #xwhois | whois xwhois $$?="¿Qué nick?" | did -a $dname 37 - | did -a $dname 37 Estado $+ $chr(9) $+ Pidiendo info de de $$! }
+    ;
+    if ($did == 24) { if ($server) join $$did(23).seltext }
+    if ($did == 25) {
+      if ($server) {
+        var %nt = $did(23).lines
+        while (%nt > 0) { .timer -m 1 500 join $did(23,%nt).text | dec %nt }
+      }
+    }
+    if ($did == 34) { .ctcp $$did(4).text $$did(33).seltext }
+    if ($did == 38) { .enable #whois | .disable #xwhois }
+  }
+}
+alias xwhois.chan {
+  if ($dialog(xwhois) == $null) { .enable #whois | halt }
+  var %canales = $1-
+  var %i = 1
+  did -r xwhois 23
+  while (%i <= $numtok(%canales,32)) {
+    if ($ [ $+ [ %i ] ] != -) {
+      var %tmp.chan = $ [ $+ [ %i ] ]
+      if ($left(%tmp.chan,1) == -) %tmp.chan = $right(%tmp.chan,$calc($len(%tmp.chan) - 1))
+      if ($left(%tmp.chan,1) == +) %tmp.chan = $right(%tmp.chan,$calc($len(%tmp.chan) - 1))
+      if ($left(%tmp.chan,1) == @) %tmp.chan = $right(%tmp.chan,$calc($len(%tmp.chan) - 1))
+      did -a xwhois 23 %tmp.chan
+    }
+    inc %i
+  }
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias trivial {
+  if ($window(@Trivialð)) { window -a @Trivialð | return }
+  ventana @Trivialð 350 250 | titulo @Trivialð Trivial (Juego de preguntas y respuestas)
+  texto cent @Trivialð 38 ConfiguracioN
+  caja @Trivialð 15 60 155 65 Tiempo de respuesta
+
+  caja @Trivialð 180 60 155 65 Archivo de preguntas
+
+  caja @Trivialð 15 140 155 60 Fin de juego cuando...
+  texto @Trivialð 25 155 A las | texto @Trivialð 78 155 preguntas...
+  texto @Trivialð 25 175 Ganador a los | texto @Trivialð 117 175 puntos...
+
+  caja @Trivialð 180 140 155 60 Canal
+  combo draw @Trivialð 190 160 118 Selecciona uno
+
+  setv but.@Trivialð 215 95 90 20 Seleccionar..._trivial.selecciona/â165 211 80 20 $iif(%trivial.enespera == si,Terminar!,Jugar!) _trivial.jugar/â255 211 80 20 OKz_ok/â
+  setv radio.@Trivialð ºtrivial.tiempo$ 55 73 15 Segundosâ ºtrivial.tiempo$ 55 88 30 Segundosâ ºtrivial.tiempo$ 55 103 60 Segundosâ
+  setv check.@Trivialð trivial.color$ 15 205 Trivial con coloresâ trivial.antirep$ 15 220 No repetir preguntasâ
+  setv edit.@Trivialð trivial.npreguntas$ 50 153 20â trivial.puntos$ 90 173 20â
+  do_but @Trivialð but.@Trivialð | do_radio @Trivialð radio.@Trivialð | do_check @Trivialð check.@Trivialð | do_edit @Trivialð edit.@Trivialð
+  edita @Trivialð 190 73 133 3 $nopath($%(trivial.archivo))
+  window -wa @Trivialð
+}
+menu @Trivialð {
+  sclick {
+    if ($mouse.x isnum 190-326 && $mouse.y isnum 160-179) { trivial.ccanales | combo push @Trivialð 190 160 118 120 tset trivialchans setv trivial.canal }
+  }
+  mouse {
+    if ($mouse.x isnum 50-70 && $mouse.y isnum 153-170) { cursor edit }
+    elseif ($mouse.x isnum 90-110 && $mouse.y isnum 173-190) { cursor edit }
+    else { cursor normal }
+  }
+}
+alias trivial.selecciona { setv trivial.archivo $$sfile($mircdirsistema\textos\trivial\*.txt,Selecciona las preguntas,OKz) | edita @Trivialð 190 73 133 3 $nopath($%(trivial.archivo)) | drawline @Trivialð }
+alias trivial.ccanales { 
+  var %tmpc = 1 | unset %trivialchans
+  while ($chan(0) >= %tmpc) {
+    %trivialchans = %trivialchans $+ $chan(%tmpc) $+  |  inc %tmpc
+  }
+}
+;Cine©{BSoD}«¿En que año ganó pedro Almodóvar su primer oscar?*En el 2000
+169       171                                                                                        42
+alias trivial.jugar {
+  if (%trivial.enespera == si) { .timerTrivial off | trivial.finjuego | return }
+  if (!$%(trivial.canal)) { avisar No seleccionaste el canal para jugar el Trivial | return }
+  if (!$%(trivial.archivo)) { avisar No seleccionaste el archivo de pregunas para el Trivial | return }
+  if (!$%(trivial.npreguntas)) { avisar No especificaste la cantidad de preguntas para dar fin al juego | return }
+  if (!$%(trivial.puntos)) { avisar No especificaste la cantidad de puntos para dar fin al juego | return }
+  if ($exists($%(trivial.archivo)) != $true) { avisar El archivo de preguntas que elegiste no existe... por favor selecciona un archivo existente | return }
+  ;if ($me !ison $%(trivial.canal)) { avisar No estas en el canal que elegiste para jugar al Trivial | return }
+  ;if (!$server) { avisar No estas conectado para jugar al Trivial | return }
+
+  if ($window(@Trivialð)) { $boton(@Trivialð,165,211,80,20,Terminar!).norm | drawline @Trivialð }
+
+  if ($%(trivial.tiempo) == 1) { %trivial.timer = 15 }
+  elseif ($%(trivial.tiempo) == 2) { %trivial.timer = 30 }
+  elseif ($%(trivial.tiempo) == 1) { %trivial.timer = 60 }
+
+  if ($%(trivial.antirep) == si) { 
+    unset %preguntas.hechas* | %t.control = 0
+    %trivial.lineas = $lines($%(trivial.archivo)) | var %n.pregunta = $rand(1,%trivial.lineas)
+    %trivial.ask = $read -l $+ %n.pregunta $%(trivial.archivo)
+    set % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] %n.pregunta $+ .
+  }
+  else { %trivial.ask = $read $%(trivial.archivo) }
+
+  %trivial.answer = $gettok($gettok(%trivial.ask,2,171),2,42) | inc %trivial.contador
+
+  if ($%(trivial.color) == si) {
+    _mtext $%(trivial.canal) $logo - Http://www.x-torm.com.ar  12Trivial activado!
+    _mtext $%(trivial.canal) 12-Tema de las preguntas:  $+ $remove($nopath($%(trivial.archivo)),.txt)
+    _mtext $%(trivial.canal) 12-Tiempo de respuesta:  $+ %trivial.timer segundos
+    .timer 1 1 _mtext $%(trivial.canal)  10Topico:1  $+ $gettok(%trivial.ask,1,169) $+  10- Autor:1  $+ $gettok($gettok(%trivial.ask,1,171),2,169) $+  10- Pregunta: $gettok($gettok(%trivial.ask,2,171),1,42) 10( $numtok(%trivial.answer,32) palabra/s )
+  }
+  else {
+    _mtext $%(trivial.canal) $strip($logo) - Http://www.x-torm.com.ar Trivial activado!
+    _mtext $%(trivial.canal) -Tema de las preguntas: $remove($nopath($%(trivial.archivo)),.txt)
+    _mtext $%(trivial.canal) -Tiempo de respuesta: %trivial.timer segundos
+    .timer 1 1 _mtext $%(trivial.canal) Topico: $gettok(%trivial.ask,1,169) - Autor: $gettok($gettok(%trivial.ask,1,171),2,169) - Pregunta: $gettok($gettok(%trivial.ask,2,171),1,42) ( $numtok(%trivial.answer,32) palabra/s )
+
+  }
+  .timerTrivial 1 %trivial.timer trivial.finpregunta | %trivial.enespera = si | write -c $mircdirSistema\Trivial.pnt
+}
+alias trivial.finpregunta {
+  %trivial.enespera = no
+  .timer 1 1 _mtext $%(trivial.canal) 12X-12Trivia12L Tiempo fuera! - 10Respuesta: %trivial.answer
+  .timer 1 2 trivial.nuevapregunta
+}
+alias trivial.nuevapregunta {
+  if ($%(trivial.antirep) == si) {
+    var %n.pregunta = $rand(1,%trivial.lineas),%anti-bucle = 0,%tmp = %t.control
+    var %cant.preguntas = $numtok( % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] ,46)
+    if (%cant.preguntas == 245) { inc %t.control }
+    if ((%t.control > 0) && ($calc((%t.control - 1) * 245 + %cant.preguntas) = %trivial.lineas)) { avisar Se han realizado todas las preguntas posibles del Trivial... Terminando juego Trivial | trivial.finjuego | return }
+    while (%tmp >= 1) {
+      while ($istok( % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] ,%n.pregunta,46)) {
+        %n.pregunta = $rand(1,%trivial.lineas) | inc %anti-bucle
+        if (%antibucle >= $numtok( % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] ,46)) goto dec
+      }
+      if (!$istok( % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] ,%n.pregunta,46)) goto pregunta
+      :dec | dec %tmp
+    }
+    :pregunta
+    %trivial.ask = $read -l $+ %n.pregunta $%(trivial.archivo)
+    set % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] % [ $+ [ preguntas.hechas ] ] [ $+ [ %t.control ] ] $+ %n.pregunta $+ .
+  }
+  else { %trivial.ask = $read $%(trivial.archivo) | }
+
+  %trivial.answer = $gettok($gettok(%trivial.ask,2,171),2,42) | inc %trivial.contador
+
+  if ($%(trivial.color) == si) {
+    .timer 1 1 _mtext $%(trivial.canal)  10Topico:1  $+ $gettok(%trivial.ask,1,169) $+  10- Autor:1  $+ $gettok($gettok(%trivial.ask,1,171),2,169) $+  10- Pregunta: $gettok($gettok(%trivial.ask,2,171),1,42) 10( $numtok(%trivial.answer,32) palabra/s )
+  }
+  else {
+    .timer 1 1 _mtext $%(trivial.canal) Topico: $gettok(%trivial.ask,1,169) - Autor: $gettok($gettok(%trivial.ask,1,171),2,169) - Pregunta: $gettok($gettok(%trivial.ask,2,171),1,42) ( $numtok(%trivial.answer,32) palabra/s )
+  }
+  .timerTrivial 1 %trivial.timer trivial.finpregunta | %trivial.enespera = si
+}
+alias trivial.finjuego {
+  if ($window(@Trivialð)) { $boton(@Trivialð,165,211,80,20,Jugar!).norm | drawline @Trivialð }
+  if ($%(trivial.color) == si) {
+    .timer 1 1 _mtext $%(trivial.canal) $logo - 12Trivial FINALIZADO!
+    .timer 1 1 _mtext $%(trivial.canal) 10-Puntaje final: $trivial.puntaje
+  }
+  else {
+    .timer 1 1 _mtext $%(trivial.canal) $strip($logo) - Trivial FINALIZADO!
+    .timer 1 1 _mtext $%(trivial.canal) -Puntaje final: $trivial.puntaje
+  }
+  unset %trivial* %preguntas.hechas* %trivialchans %t.control
+}
+alias trivial.aumenta {
+  var %tmp = 1
+  if ($exists($mircdirSistema\Trivial.pnt) != $true) { write -c $mircdirSistema\Trivial.pnt }
+  var %puntaje = $read -l $+ %tmp $mircdirSistema\Trivial.pnt
+  while (%tmp <= $lines($mircdirSistema\Trivial.pnt)) {
+    if ($gettok(%puntaje,1,32) == $1) { write -l $+ %tmp $mircdirSistema\Trivial.pnt $1 $calc($gettok(%puntaje,2,32) + 1) | goto fin }
+    inc %tmp | %puntaje =  $read -l $+ %tmp $mircdirSistema\Trivial.pnt
+  }
+  write -l $+ $calc(%tmp + 1) $mircdirSistema\Trivial.pnt $1 1
+  :fin
+}
+alias trivial.puntaje {
+  var %tmp = 1,%total
+  var %puntaje = $read -l $+ %tmp $mircdirSistema\Trivial.pnt
+  while (%puntaje) {
+    if ($1) { if ($gettok(%puntaje,1,32) == $1) return $gettok(%puntaje,2,32) }
+    else {
+      if (!%total) %total = $gettok(%puntaje,1,32) ( $+ $gettok(%puntaje,2,32) $+ )
+      else %total = %total - $gettok(%puntaje,1,32) ( $+ $gettok(%puntaje,2,32) $+ )
+    }
+    inc %tmp | %puntaje = $read -l $+ %tmp $mircdirSistema\Trivial.pnt
+  }
+  return %total
+  :fin
+}

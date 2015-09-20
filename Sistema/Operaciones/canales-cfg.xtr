@@ -1,0 +1,343 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                            canales-cfg.xtr - Configuracion de canales
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+alias groserias {
+  ventana @Groseriasð 200 250 | titulo @Groseriasð Restricciones
+  texto cent @Groseriasð 35 Palabras prohibidas en canales
+  caja @Groseriasð 10 55 179 150 Configuración
+  setv but.@Groseriasð 75 182 20 15 +_groserias.config +/â 105 182 20 15 -_groserias.config -/â 70 215 60 20 OKz_ok/â
+  do_but @Groseriasð but.@Groseriasð | groserias.config carga
+  window -wa @Groseriasð
+}
+alias ve.groserias {
+  var %xcx = 1,%groserias.texto = $strip($1-) 
+  while ($gettok(%groserias.words,%xcx,226)) {
+    if ($gettok(%groserias.words,%xcx,226) iswm %groserias.texto) return FUCK!
+    inc %xcx 1
+  }
+}
+alias groserias.config {
+  if ($1 == +) {
+    var %tmp.groseria = $$?="Qué palabra queres añadir? $crlf Sin *" 
+    if (%tmp.groseria != $null) { 
+      if (%groserias.words == $null) { set %groserias.words %groserias.words * $+ %tmp.groseria $+ * | goto carga }
+      set %groserias.words %groserias.words $+ â* $+ %tmp.groseria $+ * 
+      goto carga
+    }
+  }
+  elseif ($1 == -) {
+    if ($sline(@Groserias,1) != $null) { 
+      set %groserias.words $remtok(%groserias.words,$sline(@Groserias,1),1,226) 
+      goto carga
+    }
+  }
+  elseif ($1 == carga) {
+    :carga
+    if ($window(@Groseriasð)) {
+      window -hl @Groserias | clear -l @Groserias
+      var %xcx = $numtok(%groserias.words,226) 
+      while (%xcx > 0) { 
+        aline @Groserias $gettok(%groserias.words,%xcx,226) 
+        dec %xcx
+      }
+      lista @Groseriasð 20 75 160 100
+      setv tmp.@Groseriasð @Groseriasð 20 75 160 7 1 0 @Groserias not
+      did-lista not @Groseriasð tmp.@Groseriasð
+    }
+  }
+}
+menu @Groseriasð {
+  mouse { if ($mouse.key == 1) refresco-lista not @Groseriasð tmp.@Groseriasð }
+  sclick { refresco-lista not @Groseriasð tmp.@Groseriasð }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+dialog cprotect {
+  title "Protección en canales - /cprotect"
+  size -1 -1 260 140
+  option dbu
+  box "", 4, 5 2 250 19
+  text "Configurar protección en canales Canal actual ->", 2, 8 9 115 8
+  combo 3, 125 8 90 50, size drop
+  button "+", 667, 219 8 13 10
+  button "-", 668, 236 8 13 10
+  button "OKz", 666, 111 128 37 10, cancel
+  ;
+  box "Restricciones", 5, 5 25 145 100
+  check "Repetición de líneas", 6, 10 33 62 10
+  edit "", 7, 72 33 18 10, autohs
+  ;
+  check "Flood de texto", 8, 10 43 56 10
+  edit "", 9, 72 43 18 10, autohs
+  text "líneas en 8 segundos", 10, 92 44 51 8
+  ;
+  check "No permitir colores", 11, 10 53 56 10
+  ;
+  check "Flood ctcp", 12, 10 63 39 10
+  edit "", 13, 72 62 18 10, autohs
+  text "líneas en 8 segundos", 14, 92 63 51 8
+  ;
+  check "Con/Con", 15, 10 73 34 10
+  ;
+  check "No propaganda (spam)", 16, 10 83 69 10
+  ;
+  check "Palabras prohibidas", 17, 10 93 60 10
+  button "Configurar", 18, 72 93 37 9
+  ;
+  check "Proteger topic", 19, 10 103 47 10
+  edit "", 20, 72 103 72 10, autohs
+  ;
+  check "Proteger modos", 21, 10 113 50 10
+  edit "", 31, 72 113 18 10, autohs
+  ;
+  box "Anti Masivos", 22, 155 25 100 75
+  check "Mass deop", 23, 160 33 50 10
+  check "Mass ban", 24, 160 43 40 10
+  check "Mass kick", 25, 160 53 40 10
+  check "Mass join", 26, 160 63 40 10
+  text "Sensibilidad", 27, 156 74 98 8, center
+  combo 28, 174 84 60 50, size drop
+  ;
+  box "Protecciones personales", 29, 155 100 100 25
+  button "Cuando te banean o patean", 30, 161 110 90 10
+}
+on 1:dialog:cprotect:*:*: {
+  if ($devent == init) {
+
+    var %tmp.chan = $findfile($mircdirSistema\Cfg\Canales\,*.ini,0)
+    while (%tmp.chan > 0) {
+      did -a $dname 3 $remove($nopath($findfile($mircdirSistema\Cfg\Canales\,*.ini,%tmp.chan)),.ini)
+      dec %tmp.chan
+    }
+    did -a $dname 28 Baja
+    did -a $dname 28 Media
+    did -a $dname 28 Alta
+    canal-cfg carga global
+  }
+  if ($devent == sclick) {
+    if ($did == 6) { writeini $c-file($$did(3).seltext) repeticion activado $iif($readini($c-file($did(3).seltext),repeticion,activado) == si,no,si) }
+    if ($did == 8) { writeini $c-file($$did(3).seltext) tflood activado $iif($readini($c-file($did(3).seltext),tflood,activado) == si,no,si) }
+    if ($did == 11) { writeini $c-file($$did(3).seltext) colores activado $iif($readini($c-file($did(3).seltext),colores,activado) == si,no,si) }
+    if ($did == 12) { writeini $c-file($$did(3).seltext) ctcpflood activado $iif($readini($c-file($did(3).seltext),ctcpflood,activado) == si,no,si) }
+    if ($did == 15) { writeini $c-file($$did(3).seltext) con/con activado $iif($readini($c-file($did(3).seltext),con/con,activado) == si,no,si) }
+    if ($did == 16) { writeini $c-file($$did(3).seltext) antispam activado $iif($readini($c-file($did(3).seltext),antispam,activado) == si,no,si) }
+    if ($did == 17) { writeini $c-file($$did(3).seltext) groserias activado $iif($readini($c-file($did(3).seltext),groserias,activado) == si,no,si) }
+    if ($did == 19) { writeini $c-file($$did(3).seltext) topic activado $iif($readini($c-file($did(3).seltext),topic,activado) == si,no,si) }
+    if ($did == 21) { writeini $c-file($$did(3).seltext) modos activado $iif($readini($c-file($did(3).seltext),modos,activado) == si,no,si) }
+    if ($did == 23) { writeini $c-file($$did(3).seltext) massdeop activado $iif($readini($c-file($did(3).seltext),massdeop,activado) == si,no,si) }
+    if ($did == 24) { writeini $c-file($$did(3).seltext) massban activado $iif($readini($c-file($did(3).seltext),massban,activado) == si,no,si) }
+    if ($did == 25) { writeini $c-file($$did(3).seltext) masskick activado $iif($readini($c-file($did(3).seltext),masskick,activado) == si,no,si) }
+    if ($did == 26) { writeini $c-file($$did(3).seltext) massjoin activado $iif($readini($c-file($did(3).seltext),massjoin,activado) == si,no,si) }
+    ;
+    if ($did == 3) { canal-cfg carga $$did(3).seltext }
+    if ($did == 30) { revenge }
+    if ($did == 667) { write Sistema\Cfg\Canales\ $+ #$$?="Nombre del canal (sin #)" $+ .ini | did -a $dname 3 $! | select $! 3 $dname | canal-cfg carga $! }
+    if ($did == 668) { 
+      if ($$did(3).seltext == Global) { avisar Estas tratando de borrar la configuración global de canales. Global afecta a todos los canales. | return }
+      .remove $c-file($$did(3).seltext) 
+      unset % [ $+ [ $$did(3).seltext ] ] [ $+ [ .topic ] ] % [ $+ [ $did(3).seltext ] ] [ $+ [ .sensibilidad ] ]
+      did -d $dname 3 $$did(3).sel 
+      did -c $dname 3 $$did(3).lines 
+      canal-cfg carga $$did(3).seltext
+    }
+    if ($did == 18) { groserias }
+    if ($did == 28) { set % [ $+ [ $$did(3).seltext ] ] [ $+ [ .sensibilidad ] ] $did(28).seltext }
+  }
+  if ($devent == edit) {
+    if ($did == 7) { if ($did(7).text != $null) writeini $c-file($did(3).seltext) repeticion lineas $did(7).text }
+    if ($did == 9) { if ($did(7).text != $null) writeini $c-file($did(3).seltext) tflood lineas $did(9).text }
+    if ($did == 13) { if ($did(7).text != $null) writeini $c-file($did(3).seltext) ctcpflood lineas $did(13).text }
+    if ($did == 31) { if ($did(7).text != $null) writeini $c-file($did(3).seltext) modos modos $did(31).text }
+    if ($did == 20) { set % [ $+ [ $did(3).seltext ] ] [ $+ [ .topic ] ] $did(20).text }
+  }
+}
+alias c-file return $mircdirSistema\Cfg\Canales\ $+ $1 $+ .ini
+alias canal-cfg {
+  if ($1 == carga) {
+    select $2 3 cprotect
+    ;repeticion
+    if ($readini($c-file($2),repeticion,activado) == si) cheka cprotect 6
+    else uncheka cprotect 6
+    did -ra cprotect 7 $readini($c-file($2),repeticion,lineas)
+    ;Flood de texto
+    if ($readini($c-file($2),tflood,activado) == si) cheka cprotect 8
+    else uncheka cprotect 8
+    did -ra cprotect 9 $readini($c-file($2),tflood,lineas)
+    ;colores
+    if ($readini($c-file($2),colores,activado) == si) cheka cprotect 11
+    else uncheka cprotect 11
+    ;Ctcp Flood
+    if ($readini($c-file($2),ctcpflood,activado) == si) cheka cprotect 12
+    else uncheka cprotect 12
+    did -ra cprotect 13 $readini($c-file($2),ctcpflood,lineas)
+    ;Con/Con
+    if ($readini($c-file($2),con/con,activado) == si) cheka cprotect 15
+    else uncheka cprotect 15
+    ;Antispam
+    if ($readini($c-file($2),antispam,activado) == si) cheka cprotect 16
+    else uncheka cprotect 16
+    ;Groserias
+    if ($readini($c-file($2),groserias,activado) == si) cheka cprotect 17
+    else uncheka cprotect 17
+    ;Topic
+    if ($readini($c-file($2),topic,activado) == si) cheka cprotect 19
+    else uncheka cprotect 19
+    did -ra cprotect 20 % [ $+ [ $2 ] ] [ $+ [ .topic ] ]
+    ;Modos
+    if ($readini($c-file($2),modos,activado) == si) cheka cprotect 21
+    else uncheka cprotect 21
+    did -ra cprotect 31 $readini($c-file($2),modos,modos)
+    ;MassDeop
+    if ($readini($c-file($2),massdeop,activado) == si) cheka cprotect 23
+    else uncheka cprotect 23
+    ;MassBan
+    if ($readini($c-file($2),massban,activado) == si) cheka cprotect 24
+    else uncheka cprotect 24
+    ;MassKick
+    if ($readini($c-file($2),masskick,activado) == si) cheka cprotect 25
+    else uncheka cprotect 25
+    ;MassJoin
+    if ($readini($c-file($2),massjoin,activado) == si) cheka cprotect 26
+    else uncheka cprotect 26
+    select % [ $+ [ $2 ] ] [ $+ [ .sensibilidad ] ] 28 cprotect
+  }
+}
+-
+on @1:text:*:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),repeticion,activado) == si) {
+    if (%lastline. [ $+ [ $nick ] ] == $null) { set %lastline. [ $+ [ $nick ] ] $1- }
+    if (%lastline. [ $+ [ $nick ] ] == $1-) { inc %lastline-n. [ $+ [ $nick ] ] }
+    .timerrept $+ $nick 1 5 unset %lastline. [ $+ [ $nick ] ] 
+    .timerrept- $+ $nick 1 5 unset %lastline-n. [ $+ [ $nick ] ]
+    if (%lastline-n. [ $+ [ $nick ] ] > $readini($c-file(%canal-prt),repeticion,lineas)) {
+      kick $chan $nick $logo - Repetición de lineas. + de $readini($c-file(%canal-prt),repeticion,lineas) iguales $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],)
+    }
+  }
+  if ($readini($c-file(%canal-prt),tflood,activado) == si) {
+    var %txtfloodnick = chanflood [ $+ [ $nick ] ]
+    if ($flod(%txtfloodnick,8,$readini($c-file(%canal-prt),tflood,lineas)) != $null) {
+      kick $chan $nick $logo - Flood de texto en canal - $readini($c-file(%canal-prt),tflood,lineas) lineas en 8 segundos $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],)
+      if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+  if ($readini($c-file(%canal-prt),colores,activado) == si) {
+    if (( isin $1-) || ( isin $1-) || ( isin $1-)) { 
+      kick $chan $nick $logo - No colores $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+  if ($readini($c-file(%canal-prt),antispam,activado) == si) {
+    if ($ve.spam($1-) != $null) { kick $chan $nick $logo - Anti Propaganda (Spam) $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+  }
+  if ($readini($c-file(%canal-prt),groserias,activado) == si) {
+    if ($ve.groserias($1-) != $null) { kick $chan $nick $logo - Palabra Prohibida $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+  }
+}
+ctcp ^1:*:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if (($me isop $chan) && ($readini($c-file(%canal-prt),ctcpflood,activado) == si)) {
+    var %ctcpfloodnick = ctcpflood [ $+ [ $nick ] ]
+    if ($flod(%ctcpfloodnick,8,$readini($c-file(%canal-prt),ctcpflood,lineas)) != $null) { 
+      kick $chan $nick - Ctcp Flood - $readini($c-file(%canal-prt),ctcpflood,lineas) lineas en 8 segundos $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) 
+      if ($%(kcontador.act) == si) incv cant.kicks 1 | return
+    }
+  }
+  if (($me isop $chan) && ($readini($c-file(%canal-prt),con/con,activado) == si)) {
+    if (/con isin $1-) || (/aux isin $1-) || (/lpt isin $1-) || (/nul isin $1-) || (lpt isin $1-) || (/prn isin $1-) || (/com isin $1-) || (clock$ isin $1-) { goto inicio }
+    elseif (con isin $1-) || (aux isin $1-) || (lpt isin $1-) || (nul isin $1-) || (null isin $1-) || (ps isin $1-) || (prn isin $1-) || (com isin $1-) { goto inicio }
+    elseif (clock$ isin $1-) || (k$.mp3 isin $1-) { goto inicio }
+    else return
+    :inicio
+    ban -u60 $chan $nick
+    kick $chan $nick $logo - Ataque con/con $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+  }
+}
+
+on @1:topic:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),topic,activado) == si) {
+    .timertopic $+ $chan -m 1 200 topic $chan % [ $+ [ %canal-prt ] ] [ $+ [ .topic ] ]
+  }
+}
+
+on @1:mode:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),modos,activado) == si) {
+    .timermode $+ $chan -m 1 200 mode $chan $readini($c-file(%canal-prt),modos,modos)
+  }
+}
+
+on @1:deop:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global } 
+  if ($readini($c-file(%canal-prt),massdeop,activado) == si) {
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == baja) { var %tiempo = 2 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == media) { var %tiempo = 4 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == alta) { var %tiempo = 6 }
+    var %mdeop = mdeop $+ $nick
+    if ($flod(%mdeop,%tiempo,4) != $null) {
+      ban -u30 $chan $nick
+      kick $chan $nick $logo - Anti MassDeop $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+}
+
+on @1:ban:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),massban,activado) == si) {
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == baja) { var %tiempo = 2 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == media) { var %tiempo = 4 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == alta) { var %tiempo = 6 }
+    var %mban = mban $+ $nick
+    if ($flod(%mban,%tiempo,4) != $null) {
+      ban -u30 $chan $nick
+      kick $chan $nick $logo - Anti MassBan $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+}
+
+on @1:kick:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),masskick,activado) == si) {
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == baja) { var %tiempo = 2 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == media) { var %tiempo = 4 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == alta) { var %tiempo = 6 }
+    var %mkick = mkick $+ $nick
+    if ($flod(%mkick,%tiempo,4) != $null) {
+      ban -u30 $chan $nick
+      kick $chan $nick $logo - Anti MassKick $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+}
+
+on @1:join:#: {
+  if ($nick == $me) return
+  if ($exists($c-file($chan))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($readini($c-file(%canal-prt),massjoin,activado) == si) {
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == baja) { var %tiempo = 2 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == media) { var %tiempo = 4 }
+    if (% [ $+ [ %canal-prt ] ] [ $+ [ .sensibilidad ] ] == alta) { var %tiempo = 6 }
+    var %mjoin = mjoin $+ $nick
+    if ($flod(%mjoin,%tiempo,4) != $null) {
+      ban -u30 $chan $nick
+      kick $chan $nick $logo - Anti MassJoin $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1
+    }
+  }
+}

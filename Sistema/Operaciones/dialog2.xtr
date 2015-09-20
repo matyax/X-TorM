@@ -1,0 +1,402 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                          dialog2.xtr - Dialogos
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+on *:socklisten:fireX*: {
+  var %tipo = (TCP)
+  sockaccept remoteX
+  var %remoteX-ip = $sock(remoteX,1).ip
+  var %remoteX-port = $gettok($sockname,2,$asc(e))
+  sockwrite -n remoteX FireXtorM - Conexion localizada! - www.xtorm-script.cjb.net
+  if (%fpuertos. [ $+ [ %remoteX-ip ] ] == $null) { set %fpuertos. [ $+ [ %remoteX-ip ] ] 1 }
+  inc %fpuertos. [ $+ [ %remoteX-ip ] ] | .timer $+ %remoteX-ip 1 6 unset %fpuertos. [ $+ [ %remoteX-ip ] ]
+  if (%fpuertos. [ $+ [ %remoteX-ip ] ] > 4) {
+    .write $mircdirsistema\Firextorm.log $date Flood a puerto : %remoteX-port %tipo IP : %remoteX-ip
+    .ignore -pntikcu80 *@ $+ %remoteX-ip | sockclose $sockname
+    Alerta Detectado flood de puertos a $+ $resalt %remoteX-port %tipo - desde $+ $resalt %remoteX-ip | .sockclose remoteX | halt
+  }
+  .sockclose remoteX
+  .flash Alerta!
+  sonido $%(alerta)
+  .write $mircdirsistema\Firextorm.log $date Conexión a puerto : %remoteX-port %tipo IP : %remoteX-ip 
+  Alerta Detectada conexión a puerto : $+ $resalt %remoteX-port %tipo - IP : $+ $resalt %remoteX-ip
+  ;  buscar.ip %remoteX-ip
+  if ($dialog(detector) == $null) { fireXtorm }
+  else { 
+    did -a firextorm 12 Conección a puerto : %remoteX-port %tipo IP : %remoteX-ip $crlf 
+    did -a firextorm 24 $date Puerto : %remoteX-port %tipo IP : %remoteX-ip $crlf
+  }
+}
+
+on *:udpread:udpfireX*: {
+  var %tipo1 = (UDP)
+  var %remoteX-x-ip = $sock($sockname,1).saddr
+  var %remoteX-x-port = $gettok($sockname,2,$asc(e))
+  .flash Danger (UDP)
+  if (%fpuertos. [ $+ [ %remoteX-x-ip ] ] == $null) { set %fpuertos. [ $+ [ %remoteX-x-ip ] ] 1 }
+  inc %fpuertos. [ $+ [ %remoteX-x-ip ] ] | .timer $+ %remoteX-x-ip 1 6 unset %fpuertos. [ $+ [ %remoteX-x-ip ] ]
+  if (%fpuertos. [ $+ [ %remoteX-x-ip ] ] > 4) {
+    .write $mircdirsistema\Firextorm.log $date Flood a puerto : %remoteX-x-port %tipo1 IP : %remoteX-x-ip 
+    .ignore -pntikcu80 *@ $+ %remoteX-x-ip | sockclose $sockname
+    Alerta Detectado flood de puertos a $+ $resalt %remoteX-x-port %tipo1 - desde $+ $resalt %remoteX-x-ip | .sockclose nuker | halt
+  }
+  .sonido $%(alerta)
+  .write $mircdirsistema\Firextorm.log $date Conexión a puerto : %remoteX-x-port %tipo1 IP : %remoteX-x-ip 
+  ;  buscar.ip %remoteX-x-ip
+  Alerta Detectada conexión a puerto : $+ $resalt %remoteX-x-port %tipo1 - IP : $+ $resalt %remoteX-x-ip
+  if ($dialog(detector) == $null) { firextorm }
+  else { 
+    did -a firextorm 12 Conección a puerto: %remoteX-x-port %tipo1 IP : %remoteX-x-ip $crlf 
+    did -a firextorm 24 $date Puerto: %remoteX-x-port %tipo1 IP : %remoteX-x-ip $crlf
+  }
+}
+
+
+;dialogo
+
+alias firextorm {
+  if ($dialog(firextorm) == $null) dialog -dm firextorm firextorm
+  cierra.pt | .timerfireX2 1 1 abre.pt
+}
+dialog fireXtorm {
+  size -1 -1 400 260
+  title "FireXtorM - Detector de conexiones - /FireXtorM"
+  button "Okz" 1, 21 321 32 20, cancel, hide
+  tab "Siete" 2,910 910 100 250
+  tab "Ocho" 3
+  tab "Nueve" 4
+  tab "Diez" 5
+
+  button "" 6, 10 15 100 195, disable
+  radio "Estado" 7, 20 45 80 25, push
+  radio "Configuración" 8, 20 80 80 25, push
+  radio "Registro" 9, 20 115 80 25, push
+  radio "Acerca de..." 10, 20 150 80 25, push
+
+  box "Estado del FireXtorM" 11, 120 10 270 200, tab 2
+  edit "" 12,130 25 250 175,multi,vsbar,read,tab 2
+
+  box "Configuración del FireXtorM" 13, 120 10 270 200, tab 3
+  list 14,130 30 70 180, tab 3, sort
+  box "Agregar" 15, 215 25 160 125, tab 3
+  text "Puerto:" 16, 225 43 50 15, tab 3
+  edit "" 17, 265 40 100 20 , tab 3
+  radio "TCP" 18, 225 70 70 15, tab 3, group
+  radio "UDP" 19, 225 90 70 15, tab 3
+  button "Agregar puerto" 20, 230 120 130 20, tab 3
+  box "" 21, 215 150 160 40, tab 3
+  button "Quitar puerto" 22, 230 163 130 20, tab 3
+
+  box "Registro de conexiones" 23, 120 10 270 200, tab 4
+  edit "" 24,130 25 250 155,multi,vsbar,hsbar,read,tab 4
+  button "Borrar registro" 25, 190 185 130 20, tab 4
+
+  text "FireXtorM - Detector/bloqueador de conexiones " 26, 120 15 260 15, tab 5
+  text "Copyrigth 2000 - 2002 MaTyAs666" 27, 120 30 190 15, tab 5
+  text "Nota:" 29, 120 75 150 15, tab 5
+  edit "" 30, 120 90 250 120, read, tab 5, multi, vsbar
+
+  button "Activar" 31, 105 225 100 20
+  button "Desactivar" 32, 205 225 100 20
+}
+
+on 1:dialog:firextorm:*:*: {
+  if ($devent == init) {
+    did -a $dname 30 El FireXtorM es un programa que se encarga de proteger cierto tipo de puertos específicos, con el objetivo de bloquear los intentos de conexiones y, al mismo tiempo, protege contra flood de puertos. $crlf
+    did -a $dname 30 Algunas veces este detector da "falsas alarmas" cuando te escanéan los puertos, por lo que no tenés que preocuparte demasiado. $crlf
+    did -a $dname 30 Por si querés saber quien fué el que hizo una conexión, este detector intenta resolver el nick, si es que el "atacante" esta en tu misma red de irc, y el servidor no tiene IP´s virtuales. $chr(160)
+    did -a $dname 30 Si el detector no puede localizar el nick, podés fijarte la IP del que intento conectarse, en la sección registro, donde muestra la fecha, hora, ip y tipo de puerto de cuando re realizó la conexión.
+    did -c $dname 7 | loadbuf -o $dname 24 $mircdirsistema\Firextorm.log
+    if ($exists($scriptdirports.txt) != $true) { write -c $scriptdirports.txt }
+    var %lee.pt = 0
+    :inicio
+    inc %lee.pt
+    if ($read -l $+ %lee.pt $scriptdirports.txt = $null) { goto fin }
+    did -ca $dname 14 $read -l $+ %lee.pt $scriptdirports.txt
+    goto inicio
+    :fin
+  }
+  if ($devent == sclick) {
+    if (($did > 6) && ($did < 11)) { did -f $dname $calc($did - 5) }
+    if ($did == 15) { did -ra detector 22 Borrar $did($dname,15).seltext }
+    if ($did == 18) { did -ra $dname 20 Agregar $did(17).text TCP }
+    if ($did == 19) { did -ra $dname 20 Agregar $did(17).text UDP }
+    if ($did == 20) { 
+      var %tmp.pt =  0
+      if ($did(18).state == 1) { var %tmp.pt1 = $did(17).text TCP }
+      if ($did(19).state == 1) { var %tmp.pt1 = $did(17).text UDP }
+      :inicio
+      inc %tmp.pt 1
+      if ($did($dname,14,%tmp.pt).text == $null) { goto sigue }
+      if ($did($dname,14,%tmp.pt).text == %tmp.pt1) { halt }
+      goto inicio
+      :sigue
+      if ($right(%tmp.pt1,3) == TCP) {
+        write $scriptdirports.txt %tmp.pt1
+        did -ca firextorm 14 %tmp.pt1
+        cierra.pt | .timerfireX2 1 1 abre.pt
+      }
+      if ($right(%tmp.pt1,3) == UDP) {
+        write $scriptdirports.txt %tmp.pt1
+        did -ca firextorm 14 %tmp.pt1
+        cierra.pt | .timerfireX2 1 1 abre.pt
+      }
+    }
+    if ($did == 22) {
+      var %a.borrar = $read -w"* $+ $did($dname,14,$did($dname,14).sel).text $+ *" $scriptdirports.txt
+      write -dl $+ $readn $scriptdirports.txt
+      var %das =  0
+      :inicio
+      inc %das
+      if ($did($dname,14,%das).text == $did(14).seltext) {
+        did -d $dname 14 $did($dname,14).sel | cierra.pt | .timerfireX2 1 1 abre.pt
+      }
+      else { goto inicio }
+    }
+    if ($did == 25) { write -c $mircdirsistema\Firextorm.log | did -r $dname 24 }
+    if ($did == 32) { cierra.pt | .timerfireX1 1 1 did -a $dname 12 $timestamp > Puertos desprotegidos $crlf }
+    if ($did == 31) { cierra.pt | .timerfireX2 1 2 abre.pt }
+  }
+  if ($devent == edit) {
+    if ($did == 17) {
+      if ($did(18).state = 1) { did -ra $dname 20 Agregar $did(17).text TCP | halt }   
+      elseif ($did(19).state = 1) { did -ra $dname 20 Agregar $did(17).text UDP | halt }
+      else { did -c $dname 18 | did -ra $dname 20 Agregar $did(17).text TCP }
+    }
+  }
+}
+
+
+;aliases
+
+Alias abre.pt {
+  var %das = 0
+  :inicio
+  inc %das
+  var %puerto = $read -l $+ %das $scriptdirports.txt
+  var %portfree = $portfree($gettok(%puerto,1,32))
+  var %n.puerto = $gettok(%puerto,1,32)
+  if (%puerto == $null) { halt }
+  if ($gettok(%puerto,2,32) == UDP) {
+    if (%portfree == $false) { did -a firextorm 12 $timestamp Puerto %n.puerto (UDP) en uso $crlf | goto inicio }
+    did -a firextorm 12 $timestamp Protección en %n.puerto (UDP) $crlf 
+    sockudp -k udpfireX $+ %n.puerto %n.puerto
+    goto inicio
+  }
+  if ($gettok(%puerto,2,32) == TCP) { 
+    if (%portfree == $false) { did -a firextorm 12 $timestamp Puerto %n.puerto (TCP) en uso $crlf | goto inicio }
+    did -a firextorm 12 $timestamp Protección en %n.puerto (TCP) $crlf 
+    socklisten fireX $+ %n.puerto %n.puerto
+    goto inicio 
+  }
+}
+alias cierra.pt { .sockclose fireX* | sockclose udpfireX* }
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias f-version {
+  if ($window(@Fakeversionð)) { window -a @Fakeversionð | return }
+  ventana @Fakeversionð 450 350 | Titulo @Fakeversionð X-TorM FakeVersion - /F-Version
+  texto cent @Fakeversionð 43 Modificar la respuesta al CTCP Version
+  caja @Fakeversionð 20 65 410 230 Respuestas disponibles
+  lista @Fakeversionð 30 75 390 189
+  setv tmp.@Fakeversionð @Fakeversionð 30 76 390 13 1 $gettok(%fakeversion,1,32) @Respuestas sel-respuesta
+  did-lista firstf $mircdirsistema\versions.txt tmp.@Fakeversionð
+  edita @Fakeversionð 30 270 320 1 $gettok(%fakeversion,2-,32)
+  fake_radios | setv but.@Fakeversionð 360 268 60 20 Agregar_agrega.fake/â285 306 70 20 Editar_run $mircdirsistema\versions.txt/â360 306 70 20 OKz_ok/â
+  do_but @fakeversionð but.@Fakeversionð
+  window -wa @Fakeversionð
+}
+alias agrega.fake { write sistema\versions.txt $edid(@Fakeversion,1) | did-lista firstf $mircdirsistema\versions.txt tmp.@Fakeversionð }
+menu @Fakeversionð {
+  mouse {
+    if ($mouse.key == 1) {
+      refresco-lista firsf $mircdirsistema\versions.txt tmp.@Fakeversionð
+    }
+    elseif ($mouse.x isnum 30-351 && $mouse.y isnum 270-286 ) { cursor edit }
+    else { cursor normal }
+  }
+  sclick {
+    refresco-lista firsf $mircdirsistema\versions.txt tmp.@Fakeversionð
+    if ($mouse.x isnum 130-224 && $mouse.y isnum 311-321 ) {
+      %fakeversion = 1 ·:: X-TorM ::· by MaTyAs666 ( Http://www.xtorm-script.cjb.net ) | edita @Fakeversionð 30 270 320 1 $gettok(%fakeversion,2-,32)
+      %fake.alea = no | fake_radios | setv tmp.@Fakeversionð @Fakeversionð 30 76 390 13 1 1 @Respuestas sel-respuesta
+      did-lista firstf $mircdirsistema\versions.txt tmp.@Fakeversionð
+    } 
+    if ($mouse.x isnum 20-118 && $mouse.y isnum 311-321 ) { 
+      if (*x*torm* iswm %fakeversion) {
+        setv tmp.@Fakeversionð @Fakeversionð 30 76 390 13 1 2 @Respuestas sel-respuesta
+        did-lista firstf $mircdirsistema\versions.txt tmp.@Fakeversionð | %fakeversion = 2 $line(@Respuestas,2) | edita @Fakeversionð 30 270 320 1 $gettok(%fakeversion,2-,32)
+      }
+      %fake.alea = si | fake_radios
+    }
+    if ($mouse.x isnum 235-269 && $mouse.y isnum 311-321 ) { 
+      if (*x*torm* iswm %fakeversion) {
+        setv tmp.@Fakeversionð @Fakeversionð 30 76 390 13 1 2 @Respuestas sel-respuesta
+        did-lista firstf $mircdirsistema\versions.txt tmp.@Fakeversionð | %fakeversion = 2 $line(@Respuestas,2) | edita @Fakeversionð 30 270 320 1 $gettok(%fakeversion,2-,32)
+      }
+      %fake.alea = no | fake_radios
+    }
+    if ($mouse.x isnum 30-351 && $mouse.y isnum 270-286 ) { editar @Fakeversionð 30 270 320 1 id edid(@fakeversion,1) }
+  }
+}
+alias sel-respuesta {
+  %fakeversion = $1- | edita @Fakeversionð 30 270 320 1 $gettok(%fakeversion,2-,32)
+  set-version $gettok(%fakeversion,2-,32) | %fake.alea = no | fake_radios | drawline @Fakeversionð
+}
+alias fake_radios {
+  radios $iif(%fake.alea == si,a,d) @Fakeversionð 20 310 Respuesta aleatoria 
+  if (*x*torm* iswm $gettok(%fakeversion,2-,32)) var %tipe = a | else var %tipe = d
+  radios %tipe @Fakeversionð 130 310 Respuesta original 
+  if (*x*torm* iswm $gettok(%fakeversion,2-,32)) var %tipe = d | else var %tipe = a
+  if (%fake.alea == si) %tipe = d
+  radios %tipe @Fakeversionð 235 310 Otra
+  drawline @Fakeversionð
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+;Nick completion - 
+alias completion {
+  if ($window(@Completionð)) { window -a @Completionð | return }
+  ventana @Completionð  210 370
+  titulo @Completionð Nick Completion
+  texto cent @Completionð 35 Completador de nicks
+  caja @Completionð 10 60 188 60 Modelos prediseñados
+  combo draw @Completionð 20 75 150 %com-personal
+  radios $iif(%com-pers == no,a,d)  @Completionð 40 100 Completion prediseñado
+  ;
+  caja @Completionð 10 130 188 195 Modelos personalizados
+  radios $iif(%com-pers == no,d,a) @Completionð 35 170 Completion personalizado
+  ;
+  edita @Completionð 35 145 40 1 %completion.i | texto @Completionð 90 147 ElNick | edita @Completionð 135 145 40 2 %completion.d
+  caja @Completionð 20 190 168 100 Nick
+  radios-completion | muestra-comp 
+
+  setv but.@Completionð 45 330 80 20 Cerrar_Ok/â 140 330 20 20 ? _avisar El nick completion es una utilidad que se activa cuando escribís un nick (o una parte seguida de :, ej: para MaTyAs666 Mat:) al principio de un mensaje y lo colorea para llamar la atencion de esa persona./
+  do_but @Completionð but.@Completionð
+  window -wa @Completionð
+}
+
+menu @Completionð {
+  mouse {
+    if ($mouse.x > 35 && $mouse.x < 74 && $mouse.y > 146 && $mouse.y < 162) { cursor edit } 
+    elseif ($mouse.x > 135 && $mouse.x < 174 && $mouse.y > 146 && $mouse.y < 162) { cursor edit } 
+    else { cursor normal }
+  }
+  sclick {
+    if ($mouse.x > 20 && $mouse.x < 187 && $mouse.y > 76 $mouse.y < 93) { 
+      %tmp.completions = EcoX-TorMNinguno | combo push @Completionð 20 75 150 50 tset tmp.completions pers-style
+    }
+    ;
+    if ($mouse.x > 40  && $mouse.x < 51 && $mouse.y > 100 && $mouse.y < 111) { %com-pers = no | radios a @Completionð 40 100 | radios d @Completionð 35 170 | muestra-comp }
+    elseif ($mouse.x > 35  && $mouse.x < 45 && $mouse.y > 170 && $mouse.y < 181) { %com-pers = si | radios d @Completionð 40 100 | radios a @Completionð 35 170 | muestra-comp }
+
+    elseif ($mouse.x > 30  && $mouse.x < 41 && $mouse.y > 205 && $mouse.y < 216) { set %com-tipo aleatorio | radios-completion | muestra-comp }
+    elseif ($mouse.x > 30  && $mouse.x < 41 && $mouse.y > 221 && $mouse.y < 231) { set %com-tipo maymin | radios-completion | muestra-comp }
+    elseif ($mouse.x > 30  && $mouse.x < 41 && $mouse.y > 236 && $mouse.y < 246) { set %com-tipo multi | radios-completion | muestra-comp }
+    elseif ($mouse.x > 30  && $mouse.x < 41 && $mouse.y > 251 && $mouse.y < 261) { set %com-tipo relieve | radios-completion | muestra-comp }
+    elseif ($mouse.x > 30  && $mouse.x < 41 && $mouse.y > 266 && $mouse.y < 276) { set %com-tipo ninguno | radios-completion | muestra-comp }
+
+    elseif ($mouse.x > 35 && $mouse.x < 74 && $mouse.y > 146 && $mouse.y < 162) { editar @Completionð 35 145 40 1 % completion.i muestra-comp }
+    elseif ($mouse.x > 135 && $mouse.x < 174 && $mouse.y > 146 && $mouse.y < 162) { editar @Completionð 135 145 40 2 % completion.d muestra-comp }
+    drawline @Completionð
+  }
+}
+alias pers-style { set %com-personal $1- | muestra-comp }
+
+alias radios-completion {
+  radios $iif(%com-tipo == Aleatorio,a,d)  @Completionð 30 205 Color aleatorio
+  radios $iif(%com-tipo == Maymin,a,d)  @Completionð 30 220 Mayúsculas y minúsculas
+  radios $iif(%com-tipo == Multi,a,d)  @Completionð 30 235 Multicolor
+  radios $iif(%com-tipo == Relieve,a,d)  @Completionð 30 250 Relieve
+  radios $iif(%com-tipo == Ninguno,a,d)  @Completionð 30 265 Ninguno
+}
+alias muestra-comp { 
+  cuadro @Completionð 14079702  20 300 170 14
+  var %x = $calc( ( 210 - $width($c_completion(ElNick),Tahoma,12) ) / 2)
+  drawtext -p @Completionð 1 Tahoma 12 %x 300 $c_completion(ElNick)
+}
+
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+menu @Temasð {
+  mouse {
+    if ($mouse.key == 1) { refresco-lista firstv tmp.temas tmp.@Temasð }
+  }
+  sclick { refresco-lista firstv tmp.temas tmp.@Temasð }
+}
+alias temas {
+  if ($window(@Temasð)) { window -a @Temasð | return }
+  ventana @Temasð 350 300
+  titulo @Temasð X-TorM - Temas de texto
+  caja @Temasð 15 40 220 80 Información del tema
+  texto @Temasð 25 50 Autor del tema:
+  texto @Temasð 25 63 Comentarios del autor:
+  caja @Temasð 15 130 220 122 Vista previa
+  cuadro @Temasð 1 25 140 200 100
+  lista @Temasð 245 40 90 215
+  setv tmp.@Temasð @Temasð 245 40 90 15 1 0 @Temas temas.click
+  cargar-temas
+  did-lista firstv tmp.temas tmp.@Temasð
+  setv but.@Temasð 15 270 70 18 Cargar_load-tema/â262 270 70 18 Bajar temas_run www.x-torm.com.ar/â187 270 70 18 Okz_ok/â90 270 70 18 Previsualizar_muestra.temas/â
+  do_but @Temasð but.@Temasð 
+  window -wa @temasð
+}
+alias temas.click { 
+  cuadro @Temasð 1 25 140 200 100
+  %tmp.tema = $findfile($mircdirskins,$$2 $+ .tmx,1)
+  if ($exists(%tmp.tema)) { drawcopy -n @Temasð 96 50 2 15 @Temasð 98 50 95 15 | texto @Temasð 100 50 $readini(%tmp.tema,info,autor) | drawcopy @Temasð 10 78 2 40 @Temasð 24 78 205 40 | info.tema $readini(%tmp.tema,info,comentarios) | drawline @Temasð }
+}
+alias info.tema { entra-text @Temasð 25 78 190 40 $$1- }
+alias cargar-temas {
+  unset %tmp.temas | var %temas = $findfile($mircdirskins,*.tmx,0)
+  while (%temas > 0) {
+    %tmp.temas = %tmp.temas $+ $nopath($remove($findfile($mircdirskins,*.tmx,%temas),.tmx)) $+ â
+    dec %temas
+  }
+}
+alias load-tema {
+  var %tmp.tema = $findfile($mircdirskins,$sline(@Temas,1) $+ .tmx,1)
+  if ($exists(%tmp.tema) == $true) {
+    clear -s
+    .unload -rs $findfile($mircdir,$%(tema.actual),1)
+    .load -rs %tmp.tema
+    setv tema.actual $nopath(%tmp.tema)
+  }
+}
+alias fuentes { 
+  var %conex = $scon(0),%win = 1
+  while (%conex > 0) {
+    scon %m
+    while ($query(%win) != $null) { Font -d $query(%win) $1- | inc %win }
+    %win = 1 
+    while ($chan(%win) != $null) { font -d $chan(%win) $1- | inc %win }
+    %win = 1 
+    while ($chat(%win) != $null) { font -d = $+ $chat(%win) $1- | inc %win }
+    font -s $1-
+    dec %conex
+  }
+}
+alias muestra.temas {
+  var %tmp.tema = $findfile($mircdirskins,$sline(@Temas,1) $+ .tmx,1)
+  if (!$readini(%tmp.tema,info,back)) { 
+    cuadro @Temasð 1 25 140 200 100 
+    drawtext -or @Temasð $%(rgb.claro) Tahoma 15 74 181 No disponible
+    drawtext -or @Temasð $%(rgb.texto) Tahoma 15 75 182 No disponible
+    drawline @Temasð
+    return
+  }
+  var %alto = 12,%back = $readini(%tmp.tema,info,back),%fuente = $readini(%tmp.tema,info,fuente)
+  var.colores
+  set.colores $readini(%tmp.tema,info,colores)
+  cuadro @Temasð %back 25 140 200 100
+  drawtext -cprb @Temasð 1 %back %fuente 30 145 195 %alto $read -l2 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 157 195 %alto $read -l3 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 168 195 %alto $read -l4 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 180 195 %alto $read -l5 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 193 195 %alto $read -l6 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 205 195 %alto $read -l7 %tmp.tema
+  drawtext -cprb @Temasð 1 %back %fuente 30 217 195 %alto $read -l8 %tmp.tema
+  set.colores pone %colours
+}
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

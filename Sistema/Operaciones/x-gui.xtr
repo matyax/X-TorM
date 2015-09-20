@@ -1,0 +1,60 @@
+alias gui.prueba {
+  window -pk +fbn @prueba 200 150 280 200
+  e.fondo @prueba 11184810
+}
+
+
+alias gui.boton {
+  drawline -n %gui.destino 1 2 $calc( $1 +1 ) $calc( $2 + $4 ) $calc( $calc( $1 + $3 ) -1 ) $calc( $calc( $2 + $4 ) -1 )
+  drawline -n %gui.destino 15 1 $1 $2 $calc( $1 + $3 ) $2
+  drawline -n %gui.destino 1 2 $calc( $1 + $3 ) $calc( $2 +1 ) $calc( $1 + $3 ) $calc( $2 + $4 )
+  drawline -n %gui.destino 15 1 $1 $2 $1 $calc( $2 + $4 )
+  ;75
+  drawrect -fnr %gui.destino $rgb(38,100,100) 1 $calc( $1 +1 ) $calc( $2 +1 ) $calc( $3 - 2 ) $calc( $4 - 2 ) $7-
+  var %txtX $calc( ( ( $4 / 2 ) + $2 ) - ( ( $height( $5- ,Verdana,12) / 2 ) ) )
+  var %txtY $calc( ( ( $3 / 2 ) + $1 ) - ( ( $width( $5- ,Verdana,12,0,1) / 2 ) ) )
+  drawtext -n %gui.destino 0 Verdana 12 %txtY %txtX $5-
+  window -a %gui.destino
+}
+alias gui.pboton {
+  drawrect -fnr %gui.destino $rgb(61,84,84) 1 $1 $2 $3 $4 $7-
+  drawline -n %gui.destino 1 1 $1 $2 $calc( $1 + $3 ) $2
+  drawline -n %gui.destino 15 1 $calc( $1 + $3 ) $calc( $2 +1 ) $calc( $1 + $3 ) $calc( $2 + $4 )
+  drawline -n %gui.destino 1 1 $1 $2 $1 $calc( $2 + $4 )
+  drawline -n %gui.destino 15 1 $calc( $1 +1 ) $calc( $2 + $4 ) $calc( $calc( $1 + $3 ) -1 ) $calc( $calc( $2 + $4 ) -1 )
+
+  var %txtX $calc( ( ( $4 / 2 ) + $2 ) - ( ( $height( $5 ,Verdana,12) / 2 ) ) )
+  var %txtY $calc( ( ( $3 / 2 ) + $1 ) - ( ( $width( $5 ,Verdana,12,0,1) / 2 ) ) )
+  drawtext -n %gui.destino 0 Verdana 12 %txtY %txtX $5
+  window -a %gui.destino
+}
+
+alias e.fondo { 
+  ;ventana fondo color ancho alto
+  drawrect -fr $1 $2 $window($1).w 0 0 $window($1).w $window($1).h
+}
+alias e.linea {
+  drawrect -fn $1 14 1 $2 $3 $4 $5
+}
+alias e.text { 
+  ;ventana x y texto
+  drawtext -pn $1 12 Verdana 12 $2 $3 $4-
+}
+alias e.box {
+  ; box ventana x y w h
+  drawrect -n $1 15 1 $2 $3 $4 $5 | drawrect $1 14 1 $calc($2 -1) $calc($3 -1) $4 $5 
+  if ($6 != $null) drawtext -np $1 0 Verdana 12 $calc($2 + 5) $calc($3 - 7) $6-
+}
+alias e.edit { 
+  ; edit ventana x y w h
+  drawrect -rfn $1 $rgb(152,152,152) $5 $2 $3 $4 $5
+  drawrect -n $1 14 1 $2 $3 $4 $5 | drawrect -n $1 15 1 $2 $calc($3 + $5 - 1) $4 1 | drawrect -n $1 15 1 $calc($2 + $4 - 1) $3 1 $5
+}
+alias e.button { 
+  ; button ventana x y w h
+  ;  drawrect -f $1 14 $5 $calc($2 + 3) $calc($3 + 3) $4 $5
+  drawrect $1 0 1 $2 $3 $4 $5  
+  drawrect -rf $1 $rgb(152,152,152) $calc($5 - 1) $calc($2 + 1) $calc($3 + 1) $4 $calc($5 - 1) 
+  drawrect $1 14 1 $2 $calc($3 + $5) $4 1 
+  drawrect $1 14 1 $calc($2 + $4) $3 1 $5
+}

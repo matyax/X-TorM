@@ -1,0 +1,18 @@
+[Informacion]
+1=Te permite falsificar la información sobre el cliente de chat que estas usando
+2=Sistema para colorear el nick de alguien cuando lo mencionas
+3=Te permite mostrar un mensaje, grabar privados, recibir pages, etc., cuando estás ausente (away) del X-TorM
+4=Configura distintas combinaciones de fondos de ventanas, colores de textos y mensajes.
+5=Elige los sonidos para los distintos eventos que se producen mientras chateas.
+6=Configura tus canales favoritos para accesarlos rápidamente.
+7=Opciones generales de interface, protecciones, entre otros, del script.
+8=Sistema de protección de puertos.
+9=Selecciona y personaliza el fondo de tu mIRC.
+10=Proteccion antivirus para los archivos recibidos.
+11=Sistema de bloqueo de propaganda en privados, canales, etc.
+12=Configura la protección para canales donde tienes @p.
+13=Configura la autoidentificación para IRC-Hispano.
+14=Configura la autoidentificación con Nick2 en IRC-Hispano
+15=Sistema de encriptado de texto para los usuarios.
+16=Configura la correción ortografía, colores de escritura, etc.
+17=Guarda la configuración del X-TorM para poder recuperarla en caso de actualización o de pérdida de datos.

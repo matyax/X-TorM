@@ -1,0 +1,49 @@
+pseudo-servers.irc.ecnet.org Jue Sep 27 21:22:33 2007
+#security 1
+#digg 1 11©º°¨¨°º© 12Digg RSS Feed 11©º°¨¨°º©
+* 2
+#mendozatrivia 5 ¡¡Ganá premios en Web House!! | Visitá nuestra página: www.mendozaenfoco.com.ar | Para arrancar la trivia, tipeá !quizz
+#mendozaxmenos 5 0,9%,3'%9,3%,10,3'%3,10%,1,10'%10,1%9,1 4Bienvenido a mendozaxmenos ::: 3www.mendozaxmenos.com.ar 14| 3 Respeta las reglas del canal: No agredir, No Spam, no Flood. Gracias. 10,1%1,10%,3'%10,3%,9,3'%3,9%,0,9'% 
+#sadie's_shack 14 www.sadiesshack.com sign up for our brand new forums and photo albums || Welcome to Sadie's Shack the home of disabled chat on ecnet || All friendly chatters welcome :)
+#jasperdett 3 12,15welcome to #jasperdett.....this channel is mirrored between 2 networks There are 14 weeks, 1 day, 8 hours, 24 minutes and 33 seconds, left until New Year
+#weather 2 2,2 12,12 10,10 3,3 9,9 8,8 7,7 4,4 5,5 6,6 13,13  RSS Weather Feeds 13,13 6,6 5,5 4,4 7,7 8,8 9,9 3,3 10,10 12,12 2,2.
+#mfmb 3 Mibs - Quote: When life gives you lemons, make grape juice. Then sit back and think about how you did it.
+#nano 1 Que pasa aki que no entra nadie qlaido MaRiAnO hacele publlicidad a la mansa sala juazzzzzzzzz
+#escuelita 4 3,1\1,3\9,3\3,9\0,9\9,0\0,0-15,0\0,15\14,15\15,14\1,14\14,1\1,1-0,1 Bienvenidos a la [--- #Escuelita---] una sala alternativa quepodes consultar tu dudas y/o problemas visitanos cuando quieras Gracias 1,1-14,1/1,14/15,14/14,15/0,15/15,0/0,0-9,0/0,9/3,9/9,3/
+#Pseudo-Servers 15 11©º°¨¨°º©©º°¨¨°º© 12Pseudo-Servers - New website http://www.pseudo-servers.com/ 11©º°¨¨°º©©º°¨¨°º©
+#bola8 2 bola8 el mejor canal de irc Pasa,divertite y no te la mandes xDDDDD
+#ECnet 23 http://www.ecnet.org || http://wiki.ecnet.org || ECNet: The Epicenter Network - Two drink minimum || Use http://pastebin.ca/ for pastes larger than 3 lines || DON'T MESS WITH FOOTBALL
+#laserchat 13 http://laserchat.org - Welcome to Laser chat, the chat about lasers of all sorts! http://www.youtube.com/watch?v=Af-yMbZwaTA | Please be polite and courteous. | <+BlueFusion> you toke computers???
+#slashdot 2 11©º°¨¨°º©©º°¨¨°º© 12SlashDot RSS Feed 11©º°¨¨°º©©º°¨¨°º©
+#route07 2
+#services 11 ECNet Services Channel - Administrators Only
+#war_room 2 Looking for active chatters. Must not say lol every 2 min.|A place to plot, discuss and be yourself.
+#Diablo 1
+#amigos 1 3,1\1,3\9,3\3,9\0,9\9,0\0,0-15,0\0,15\14,15\15,14\1,14\14,1\1,1-0,1 Comiendo Diarios como "La Nacion" la gente se ahce mas inteligente (?) ||... ¡¡¡F e l i z Cumple R a a l !!!! 1,1-14,1/1,14/15,14/14,15/0,15/15,0/0,0-9,0/0,9/3,9/9,3/1,3/3,1/0,0
+#st-ooc 7 Please be sure to visit our RP Rooms as well if you enjoy this room - #Spirit_Temple - #Kenji's_Arcade - #Tralas - #Navinia -  if noone listens, we loose the radio - http://taja.listen2myradio.com
+#lost_in_translation 2 14,14.0,2  · +.·:.· +.:·:°·:.· +.:·:`.:·:°·: 11 Join us to learn Spanish phrases and Language. And have fun meeting new people!!!... Unite a nosotros para aprender ingles y de paso divertite conociendo nueva gente ;)! 0- :·-:·: .``·: . :·+ ·:. :·.+ ·:. :··14,14.15,0
+#Kenji's_Arcade 3 (Modern / Future FFRP) A large arcade in the bad part of Tokyo, the current year is 2040, the city has recently been rebuilt by Genom after the second great Kanto Earthquake destroyed the majority of the city, few geo domes exist around the city filled with peace and harmony, the rest has been left as slum
+#menosde15 5 3 2,1Bienvenidos a www.mipoio.com | #menosde15 4,1| 0,1Recuerda las reglas: 4,1NO SPAM 0,1-4,1 NO FLOOD -4,1 No pedir ACCESS -4,1 No AGREDIR -
+#mipoio 51 0,1Bienvenidos a www.mipoio.com! Respeta las reglas del canal: No SPAM - No FLOOD - No pedir ACCESS - No AGREDIR - 8Nuevas salas secundarias de mipoio.com: #menosde15, #de15a20, #masde20, #masde25, #gay
+#klownz 1 '<<yup>>
+#argentina 3 4,14http://basshunter.m0o.eu/video,BotenAnna,Spanish <-- Altísimo video
+#gay 4  2,1Bienvenidos a www.mipoio.com | #gay 4,1| 0,1Recuerda las reglas: 4,1NO SPAM 0,1-4,1 NO FLOOD -4,1 No pedir ACCESS -4,1 No AGREDIR -
+#prueba 1
+#Tralas 3 12 MFFRP5 The kingdom to the East.... The Marketplace humms with happy people.. be sure to visit our OOC channel  #st-ooc also please help sapport our radio station ..if noone listens, we loose the radio - http://taja.listen2myradio.com'
+#comando_irc 2 3,1\1,3\9,3\3,9\0,9\9,0\0,0-15,0\0,15\14,15\15,14\1,14\14,1\1,1-0,1 http://ar.geocities.com/flec0_sgo/comandos_del_irc.htm 1,1-14,1/1,14/15,14/14,15/0,15/15,0/0,0-9,0/0,9/3,9/9,3/1,3/3,1/0,0
+#trivia 7 14,1.04.4.7.:8::0 Trivia (en Espanol) - Stats: http://trivia.pseudo-servers.com | Type "!start" to play 8::7:.4.04.14,1.
+#ps3chat 1 Playstation 3 chat & discussion
+#translator 2 11-=<{([ 12Translator Bot - Type "!tr help" 11])}>=-
+#starlight-rp 2 A room for starlighters to role play to their hearts content. A room for active imaginations :)(ClaireBear) setting-Pirate ship or Beach party maybe even a private school? (your beloved op-Sheepsy)
+#masde20 4 3 2,1Bienvenidos a www.mipoio.com | #masde20 4,1| 0,1Recuerda las reglas: 4,1NO SPAM 0,1-4,1 NO FLOOD -4,1 No pedir ACCESS -4,1 No AGREDIR -
+#masde25 7 3 2,1Bienvenidos a www.mipoio.com | #masde25 4,1| 0,1Recuerda las reglas: 4,1NO SPAM 0,1-4,1 NO FLOOD -4,1 No pedir ACCESS -4,1 No AGREDIR -
+#de15a20 7 .15,2{15,2§15,3{15,3§15,4{15,4§15,5{15,5§15,6{15,6§15,7{15,7§15,8{15,8§1,8 www.mipoio.com Pasa y divertite,respeta las reglas, a los op y usuarios,no Flood,no spam #de15a20  el lugar q todos disfrutamos 15,2{15,2§15,3{15,3§15,4{15,4§15,5{15,5§15,6{15,6§15,7{15,7§15,8{15 
+#Spirit_Temple 7 (MFFRP) (Weather - the sky has become dark...there is no storm...no wind...but all is eerily quiet and there is no light... - The villages are fully restored.... what the future holds only time will tell (ST-OOC) (Ruby)
+#liverpool 1
+#starlight 12 Welcome to Starlight, Youthclub of the internet || Starlight Site Is Up! http://starlightirc.bravehost.com/Rules.html Rules, FAQ, Etc. GET FAMILIAR WITH IT || http://www.animesecrets.org/forums/ || Typo_God` Is Away For Ahwhile, and She Sends Her Regards!
+#mendoza 4 #Mendoza
+#picadas 2 4,1:: www.picadasurbanas.com :: 7,1 Canal oficial de la pagina!
+#santa-fe 5 11,10[1]8,1¯13,6[1]8,1¯11,10[1]8,1¯13,6[1]8,1¯11,10[1]8,6 WelcOme tO Santa Fe's chat :P 11,10[1]8,1¯13,6[1]8,1¯11,10[1]8,1¯13,6[1]8,1¯11,10[1]
+#Navinia 3 (MFFRP) Kingdom of the west.....great mountains, rivers, and caves.....many wetlands. Many are currently on a venture deep within the earth itself. There are only rumors as to what they are seeking, but many have joined the journey. Prospect of a great magic to be found. (Nyte)
+#travisbsd 2 The TravisBSD Help Channel || http://www.travisbsd.org/support/ - FAQs and Links to Help Information
+#hermitcrabs 1

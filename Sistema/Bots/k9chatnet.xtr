@@ -1,0 +1,243 @@
+; menus chat net k9 
+
+alias msgk9 msg k9@k9.chatnet.org $1-
+
+menu Menubar,Status {
+  $iif(chatnet.org isin $server,ChatNet K9)
+  .AYUDA K9: msgk9 help
+  .-
+  .Comandos disponibles: msgk9 commands #$$?="Canal? (sin #)"
+  .-
+  .Identificarse (auth): msgk9 auth #$$?="En qué canal? (sin #)" $$?="Password?"
+  .Cambiar pass: msgk9 setpass #$$?="En qué canal? (sin #)" $$?="Password?"
+  .Accesos (access)
+  ..Ver level de...: msgk9 access #$$?="Canal? (sin #)" $$?="Nick?"
+  ..Lista de operadores 
+  ...TODOS: msgk9 access #$$?="Canal? (sin #)" >0
+  ...-
+  ...10 resultados: msgk9 access #$$?="Canal? (sin #)" - $+ $$?="A partir de qué número?"
+  ...Con level específico: msgk9 access #$$?="Canal? (sin #)" = $+ $$?="Con qué level?"
+  ...Con level mayor que...: msgk9 access #$$?="Canal? (sin #)" > $+ $$?="A partir de qué level quieres mostrar?"
+  .Inicializar K9: msgk9 initchan #$$?="Canal? (sin #)" $$?="Password?"
+  .Lista de bans: msgk9 banlist #$$?="Canal? (sin #)"
+  .-
+  .>>> Level 50
+  ..Kickear: msgk9 kick #$$?="Canal? (sin #)" $$?="Nick?" $$?="Motivo?"
+  .>>> Level 75
+  ..Mensaje/comando al entrar: msgk9 comment #$$?="Canal? (sin #)" $$?="Escribe el mensaje. Puedes usar: $crlf '$ACT' para una accion tipo /me $crlf '$NICK' se sustituira por el nick de la persona $crlf '$SND' sonido.wav pone un sonido"
+  ..Banear: msgk9 ban #$$?="Canal? (sin #)" $$?="Nick o máscara?" $$?="Cuánto tiempo? (en minutos)" $$?="Motivo?"
+  ..Desbanear: msgk9 unban #$$?="Canal? (sin #)" $$?="Escribe el user@host que aparece en la lista de bans"
+  .>>> Level 100
+  ..Dar voz: msgk9 voice #$$?="Canal? (sin #)" $$?="Nick?"
+  ..Dar op: msgk9 op #$$?="Canal? (sin #)" $$?="Nick?"
+  ..Quitar op: msgk9 deop #$$?="Canal? (sin #)" $$?="Nick?"
+  ..Invitar: msgk9 invite #$$?="Canal? (sin #)" $$?="Nick?"
+  ..Suspender: msgk9 suspend #$$?="Canal? (sin #)" $$?="userID? ejemplo: 1085" $$?="Nivel de suspensión? ejemplo: 100"
+  ..Quitar suspensión: msgk9 suspend #$$?="Canal? (sin #)" $$?="userID? ejemplo: 1085" 0
+  .>>> Level 200
+  ..Cambiar topic: msgk9 topic #$$?="Canal? (sin #)" $$?="Escribe el nuevo topic"
+  .>>> Level 400
+  ..Registrar usuario: msgk9 adduser #$$?="Canal? (sin #)" $$?="Nick?" $$?="Nivel? (0-499)"
+  ..Borrar registro: msgk9 remuser #$$?="Canal? (sin #)" $$?="user-ID? ejemplo: 2453" 
+  ..Cambiar nivel: msgk9 moduser #$$?="Canal? (sin #)" $$?="user-ID? ejemplo: 14562" $$?="Nuevo nivel?"
+  ..Añadir máscara: msgk9 addmask #$$?="Canal? (sin #)" $$?="user-ID? ejemplo: 14556" $$?="Nick con la nueva máscara?"
+  ..Borrar máscara: msgk9 remmask #$$?="Canal? (sin #)" $$?="user-ID? ejemplo: 1422" $$?="máscara-ID? ejemplo: 4319"
+  ..-
+  ..Añadir al Auto-op: msgk9 autoop #$$?="Canal? (sin #)" $$?="Nick?" T
+  ..Añadir al Auto-voz: msgk9 autoop #$$?="Canal? (sin #)" $$?="Nick?" V
+  ..Quitar del Auto-op: msgk9 autoop #$$?="Canal? (sin #)" $$?="Nick?" F
+  ..Quitar del Auto-voz: msgk9 autoop #$$?="Canal? (sin #)" $$?="Nick?" F
+  ..-
+  ..Cambiar modos canal: msgk9 mode #$$?="Canal? (sin #)" $$?="Escribe los modos. $crlf Ejemplo: -si+nt"
+  .>>> Level 450
+  ..Añadir linea al saludo: msgk9 onjoin #$$?="Canal? (sin #)" add $$?="Escribe la linea a añadir"
+  ..Deshabilitar saludo: msgk9 onjoin clear
+  ..Nuevo saludo: msgk9 onjoin clear | msgk9 onjoin #$$?="Canal? (sin #)" add $$?="Escribe el nuevo saludo"
+  ..-
+  ..Meter a K9 en canal: msgk9 join #$$?="Canal? (sin #)"
+  ..Sacar a K9 de canal: msgk9 part #$$?="Canal? (sin #)"
+  ..-
+  ..Proteger topic
+  ...on: msgk9 guardt #$$?="Canal? (sin #)" T
+  ...off: msgk9 guardt #$$?="Canal? (sin #)" F
+  ..Proteger modos: msgk9 guardm #$$?="Canal? (sin #)" $$?="Escribe los modos a proteger $crlf Ejemplo: +ntsil 30"
+  .>>> Level 500
+  ..Hacer hablar a K9: msgk9 say #$$?="Canal? (sin #)" $$?="Qué quieres que diga?"
+  ..Hacer hablar a K9 (acción): msgk9 act #$$?="Canal? (sin #)" $$?="Qué está haciendo K9?"
+  ..Poner un sonido al canal: msgk9 snd #$$?="Canal? (sin #)" $$?="Qué sonido? $crlf Ejemplo: sonido.wav" $$?="Comentario del sonido?"
+}
+
+
+menu Channel {
+  $iif(chatnet.org isin $server,ChatNet K9)
+  .AYUDA K9: msgk9 help
+  .-
+  .Dar voz (100): msgk9 voice $active $$?="Nick?"
+  .Dar op (100): msgk9 op $active $$?="Nick?"
+  .Quitar op (100): msgk9 deop $active $$?="Nick?"
+  .Kickear (50): msgk9 kick $active $$?="Nick?" $$?="Motivo?"
+  .Cambiar topic (200): msgk9 topic $active $$?="Escribe el nuevo topic"
+  .Cambiar modos canal (400): msgk9 mode $active $$?="Escribe los modos. $crlf Ejemplo: -si+nt"
+  .-
+  .Registros (400)
+  ..Registrar usuario: msgk9 adduser $active $$?="Nick?" $$?="Nivel? (0-499)"
+  ..Borrar registro: msgk9 remuser $active $$?="user-ID? ejemplo: 2453" 
+  ..Cambiar nivel: msgk9 moduser $active $$?="user-ID? ejemplo: 14562" $$?="Nuevo nivel?"
+  ..Añadir máscara: msgk9 addmask $active $$?="user-ID? ejemplo: 14556" $$?="Nick con la nueva máscara?"
+  ..Borrar máscara: msgk9 remmask $active $$?="user-ID? ejemplo: 1422" $$?="máscara-ID? ejemplo: 4319"
+  .Auto-op/voz (400)
+  ..Añadir al Auto-op: msgk9 autoop $active $$?="Nick?" T
+  ..Añadir al Auto-voz: msgk9 autoop $active $$?="Nick?" V
+  ..Quitar del Auto-op: msgk9 autoop $active $$?="Nick?" F
+  ..Quitar del Auto-voz: msgk9 autoop $active $$?="Nick?" F
+  .-
+  .Hacer hablar a K9: msgk9 say $active $$?="Qué quieres que diga?"
+  .-
+  .Comandos disponibles: msgk9 commands $active
+  .-
+  .Identificarse (auth): msgk9 auth $active $$?="Password?"
+  .Cambiar pass: msgk9 setpass $active (sin #)" $$?="Password?"
+  .Accesos (access)
+  ..Ver level de...: msgk9 access $active $$?="Nick?"
+  ..Lista de operadores 
+  ...TODOS: msgk9 access $active >0
+  ...-
+  ...10 resultados: msgk9 access $active - $+ $$?="A partir de qué número?"
+  ...Con level específico: msgk9 access $active = $+ $$?="Con qué level?"
+  ...Con level mayor que...: msgk9 access $active > $+ $$?="A partir de qué level quieres mostrar?"
+  .Inicializar K9: msgk9 initchan $active $$?="Password?"
+  .Lista de bans: msgk9 banlist $active
+  .-
+  .>>> Level 50
+  ..Kickear: msgk9 kick $active $$?="Nick?" $$?="Motivo?"
+  .>>> Level 75
+  ..Mensaje/comando al entrar: msgk9 comment $active $$?="Escribe el mensaje. Puedes usar: $crlf '$ACT' para una accion tipo /me $crlf '$NICK' se sustituira por el nick de la persona $crlf '$SND' sonido.wav pone un sonido"
+  ..Banear: msgk9 ban $active $$?="Nick o máscara?" $$?="Cuánto tiempo? (en minutos)" $$?="Motivo?"
+  ..Desbanear: msgk9 unban $active $$?="Escribe el user@host que aparece en la lista de bans"
+  .>>> Level 100
+  ..Dar voz (100): msgk9 voice $active $$?="Nick?"
+  ..Dar op (100): msgk9 op $active $$?="Nick?"
+  ..Quitar op (100): msgk9 deop $active $$?="Nick?"
+  ..Invitar: msgk9 invite $active $$?="Nick?"
+  ..Suspender: msgk9 suspend $active $$?="userID? ejemplo: 1085" $$?="Nivel de suspensión? ejemplo: 100"
+  ..Quitar suspensión: msgk9 suspend $active $$?="userID? ejemplo: 1085" 0
+  .>>> Level 200
+  ..Cambiar topic: msgk9 topic $active $$?="Escribe el nuevo topic"
+  .>>> Level 400
+  ..Registrar usuario: msgk9 adduser $active $$?="Nick?" $$?="Nivel? (0-499)"
+  ..Borrar registro: msgk9 remuser $active $$?="user-ID? ejemplo: 2453" 
+  ..Cambiar nivel: msgk9 moduser $active $$?="user-ID? ejemplo: 14562" $$?="Nuevo nivel?"
+  ..Añadir máscara: msgk9 addmask $active $$?="user-ID? ejemplo: 14556" $$?="Nick con la nueva máscara?"
+  ..Borrar máscara: msgk9 remmask $active $$?="user-ID? ejemplo: 1422" $$?="máscara-ID? ejemplo: 4319"
+  ..-
+  ..Añadir al Auto-op: msgk9 autoop $active $$?="Nick?" T
+  ..Añadir al Auto-voz: msgk9 autoop $active $$?="Nick?" V
+  ..Quitar del Auto-op: msgk9 autoop $active $$?="Nick?" F
+  ..Quitar del Auto-voz: msgk9 autoop $active $$?="Nick?" F
+  ..-
+  ..Cambiar modos canal: msgk9 mode $active $$?="Escribe los modos. $crlf Ejemplo: -si+nt"
+  .>>> Level 450
+  ..Añadir linea al saludo: msgk9 onjoin $active add $$?="Escribe la linea a añadir"
+  ..Deshabilitar saludo: msgk9 onjoin clear
+  ..Nuevo saludo: msgk9 onjoin clear | msgk9 onjoin $active add $$?="Escribe el nuevo saludo"
+  ..-
+  ..Meter a K9 en canal: msgk9 join $active
+  ..Sacar a K9 de canal: msgk9 part $active
+  ..-
+  ..Proteger topic
+  ...on: msgk9 guardt $active T
+  ...off: msgk9 guardt $active F
+  ..Proteger modos: msgk9 guardm $active $$?="Escribe los modos a proteger $crlf Ejemplo: +ntsil 30"
+  .>>> Level 500
+  ..Hacer hablar a K9: msgk9 say $active $$?="Qué quieres que diga?"
+  ..Hacer hablar a K9 (acción): msgk9 act $active $$?="Qué está haciendo K9?"
+  ..Poner un sonido al canal: msgk9 snd $active $$?="Qué sonido? $crlf Ejemplo: sonido.wav" $$?="Comentario del sonido?"
+}
+
+
+
+menu Nicklist {
+  $iif(chatnet.org isin $server,ChatNet K9)
+  .AYUDA K9: msgk9 help
+  .-
+  .Dar voz (100): msgk9 voice $active $$1
+  .Dar op (100): msgk9 op $active $$1
+  .Quitar op (100): msgk9 deop $active $$1
+  .Kickear (50): msgk9 kick $active $$1 $$?="Motivo?"
+  .Cambiar topic (200): msgk9 topic $active $$?="Escribe el nuevo topic"
+  .Cambiar modos canal (400): msgk9 mode $active $$?="Escribe los modos. $crlf Ejemplo: -si+nt"
+  .-
+  .Registros (400)
+  ..Registrar usuario: msgk9 adduser $active $$1 $$?="Nivel? (0-499)"
+  ..Borrar registro: msgk9 remuser $active $$?="user-ID? ejemplo: 2453" 
+  ..Cambiar nivel: msgk9 moduser $active $$?="user-ID? ejemplo: 14562" $$?="Nuevo nivel?"
+  ..Añadir máscara: msgk9 addmask $active $$?="user-ID? ejemplo: 14556" $$?="Nick con la nueva máscara?"
+  ..Borrar máscara: msgk9 remmask $active $$?="user-ID? ejemplo: 1422" $$?="máscara-ID? ejemplo: 4319"
+  .Auto-op/voz (400)
+  ..Añadir al Auto-op: msgk9 autoop $active $$1 T
+  ..Añadir al Auto-voz: msgk9 autoop $active $$1 V
+  ..Quitar del Auto-op: msgk9 autoop $active $$1 F
+  ..Quitar del Auto-voz: msgk9 autoop $active $$1 F
+  .-
+  .Hacer hablar a K9: msgk9 say $active $$?="Qué quieres que diga?"
+  .-
+  .Comandos disponibles: msgk9 commands $active
+  .-
+  .Identificarse (auth): msgk9 auth $active $$?="Password?"
+  .Cambiar pass: msgk9 setpass $active (sin #)" $$?="Password?"
+  .Accesos (access)
+  ..Ver level de...: msgk9 access $active $$1
+  ..Lista de operadores 
+  ...TODOS: msgk9 access $active >0
+  ...-
+  ...10 resultados: msgk9 access $active - $+ $$?="A partir de qué número?"
+  ...Con level específico: msgk9 access $active = $+ $$?="Con qué level?"
+  ...Con level mayor que...: msgk9 access $active > $+ $$?="A partir de qué level quieres mostrar?"
+  .Inicializar K9: msgk9 initchan $active $$?="Password?"
+  .Lista de bans: msgk9 banlist $active
+  .-
+  .>>> Level 50
+  ..Kickear: msgk9 kick $active $$1 $$?="Motivo?"
+  .>>> Level 75
+  ..Mensaje/comando al entrar: msgk9 comment $active $$?="Escribe el mensaje. Puedes usar: $crlf '$ACT' para una accion tipo /me $crlf '$NICK' se sustituira por el nick de la persona $crlf '$SND' sonido.wav pone un sonido"
+  ..Banear: msgk9 ban $active $$?="Nick o máscara?" $$?="Cuánto tiempo? (en minutos)" $$?="Motivo?"
+  ..Desbanear: msgk9 unban $active $$?="Escribe el user@host que aparece en la lista de bans"
+  .>>> Level 100
+  ..Dar voz (100): msgk9 voice $active $$1
+  ..Dar op (100): msgk9 op $active $$1
+  ..Quitar op (100): msgk9 deop $active $$1
+  ..Invitar: msgk9 invite $active $$1
+  ..Suspender: msgk9 suspend $active $$?="userID? ejemplo: 1085" $$?="Nivel de suspensión? ejemplo: 100"
+  ..Quitar suspensión: msgk9 suspend $active $$?="user-ID? ejemplo: 1085" 0
+  .>>> Level 200
+  ..Cambiar topic: msgk9 topic $active $$?="Escribe el nuevo topic"
+  .>>> Level 400
+  ..Registrar usuario: msgk9 adduser $active $$1 $$?="Nivel? (0-499)"
+  ..Borrar registro: msgk9 remuser $active $$?="user-ID? ejemplo: 2453" 
+  ..Cambiar nivel: msgk9 moduser $active $$?="user-ID? ejemplo: 14562" $$?="Nuevo nivel?"
+  ..Añadir máscara: msgk9 addmask $active $$?="user-ID? ejemplo: 14556" $$?="Nick con la nueva máscara?"
+  ..Borrar máscara: msgk9 remmask $active $$?="user-ID? ejemplo: 1422" $$?="máscara-ID? ejemplo: 4319"
+  ..-
+  ..Añadir al Auto-op: msgk9 autoop $active $$1 T
+  ..Añadir al Auto-voz: msgk9 autoop $active $$1 V
+  ..Quitar del Auto-op: msgk9 autoop $active $$1 F
+  ..Quitar del Auto-voz: msgk9 autoop $active $$1 F
+  ..-
+  ..Cambiar modos canal: msgk9 mode $active $$?="Escribe los modos. $crlf Ejemplo: -si+nt"
+  .>>> Level 450
+  ..Añadir linea al saludo: msgk9 onjoin $active add $$?="Escribe la linea a añadir"
+  ..Deshabilitar saludo: msgk9 onjoin clear
+  ..Nuevo saludo: msgk9 onjoin clear | msgk9 onjoin $active add $$?="Escribe el nuevo saludo"
+  ..-
+  ..Meter a K9 en canal: msgk9 join $active
+  ..Sacar a K9 de canal: msgk9 part $active
+  ..-
+  ..Proteger topic
+  ...on: msgk9 guardt $active T
+  ...off: msgk9 guardt $active F
+  ..Proteger modos: msgk9 guardm $active $$?="Escribe los modos a proteger $crlf Ejemplo: +ntsil 30"
+  .>>> Level 500
+  ..Hacer hablar a K9: msgk9 say $active $$?="Qué quieres que diga?"
+  ..Hacer hablar a K9 (acción): msgk9 act $active $$?="Qué está haciendo K9?"
+  ..Poner un sonido al canal: msgk9 snd $active $$?="Qué sonido? $crlf Ejemplo: sonido.wav" $$?="Comentario del sonido?"
+}

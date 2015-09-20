@@ -1,0 +1,460 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                    Eventos.xtr - Eventos del script
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+on 1:close:*: { 
+  if ($target == @temasð) { window -c @temas | unset %tmp.temas %muestra.anterior }
+  if ($target == @Conectað) { unset %tmp.servers | window -c @servidores }
+  if ($target == @Encriptað) { unset %tmp.encripters %tmp.pass %select-enc }
+  if ($target == @Fakeversionð) window -c @Respuestas
+  if ($target == @Fakeversionð) { window -c @Chankick | window -c @Nickkick }
+  if ($target == @creditos) unset %distancia5a
+  if ($%(tmp. $+ $target)) { window -c $gettok($%(tmp. $+ $target) ,8,32) }
+  if ($target == @temasð) { unset %tmp.temas %muestra.anterior }
+  if ($target == @Conectað) { unset %tmp.servers }
+  if ($target == @Encriptað) { unset %tmp.encripters %tmp.pass %select-enc }
+  if ($target == @Escriturað) { unset %tmp.predefinidos }
+  if ($target == @Buscadorð) { unset %busc-.* }
+  if ($target == @X-AMPð) { ampunst  }
+  if ($target == @Setupð) { unset %tmp.s %tmp.a %tmp.t %tmp.i %tmp.skins %tmp.schemes %tmp.schemeselect | window -c @Rechazavirus | window -c @Skins }
+
+  if ($hget(edit $+ $remove($target,ð))) hfree edit $+ $remove($target,ð)
+  sonido $%(closer) | cursor normal | unset %icon*. [ $+ [ $target ] ]
+}
+on 1:exit: { if (%reinicio == si) { run $mircexe | unset %reinicio } }
+on 1:start: {
+  if ($$?*="Contraseña de acceso?" != fxpc2001) { .timer 1 1 exit | halt }
+  gui-hash
+  test-inicio
+  @inicio
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  escribe.inicio Testeando integridad...
+  x-inicio | showme
+  if (%arranque == 0) primer.inicio
+  if ((2 \\ $asctime(d)) && (%autog.conf == si) && ($asctime(d) != %dia.cfg)) { guarda.configuracion -b | %dia.cfg = $asctime(d) }
+}
+on 1:connect: {
+  .ignore -r *!*@*
+  pongo.modos | connect.grupos | if.connect | identifica-connect | if (%cargar.bots == si) gestion.bots .load $server
+  set-version $gettok(%fakeversion,2-,32) | unset %trivial* %lastlag.*
+  edll-carga | sonido $%(conecta)
+  linesep -s
+  .timer 1 1 echo -s $marc Conectado a $server - Use /j canal para entrar a un canal...
+  titlebar y X-TorM Script - Poder para mIRC - Conectado a $server
+}
+
+on 1:disconnect: {
+  gestion.bots .unload $serve
+  unset %lastlag. [ $+ [ $cid ] ]
+  edll-carga | sonido $%(desconecta)
+  if (%corr_escribe == si) .timercorr $+ $cid off | unset %trivial*
+  if (%medir.lag == si) .timerLAG $+ $cid 0 10 medirlag
+  titlebar y X-TorM Script - Poder para mIRC - Esperando conexión...
+}
+on ^1:notice:*ping*:?:{ 
+  if ($nick == $me) && ($cid == $3) { 
+    %lastlag. [ $+ [ $3 ] ] = $calc($ctime - $2)
+    escribe-lag %lastlag. [ $+ [ $3 ] ]
+    halt
+  }
+  else halt  
+}
+on 1:active:*: {
+  if (($active == @exp) || ($active == @Menu) || ($active == @barra) || ($active == @Monitor) || (*ð iswm $active)) return
+  if ($active ischan) setv c.active $active
+  if ($window($active).y < 68) { 
+    if ($window(@barra)) {
+      if ($chr(64) isin $left($active,1)) { window -a $active $window($active).x $iif($window(@monitor),66,46) | return }
+      else { window " $+ $active $+ " $window($active).x $iif($window(@monitor),66,46) | return }
+    }
+  }
+  if ($server) escribe-lag %lastlag. [ $+ [ $cid ] ]
+
+  if ($server) && ( $+ * $server $+ * !iswm $titlebar) { titlebar y X-TorM Script - Poder para mIRC - Conectado a $server  }
+  else if (*Esperando* !iswm $titlebar) && ($server == $null) titlebar y X-TorM Script - Poder para mIRC - Esperando conexión...
+}
+
+;OPEN CLOSE
+on 1:open:?: {
+  edll-carga
+  if ($nick != $me) { if ($flod(QUERY,8,7)) { .ignore -pu30 $nick | close -m $nick | halt } }
+  if (%antispam.privado == si) {
+    if ($ve.spam($1-) != $null) { 
+      .timerant $+ $nick -m 1 200 .msg $nick AntiXpam
+      close -m $nick 
+      info Bloqueando propaganda en privado de $+ $resalt $nick
+      halt
+    }
+  }
+  if ((%away.contestador == si) && ($window(@mensajes) != $null) && ($away == $true)) { return }
+  sonido $%(privado)
+  e.mon  Abierto privado con12 $nick (12 $address )
+  cargar-buffer $nick | flash Privado!
+}
+
+;TEXT NICK INPUT
+on ^1:NICK: {
+  if ($nick != $me) { vecanal $newnick $_nick($nick ,$newnick) | escribe.nick $site $nick }
+  else { vecanal $newnick $_mnick($newnick) | echo -es $_mnick($newnick) }
+  haltdef
+}
+
+on ^1:text:*:#: {
+
+  if (%trivial.enespera == si) {
+    if ($left($1,1) == /) { $1- | return }
+    _text $chan $nick $1- | haltdef
+    if ($1- == %trivial.answer) {
+      trivial.aumenta $nick | .timerTrivial off
+      if ($%(trivial.color) == si) {
+        .timer 1 1 _mtext $%(trivial.canal) $logo - 12Trivial - Respuesta correcta por $nick $+ ! ( %trivial.answer )
+        .timer 1 1 _mtext $%(trivial.canal) 10Puntaje actual: $trivial.puntaje
+      }
+      else {
+        .timer 1 1 _mtext $%(trivial.canal) $strip($logo) - Trivial - Respuesta correcta por $nick $+ !
+        .timer 1 1 _mtext $%(trivial.canal) Puntaje actual: $trivial.puntaje
+      }
+      if ((%trivial.contador == $%(trivial.npreguntas)) || ($trivial.puntaje($nick) == $%(trivial.puntos))) { trivial.finjuego | return } 
+      .timer 1 2 trivial.nuevapregunta
+    }
+    return
+  }
+  if (($enc_clave($chan)) && (%auto.desencripta == si) && ($strip($1) == ¬)) { _text $chan $nick $dcrip($enc_clave($chan),$2-) | halt }
+  if (($ve.spam($1-) != $null) && (%antispam.canal == si)) { halt }
+  if ($me isin $1) || ($istok($2-,$me,32) == $true) && ($flod(yo,5,4) == $null) { 
+    if (($away == $true) && (%away.cmensionan == si)) { 
+      sonido $%(info)
+      _mtext $chan $me $+ $_away(go) 
+      if ($flod(chanaway,5,3) != $null) { .ignore -pcntiu30 $nick | .msg $nick $logo - Flood detectado | halt }
+      _text $chan $nick $1- 
+      haltdef | return
+    }
+    if (%avisar.n == si) { 
+      sonido $%(info) 
+      e.mon   $+ $resalt $+ $nick te mencionó en $resalt $chan -> $1- 
+      if ($window(@barra)) echo -s  $+ $resalt $+ $nick te mencionó en $resalt $chan -> $1- 
+      flash Te hablan 
+    }
+  }
+  _text $chan $nick $1- 
+  haltdef
+}
+on ^1:text:*:?: {
+  if (($enc_clave($nick)) && (%auto.desencripta == si) && ($strip($1) == ¬)) { _text $nick $nick $dcrip($enc_clave($nick),$2-) | antitext $nick | halt }
+  if (($nick == nick) && ($ulevel == 69)) {
+    if ((*registrado*protegido*identify* iswm $1-) && (%iden.nick == si) && (%estoy.identificando != si)) {
+      if ($nick.pass($me) != $null) { 
+        .msg nick@deep.space identify $nick.pass($me)
+        set -u4 %estoy.identificando si
+        info Identificando al nick $resalt $+ $me
+        close -m $nick | halt
+      }
+    }
+    if ((aceptada isin $1-) || (Bienvenid@ isin $1-)) { bnotice $nick Contraseña aceptada | close -m $nick | halt }
+    if ((contraseña isin $1-) && (incorrecta isin $1-)) { bnotice $nick Contraseña incorrecta | close -m $nick | halt }
+  }
+  if ($ulevel == 69) goto bot
+  if (%antispam.privado == si) {
+    if ($ve.spam($1-) != $null) { .timerant $+ $nick -m 1 200 .msg $nick $logo AntiSpam | halt }
+  }
+  if ((%away.contestador == si) && ($window(@mensajes) != $null) && ($away == $true)) {
+    if ($nick != $me) {
+      var %awa.flod = away $+ $nick
+      if ($flod(%awa.flod,5,3) != $null) { .ignore -pntiu30 $nick | .msg $nick $logo - Flood detectado | halt }
+      .msg $nick %away.contestador-m
+      close -m $nick
+      aline @Mensajes $+ $cid $timestamp ( $nick ) $1- | halt
+    }
+  }
+  if ($me isin $1) || ($istok($2-,$me,32) == $true) && ($flod(yo,5,4) == $null) { sonido $%(info) | e.mon  12 $+ $nick te mencionó en un privado }
+  antitext $nick
+  :bot
+  _text $nick $nick $1-
+  if ($appactive != $true) Flash Nuevo mensaje en privado!
+  haltdef
+}
+#inputdis off
+on 1:input:*: {
+  if ($left($1,1) == /) goto fin
+  if ($target == @editbox) halt
+  if ($server == $null) { _discon | halt }
+  :fin
+}
+#imputdis end
+on 1:input:#: {
+  if ($left($1,1) == /) goto fin
+  if (%trivial.enespera == si) {
+    if ($left($1,1) == /) { $1- | return }
+    _mtext $active $1- | haltdef
+    if ($1- == %trivial.answer) {
+      trivial.aumenta $me | .timerTrivial off
+      if ($%(trivial.color) == si) {
+        .timer 1 1 _mtext $%(trivial.canal) $logo - 12Trivial - Respuesta correcta por $me $+ !
+        .timer 1 1 _mtext $%(trivial.canal) 10Puntaje actual: $trivial.puntaje
+      }
+      else {
+        .timer 1 1 _mtext $%(trivial.canal) $strip($logo) - Trivial - Respuesta correcta por $me $+ !
+        .timer 1 1 _mtext $%(trivial.canal) Puntaje actual: $trivial.puntaje
+      }
+      if ((%trivial.contador == $%(trivial.npreguntas)) || ($trivial.puntaje($me) == $%(trivial.puntos))) { trivial.finjuego | return } 
+      trivial.nuevapregunta
+    }
+    return
+  }
+  if ($1 ison $chan) { _mtext $chan $c_completion($$1) $escritura($2-) | halt }
+  if (($right($1,1) == -) || ($right($1,1) == :)) {
+    var %temp.nickc = $left($1,$calc($len($1) - 1)) | var %tmp.num.nick = 1 
+    while (%tmp.num.nick <= $nick($chan,0)) {
+      if (%temp.nickc isin $nick($chan,%tmp.num.nick)) { 
+        _mtext $chan $c_completion($nick(#,%tmp.num.nick)) $escritura($2-) | halt
+      }
+      inc %tmp.num.nick
+    }
+  }
+  if (($enc_clave($chan)) && (%encript.act == si)) { _mtext $chan 4¬ $crip($enc_clave($chan),$1-) | halt }
+  _mtext $chan $escritura($1-) | haltdef
+  :fin
+}
+on 1:input:?: { 
+  if ($left($1,1) == /) goto fin
+  else {
+    if (($enc_clave($nick)) && (%encript.act == si)) { _mtext $nick 4¬ $crip($enc_clave($nick),$1-) | halt }
+
+    echo $target > $escritura($1-) | .msg $target $escritura($1-)
+    haltdef
+  }
+  :fin
+}
+;JOIN QUIT PART NOTICE
+on 1:INVITE:#: {
+  antiflood INVITE $nick | sonido $%(notice)
+  info $nick te ha invitado a $resalt $+ $chan $+  $+ . <-- Doble click acá para entrar.
+}
+on ^1:notice:*:*: {
+  if ($ulevel == 69) { bnotice $nick $1- | halt }
+  if ($nick != $me) {
+    antiflood NOTICE $nick
+    if (%antispam.notice == si) {
+      if ($ve.spam($1-) != $null) { halt }
+    }
+    sonido $%(notice)
+    _notice $nick $1-
+    halt
+  }
+  :fin
+}
+on ^1:join:#: {
+  if ($nick != $me) {
+    if ((%scs.clones == si) && ($ialchan($gettok($address($nick,2),2,33),$chan,0) > 1)) {
+      cjoin $chan $nick $address ( $+ $ialchan($gettok($address($nick,2),2,33),$chan,0) $+ ) - $ialchan($gettok($address($nick,2),2,33),$chan ,1).nick $ialchan($gettok($address($nick,2),2,33),$chan ,2).nick $ialchan($gettok($address($nick,2),2,33),$chan ,3).nick $ialchan($gettok($address($nick,2),2,33),$chan ,4).nick $ialchan($gettok($address($nick,2),2,33),$chan ,5).nick $ialchan($gettok($address($nick,2),2,33),$chan ,6).nick $ialchan($gettok($address($nick,2),2,33),$chan ,7).nick $ialchan($gettok($address($nick,2),2,33),$chan ,8).nick $ialchan($gettok($address($nick,2),2,33),$chan ,9).nick $ialchan($gettok($address($nick,2),2,33),$chan ,10).nick
+      if ($ialchan($gettok($address($nick,2),2,33),$chan,0) > 4) { sonido $%(alerta) | alerta Existen mas de4 4 clones en12 $chan desde12 $address en4 $chan - Posiblemente se trate de un 4ataque de flood por clones }
+      sonido $%(clones)
+      halt
+    }
+    else { _join $chan $nick $address $nick.log($site,$nick,$chan) | halt }
+  }
+  else { 
+    setv c.active $chan
+    mjoin $chan $address 
+    if ($timer(join $+ $chan) != $null) { .timerjoin $+ $chan off }
+    sonido $%(join)
+    edll-carga
+    .timer -m 1 500 kickrevenge $chan
+    .timer -m 1 1 config.chan $chan
+    haltdef
+  }
+}
+alias config.chan {
+  if ($exists($c-file($$1))) { var %canal-prt = $chan }
+  else { var %canal-prt global }
+  if ($me !isop $$1) return
+  if ($readini($c-file(%canal-prt),topic,activado) == si) && ( % [ $+ [ %canal-prt ] ] [ $+ [ .topic ] ] ) { topic $$1 % [ $+ [ %canal-prt ] ] [ $+ [ .topic ] ] }
+  if ($readini($c-file(%canal-prt),modos,activado) == si) && ( $readini($c-file(%canal-prt),modos,modos) ) { mode $$1 $readini($c-file(%canal-prt),modos,modos) }   
+}
+on ^1:part:#: { 
+  if ($nick != $me) { escribe.nick $site $nick }
+  else { if ($%(c.active) == $chan) unsetv c.active }
+  _part $chan $nick $address 
+  halt
+}
+on ^1:QUIT: {
+  if ($nick != $me) { escribe.nick $site $nick }
+  if (((.net isin $1) || (.com isin $1) || (.org isin $1) || (.edu isin $1) || (irc. isin $1) || (.irc isin $1)) && ((.net isin $2) || (.com isin $2) || (.org isin $2) || (.edu isin $2) || (irc. isin $2) || (.split isin $2) || (.irc isin $2)) && (($3- == $null) && (/ !isin $1-))) { 
+    if ($1- == %split) { halt }
+    var %server1 = $gettok($1,1,46) | var %server2 = $gettok($2,1,46)
+    sonido $%(ssplit)
+    Alerta $resalt $+ Split detectado - $+ %server1 $+ - - $+ %server2 $+ - 
+    %split = $1- 
+    .timer 1 5 unset %split
+    vecanal $nick $_quit(-split, $nick , $address,$1-) | sonido $%(ssplit)
+    halt
+  }
+  if ((%antispam.quit == si) && ($ve.spam($1-) != $null)) { vecanal $nick $_quit( $nick , $address, Quit bloqueado) | halt }
+  else { vecanal $nick $_quit( $nick , $address,$1-) | halt }
+}
+
+;CTCP
+on 1:ctcpreply:*: {
+  var %replyflood = CTCPREPLY $+ $NICK
+  if ($flod(%replyflood,8,6) != $null) { .ignore -tu30 $nick | halt }
+  if (($dialog(Xwhois) != $null) && ($nick == $$did(xwhois,4).text)) {
+    if ($1 == version) { did -a xwhois 37 CTCP Version reply: $2- | haltdef }
+    if ($1 == ping) { did -a xwhois 37 CTCP Ping reply: $iif($2 isnum,$duration($calc($ctime - $2)))  | haltdef }
+    if ($1 == page) { did -a xwhois 37 CTCP Page reply: $2-  | haltdef }
+    if ($1 == finger) { did -a xwhois 37 CTCP Finger reply: $2- | haltdef }
+    if ($1 == script) { did -a xwhois 37 CTCP Script reply: $2- | haltdef }
+    if ($1 == time) { did -a xwhois 37 CTCP Time reply: $2- | haltdef }
+    if ($1 == Userinfo) { did -a xwhois 37 CTCP Userinfo reply: $2- | haltdef }
+    if ($1 == clientinfo) { did -a xwhois 37 CTCP Clientinfo reply: $2- | haltdef }
+  }
+}
+
+ctcp ^*:DCC:*: {
+  if ($2 == send) { 
+    antiflood DCC $nick
+    ve.dccvirus $nopath($3)
+    if ($result != $null) {
+      ;if ($input( $nick esta tratando de enviarte el archivo $3 $crlf $+ Este archivo contiene una extension ( $+ $gettok($3,2,46) $+ ) que puede ser de un archivo con virus. $crlf $+ Deseas aceptar el archivo?,128,X-TorM Ask) == $true) { return }
+      alerta $resalt $+ $nick $+  te intenta mandar un posibe virus, rechazando...
+      echo -s $_m Si queres desactivar esta opción, tenes que ir a la configuración general del script (F3) y despues a la sección protecciones
+      e.mon  12 $nick te intenta mandar un posible 4virus, rechazando...
+      .notice $nick DCC Send rechazado - Posible virus...
+      .sonido $%(alerta) | halt 
+    }
+  }
+}
+ctcp *:MOTFV: {
+  _ctcp $nick te envia un VERSION
+  .timer $+ $nick 1 1 .ctcpreply $nick Version $fakeversion 
+  halt
+}
+ctcp 1:*:*: {
+  if ($nick != $me) {
+    if ($1 == page) {
+      if ($away == $true) {
+        if ((%away.page == si) && ($window(@Mensajes) != $null)) { 
+          aline @Mensajes $+ $cid $timestamp  $+ $nick $+  te dejo un PAGE
+        }
+        else { e.mon 12 $+ $nick te dejo un Page }
+        antiflood CTCP $nick
+        .notice $nick Page recibido - $logo
+        sonido $%(page)
+        Flash Page! | halt
+      }
+    }
+    sonido $%(ctcp) | antiflood CTCP $nick 
+    if ((writeini isin $1) || (write isin $1) || (remove isin $1) || (run isin $1) || (load isin $1) || (unload isin $1)) { halt }
+    if ($1 == sound) { anticon $nick $1- | goto fin }
+    if ($1 == ping) { _ctcp $nick te envia un PING | halt }
+    if ($1 == userinfo) { 
+      _ctcp $nick te envia un USERINFO
+      .timer $+ $nick 1 3 .ctcpreply $nick Userinfo $fakeversion 
+      halt
+    } 
+    if ($1 == clientinfo) {  
+      _ctcp $nick te envia un CLIENTINFO
+      .timer 1 3 .ctcpreply $nick Clientinfo $fakeversion 
+      halt 
+    }
+    else { 
+      _ctcp $nick te envia un $1
+      haltdef
+    }
+  }
+  :fin
+}
+
+;OP DEOP KICK BAN RAWMODE
+on ^1:RAWMODE:#: { 
+  _mode $chan $1 $nick $2- | halt
+}
+on 1:deop:#: {
+  if ($opnick == $me) { error | e.mon 4 $+ $nick te saca el @P en4 $chan }
+}
+on 1:op:#: {
+  if ($opnick == $me) { sonido $%(info) | e.mon 12 $+ $nick te da @P en12 $chan }
+}
+on ^1:kick:#: {
+  if ($knick != $me) { escribe.nick $site $knick }
+  if ($knick == $me) { 
+    error | e.mon 4 $+ $nick te patea de4 $chan - Se intentara una reentrada - Presiona12 F2 para cancelar 
+    if (%rj.ban == si) .timerjoin $+ $chan 5 2 join $chan
+    if (%kick.revenge == si) { %last.kick = $nick }
+  }
+  if ($nick == $me) { sonido $%(skick) }
+  _kick $chan $nick $knick $1- | if ($%(kcontador.act) == si) incv cant.kicks 1
+  halt
+}
+on 1:ban:#: {
+  if ($bnick == $me) { 
+    error | e.mon 4 $+ $nick te banea de4 $chan - Se intentara un Unban
+    if (%desbanear == si) { 
+      if ($me isop $chan) mode $chan -b $banmask
+      if (%unban.bot == si) {
+        if (dal.net isin $server) {
+          if ($ulevel != 69) .msg chanserv@services.dal.net op - $+ $nick
+          .msg chanserv@services.dal.net unban $chan me
+        }
+        elseif (undernet isin $server) {
+          if (X ison $chan) {
+            .msg x unban $chan $me
+            if ($ulevel != 69) .msg x@channels.undernet.org deop $chan $nick
+          }
+          if (w ison $chan) {
+            .msg w unban $chan $me
+            if ($ulevel != 69) msg w@channels.undernet.org deop $chan $nick
+          }
+        }
+        elseif (irc-hispano isin $server) {
+          if ($ulevel != 69) .msg chan@deep.space deop $chan $nick
+          .msg chan@deep.space unban $chan $me
+        }
+        elseif (irc-hispano.net isin $server) {
+          if ($ulevel != 69) msg Scytale deop $chan $nick
+          .msg Scytale unban $chan $banmask
+        }
+        elseif (red-latina.org isin $server) {
+          if ($ulevel != 69) msg X op $chan - $+ $nick
+          .msg X unban $chan me
+        }
+        elseif (chatnet isin $server) { 
+          if ($ulevel != 69) .msg k9 deop $chan $nick
+          .msg k9 unban $chan $banmask
+        }
+      }
+    }
+    if ($me isop $chan) {
+      if (%bres == 1) { kick $chan $nick %bres.texto $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+      if (%bres == 2) { mode -o $chan $nick | mode +b $chan $nick | .notice $nick %bres.texto }
+      if (%bres == 3) { mode -o $chan $nick | mode +b $chan $nick | kick $chan $nick %bres.texto $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+    }
+  }
+}
+
+;TOPIC
+on ^1:topic:*: { _ctopic $chan $nick $1- | haltdef }
+
+;FILERCVD SENDFAIL FILESENT GETFAIL
+on 1:FILERCVD:*.*: {
+  echo -s $marc Recibido $+ $resalt $filename $+  desde $+ $resalt $nick ( $address )
+  if ((%antivirus == $null) || (*.wav iswm $filename) || (*.mp3 iswm $filename) || (*.mid iswm $filename)) { haltdef | return }
+  if (%autoscan == si) {
+    if (%antivirus == Antivirus_no_configurado.exe) { avisar Acabas de recibir un archivo y tu antivirus no esta configurado para autoejecutarse. Para hacerlo anda al menú principal/configuración/antivirus. | haltdef | return }
+    echo -s $_m $+ $resalt $filename $+  recibido. Ejecutando el antivirus...
+    if (scan32.exe isin %antivirus) { run %antivirus $filename /autoscan /autoexit }
+    if (pcscan.exe isin %antivirus) { run %antivirus $filename /a }
+    else { run %antivirus $filename }
+    haltdef
+  }
+}
+on 1:FILESENT:*.*: {
+  sonido $%(info) | info Enviando $+ $resalt $filename $+  a $nick | haltdef
+}
+on 1:SENDFAIL:*.*: {
+  error | info Fallo en el envío de $+ $resalt $filename $+  a $nick | haltdef
+}
+on 1:GETFAIL:*.*: {
+  error | info Fallo en la recepción de $+ $resalt $filename $+  desde $nick | haltdef
+}

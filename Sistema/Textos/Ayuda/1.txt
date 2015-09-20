@@ -1,0 +1,7 @@
+  Cómo conectarse a un servidor
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Para seleccionar un servidor para conectarte, cambiar tu nick, nick
+  aleatorio y demás, tenes que ir al diálogo de conexión del script.
+€ 
+  El diálogo de conexión puede abrirse desde su correspondiente ícono 
+  en la barra (el primero) o desde el menú principal.

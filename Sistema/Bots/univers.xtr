@@ -1,0 +1,737 @@
+; ******************************************************
+; univers.xcr
+;
+; (c) 1998-2000 TeMpEsT. Prohibida la copia total o 
+; parcial de este archivo.
+;
+; Menus para los bots C,N,M de Univers/Upworld... 
+; ******************************************************
+
+
+alias msgc { msg C $$1- }
+alias msgn { msg N $$1- }
+alias msgm { msg M $$1- }
+
+alias universpass {
+  if ($gettok(%univers.passes,$findtok(%univers.nicks,$$1,1,44),44) != $null) {
+    return $ifmatch
+  }
+  else {
+    return $$?="Password de $$1 $+ ?"
+  }
+}
+alias universpass.c {
+  if ($gettok(%univers.passes.c,$findtok(%univers.chans,$$1,1,44),44) != $null) {
+    return $ifmatch
+  }
+  else {
+    return $$?="Password de $$1 $+ ?"
+  }
+}
+
+
+menu Menubar,Status {
+  $iif(univers.org isin $server,[Univers BOTS])
+  .Dar @p: msgc op #$$?="¿Canal?" $$?="Nick?"
+  .Quitar @p: msgc deop #$$?="¿Canal?" $$?="Nick?"
+  .-
+  ;  .Registrar canal: msgc register #$$?="¿Canal?" $$?="Password?" $$?="Descripción?"
+  ; .Lista IRCops: msgc ircops
+  .-
+  .Registrar nick: msgn register $$?="Password?"
+  .Identificar ( $+ $me $+ ): identify $universpass($me)
+  .-
+  .Lista mensajes: msgm list
+  .Enviar mensaje: msgm send $$?="Nick?" $$?="Mensaje?"  
+  .-
+  .(C)anales
+  ..Dar @p: msgc op #$$?="¿Canal?" $$?="Nick?"
+  ..Quitar @p: msgc deop #$$?="¿Canal?" $$?="Nick?"
+  ..Dar +voz: msgc voice #$$?="¿Canal?" $$?="Nick?"
+  ..Quitar +voz: msgc devoice #$$?="¿Canal?" $$?="Nick?"
+  ..Dar [ % ] $+ halfop: msgc halfop #$$?="¿Canal?" $$?="Nick?"
+  ..Quitar [ % ] $+ halfop: msgc dehalfop #$$?="¿Canal?" $$?="Nick?"
+  ..Quitar BAN: msgc unban #$$?="¿Canal?" $$?="Nick? (o host)"
+  ..-
+  ;  ..Registrar canal: msgc register #$$?="¿Canal?" $$?="Password?" $$?="Descripción?"
+  ..Identificar fundador: msgc identify #$$?="¿Canal?" $universpass.c($$!)
+  ..Desregistrar canal: msgc drop #$$?="¿Canal?"
+  ..-
+  ..Usuarios reg.
+  ...Añadir: msgc access #$$?="¿Canal?" add $$?="Nick? (o host)" $$?="Nivel?"
+  ...Borrar: msgc access #$$?="¿Canal?" del $$?="Nick? (o host o número de registro)"
+  ...Cambiar level: msgc access #$$?="¿Canal?" add $$?="Nick?" $$?="Nuevo nivel?"
+  ...-
+  ...Lista 
+  ....Todos: msgc access #$$?="¿Canal?" list
+  ....-
+  ....Patrón: msgc access #$$?="¿Canal?" list $$?="Patrón? $crlf Puede ser un nick, o una mascara"
+  ..Auto-Kick
+  ...Añadir: msgc akick #$$?="¿Canal?" add $$?="Nick? (o host)" $$?="Motivo?"
+  ...Borrar: msgc akick #$$?="¿Canal?" del $$?="Nick? (o host o numero de akick)"
+  ...-
+  ...Lista: msgc akick #$$?="¿Canal?" list
+  ..Quitar todos
+  ...Bans: msgc clear #$$?="¿Canal?" bans
+  ...+Voices: msgc clear #$$?="¿Canal?" voices
+  ...@ps: msgc clear #$$?="¿Canal?" ops
+  ...Users (mass kick): msgc clear #$$?="¿Canal?" users
+  ...Modos (reinicia): msgc clear #$$?="¿Canal?" modes
+  ..-
+  ..Admin.
+  ...Cambia topic: msgc set #$$?="¿Canal?" topic $$?="Nuevo Topic?"
+  ...-
+  ...Cambia fundador: msgc set #$$?="¿Canal?" founder $$?="Nick?"
+  ...Cambia password: msgc set #$$?="¿Canal?" passwords $$?="Nuevo password?" 
+  ...Cambia descripción: msgc set #$$?="¿Canal?" desc $$?="Nueva descripción?"
+  ...Cambia URL: msgc set URL $$?="Nueva URL?"
+  ...
+  ...Bloquea modos: msgc set #$$?="¿Canal?" mlock $$?="Modos? $crlf Ej: +nt"
+  ...Borrar topic al salir
+  ....on: msgc set #$$?="¿Canal?" keeptopic off
+  ....off: msgc set #$$?="¿Canal?" keeptopic on
+  ...Bloquear topic
+  ....on: msgc set #$$?="¿Canal?" topiclock on
+  ....off: msgc set #$$?="¿Canal?" topiclock off
+  ...-
+  ...Acceso seguro
+  ....on: msgc set #$$?="¿Canal?" secure on
+  ....off: msgc set #$$?="¿Canal?" secure off
+  ...Solo @ registrados
+  ....on: msgc set #$$?="¿Canal?" secureops on
+  ....off: msgc set #$$?="¿Canal?" secureops off
+  ...Solo registrados entran
+  ....on: msgc set #$$?="¿Canal?" restricted on
+  ....off: msgc set #$$?="¿Canal?" restricted off
+  ...Aparece en lista
+  ....on: msgc set #$$?="¿Canal?" private on
+  ....off: msgc set #$$?="¿Canal?" private off
+  ...-
+  ...Revenge
+  ....Desactivar: msgc set #$$?="¿Canal?" revenge none
+  ....-
+  ....Devuelve: msgc set #$$?="¿Canal?" revenge reverse
+  ....Deop: msgc set #$$?="¿Canal?" revenge depo
+  ....Kickea: msgc set #$$?="¿Canal?" revenge kick
+  ....Banea nick: msgc set #$$?="¿Canal?" revenge nickban
+  ....Banea máscara: msgc set #$$?="¿Canal?" revenge maskban
+  ....Banea IP: msgc set #$$?="¿Canal?" revenge hostban
+  ....Mirror: msgc set #$$?="¿Canal?" revenge mirror
+  ...-
+  ...Meter a C
+  ....on: msgc set #$$?="¿Canal?" join on
+  ....off: msgc set #$$?="¿Canal?" join off
+  ..-
+  ..Niveles
+  ...Lista: msgc LEVEL #$$?="¿Canal?" list
+  ...-
+  ...Auto-@p
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set autoop $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset autoop
+  ...Autovoice
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set autovoice $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset autovoice
+  ...Auto-de@p
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set autodeop $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset autodeop
+  ...Leer Noticias
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set newsread $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset newsread
+  ...Enviar Noticias
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set newspost $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset newspost
+  ...Borrar Noticias
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set newsdel $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset newsdel
+  ...Ignora baneos server
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set bounce $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset bounce
+  ...Cambiar opciones
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set set $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset set
+  ...Invitar
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set invite $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset invite
+  ...Modificar AKICK
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set akick $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset akick
+  ...Limpiar modos (clear)
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set clear $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset clear
+  ...Invitar
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set invite $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset invite
+  ...Desbanear (unban)
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set unban $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset unban
+  ...Dar @p
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set op $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset op
+  ...Dar +voz
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set voice $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset voice
+  ...Añadir/borrar registros
+  ....Cambiar: msgc LEVEL #$$?="¿Canal?" set access $$?="Nivel?"
+  ....-
+  ....Resetear: msgc LEVEL #$$?="¿Canal?" reset access
+  ..-
+  ..Info canal: msgc info #$$?="¿Canal?"
+  ..Modos puestos: msgc mode #$$?="¿Canal?"
+  ..Lista canales reg.
+  ...Todos: msgc list *
+  ...Patrón: msgc list $$?="Patrón?"
+  ..Users en canal: msgc users #$$?="¿Canal?"
+  ..Invitar a canal: msgc invite #$$?="¿Canal?" $$?="Nick?"
+  ; ..Lista IRCops: msgc ircops
+
+  .(N)icks
+  ..Registrar nick: msgn register $$?="Password?"
+  ..Desregistrar: msgn drop
+  ..Identificar ( $+ $me $+ ): identify $universpass($me)
+  ..Cambia pass.: msgn set password $$?="Nuevo password?"
+  ..-
+  ..Config $me
+  ...Máscaras
+  ....Añadir
+  .....Actual: msgn access current
+  .....Otra: msgn access add $$?="Mascara a añadir"
+  ....Borrar: msgn access del $$?="Máscara o num. de $crlf máscara a borrar"
+  ....Lista: msgn access list
+  ...-
+  ...Linkar: msgn link $$?="Con qué nick?" $universpass($$!)
+  ...Lista links: msgn slaves
+  ...Deslinkar: msgn dropslave $$?="Nick?"
+  ...-
+  ...Cambiar email: msgn set email $$?="Nuevo email?"
+  ...Cambiar URL:msgn set url $$?="Nueva URL?"
+  ...Recibir mensajes
+  ....En query: msgn set privmsg on
+  ....En notice: msgn set privmsg off
+  ...Privado
+  ....on: msgn set private on
+  ....off: msgn set private off
+  ..-
+  ..Protección
+  ...Kill
+  ....on: msgn set kill on
+  ....off: msgn set kill off
+  ...Identificarse siempre (secure)
+  ....on: msgn set secure on
+  ....off: msgn set secure off
+  ..-
+  ..Información: msgn info $$?="De qué Nick?"
+  ..Buscar nicks: msgn list $$?="Criterio de búsqueda? $crlf por ej. *pep*"
+  ..Ghost: msgn ghost $$?="Nick?" $universpass($$!)
+  ..Recuperar nick
+  ...Recuperar: msgn recover $$?="Nick?" $universpass($$!)
+  ...Soltar: msgn release $$?="Nick?" $universpass($$!)
+  ..-
+  ..Ignorar
+  ...Añadir: msgn ignore add $$?="Nick?"
+  ...Borrar: msgn ignore del $$?="Nick? $crlf (o numero de la lista)"
+  ...Ver lista: msgn ignore list
+
+  .(M)ensajería
+  ..Enviar mensaje
+  ...A un canal: msgm send #$$?="¿Canal?" $$?="Mensaje?"  
+  ...A un nick: msgm send $$?="Nick?" $$?="Mensaje?"  
+  ..-
+  ..Lista recibidos
+  ...Propios: msgm list
+  ...Canal: msgm list #$$?="¿Canal?" 
+  ..Leer
+  ...Propios
+  ....Por número: msgm read $$?="Número?" 
+  ....Todos!: msgm read all
+  ...Canal
+  ....Por número: msgm read #$$?="¿Canal?" $$?="Número?" 
+  ....Todos!: msgm read #$$?="¿Canal?" all
+  ..Borrar
+  ...Propios
+  ....Por número: msgm del $$?="Número?" 
+  ....Todos!: msgm del all
+  ...Canal
+  ....Por número: msgm del #$$?="¿Canal?" $$?="Número?" 
+  ....Todos!: msgm del #$$?="¿Canal?" all
+  ..Reenviar recibido
+  ...Propio: msgm forward $$?="Número?" $$?="A quién? (o #canal)"
+  ...Canal: msgm forward #$$?="¿Canal?" $$?="Número?" $$?="A quién? (o #canal)"
+}
+
+
+menu Channel {
+$iif(univers.org isin $server,[Univers BOTS])
+  .Dar @p: msgc op $$active $$?="Nick?"
+  .Quitar @p: msgc deop $$active $$?="Nick?"
+  .Dar [ % ] $+ halfop: msgc halfop $$active $$?="Nick?"
+  .Quitar [ % ] $+ halfop: msgc dehalfop $$active $$?="Nick?"
+  .Dar +voz: msgc voice $$active $$?="Nick?"
+  .Quitar +voz: msgc devoice $$active $$?="Nick?"
+  .Quitar BAN: msgc unban $$active $$?="Nick? (o host)"
+  .-
+  ;  .Registrar canal: msgc register $$active $$?="Password?" $$?="Descripción?"
+  .Identificar fundador: msgc identify $$active $universpass.c($active)
+  .Desregistrar canal: msgc drop $$active
+  .-
+  .Usuarios reg.
+  ..Añadir: msgc access $$active add $$?="Nick? (o host)" $$?="Nivel?"
+  ..Borrar: msgc access $$active del $$?="Nick? (o host o número de registro)"
+  ..Cambiar level: msgc access $$active add $$?="Nick?" $$?="Nuevo nivel?"
+  ..-
+  ..Lista 
+  ...Todos: msgc access $$active list
+  ...-
+  ...Patrón: msgc access $$active list $$?="Patrón? $crlf Puede ser un nick, o una mascara"
+  .Auto-Kick
+  ..Añadir: msgc akick $$active add $$?="Nick? (o host)" $$?="Motivo?"
+  ..Borrar: msgc akick $$active del $$?="Nick? (o host o numero de akick)"
+  ..-
+  ..Lista: msgc akick $$active list
+  .Quitar todos
+  ..Bans: msgc clear $$active bans
+  ..+Voices: msgc clear $$active voices
+  ..@ps: msgc clear $$active ops
+  ..Users (mass kick): msgc clear $$active users
+  ..Modos (reinicia): msgc clear $$active modes
+  .-
+  .Admin.
+  ..Cambia topic: msgc set $$active topic $$?="Nuevo Topic?"
+  ..-
+  ..Cambia fundador: msgc set $$active founder $$?="Nick?"
+  ..Cambia password: msgc set $$active passwords $$?="Nuevo password?" 
+  ..Cambia descripción: msgc set $$active desc $$?="Nueva descripción?"
+  ..Cambia URL: msgc set URL $$?="Nueva URL?"
+  ..
+  ..Bloquea modos: msgc set $$active mlock $$?="Modos? $crlf Ej: +nt"
+  ..Borrar topic al salir
+  ...on: msgc set $$active keeptopic off
+  ...off: msgc set $$active keeptopic on
+  ..Bloquear topic
+  ...on: msgc set $$active topiclock on
+  ...off: msgc set $$active topiclock off
+  ..-
+  ..Acceso seguro
+  ...on: msgc set $$active secure on
+  ...off: msgc set $$active secure off
+  ..Solo @ registrados
+  ...on: msgc set $$active secureops on
+  ...off: msgc set $$active secureops off
+  ..Solo registrados entran
+  ...on: msgc set $$active restricted on
+  ...off: msgc set $$active restricted off
+  ..Aparece en lista
+  ...on: msgc set $$active private on
+  ...off: msgc set $$active private off
+  ..-
+  ..Revenge
+  ...Desactivar: msgc set $$active revenge none
+  ...-
+  ...Devuelve: msgc set $$active revenge reverse
+  ...Deop: msgc set $$active revenge depo
+  ...Kickea: msgc set $$active revenge kick
+  ...Banea nick: msgc set $$active revenge nickban
+  ...Banea máscara: msgc set $$active revenge maskban
+  ...Banea IP: msgc set $$active revenge hostban
+  ...Mirror: msgc set $$active revenge mirror
+  ..-
+  ..Meter a C
+  ...on: msgc set $$active join on
+  ...off: msgc set $$active join off
+  .-
+  .Niveles
+  ..Lista: msgc LEVEL $$active list
+  ..-
+  ..Auto-@p
+  ...Cambiar: msgc LEVEL $$active set autoop $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autoop
+  ..Autovoice
+  ...Cambiar: msgc LEVEL $$active set autovoice $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autovoice
+  ..Auto-de@p
+  ...Cambiar: msgc LEVEL $$active set autodeop $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autodeop
+  ..Leer Noticias
+  ...Cambiar: msgc LEVEL $$active set newsread $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newsread
+  ..Enviar Noticias
+  ...Cambiar: msgc LEVEL $$active set newspost $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newspost
+  ..Borrar Noticias
+  ...Cambiar: msgc LEVEL $$active set newsdel $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newsdel
+  ..Ignora baneos server
+  ...Cambiar: msgc LEVEL $$active set bounce $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset bounce
+  ..Cambiar opciones
+  ...Cambiar: msgc LEVEL $$active set set $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset set
+  ..Invitar
+  ...Cambiar: msgc LEVEL $$active set invite $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset invite
+  ..Modificar AKICK
+  ...Cambiar: msgc LEVEL $$active set akick $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset akick
+  ..Limpiar modos (clear)
+  ...Cambiar: msgc LEVEL $$active set clear $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset clear
+  ..Invitar
+  ...Cambiar: msgc LEVEL $$active set invite $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset invite
+  ..Desbanear (unban)
+  ...Cambiar: msgc LEVEL $$active set unban $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset unban
+  ..Dar @p
+  ...Cambiar: msgc LEVEL $$active set op $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset op
+  ..Dar +voz
+  ...Cambiar: msgc LEVEL $$active set voice $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset voice
+  ..Añadir/borrar registros
+  ...Cambiar: msgc LEVEL $$active set access $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset access
+  .-
+  .Info canal: msgc info $$active
+  .Modos puestos: msgc mode $$active
+  .Lista canales reg.
+  ..Todos: msgc list *
+  ..Patrón: msgc list $$?="Patrón?"
+  .Users en canal: msgc users $$active
+  .Invitar a canal: msgc invite $$active $$?="Nick?"
+  ;.Lista IRCops: msgc ircops
+  .-
+  .(N)icks
+  ..Registrar nick: msgn register $$?="Password?"
+  ..Desregistrar: msgn drop
+  ..Identificar ( $+ $me $+ ): identify $universpass($me)
+  ..Cambia pass.: msgn set password $$?="Nuevo password?"
+  ..-
+  ..Config $me
+  ...Máscaras
+  ....Añadir
+  .....Actual: msgn access current
+  .....Otra: msgn access add $$?="Mascara a añadir"
+  ....Borrar: msgn access del $$?="Máscara o num. de $crlf máscara a borrar"
+  ....Lista: msgn access list
+  ...-
+  ...Linkar: msgn link $$?="Con qué nick?" $universpass($$!)
+  ...Lista links: msgn slaves
+  ...Deslinkar: msgn dropslave $$?="Nick?"
+  ...-
+  ...Cambiar email: msgn set email $$?="Nuevo email?"
+  ...Cambiar URL:msgn set url $$?="Nueva URL?"
+  ...Recibir mensajes
+  ....En query: msgn set privmsg on
+  ....En notice: msgn set privmsg off
+  ...Privado
+  ....on: msgn set private on
+  ....off: msgn set private off
+  ..-
+  ..Protección
+  ...Kill
+  ....on: msgn set kill on
+  ....off: msgn set kill off
+  ...Identificarse siempre (secure)
+  ....on: msgn set secure on
+  ....off: msgn set secure off
+  ..-
+  ..Información: msgn info $$?="De qué Nick?"
+  ..Buscar nicks: msgn list $$?="Criterio de búsqueda? $crlf por ej. *pep*"
+  ..Ghost: msgn ghost $$?="Nick?" $universpass($$!)
+  ..Recuperar nick
+  ...Recuperar: msgn recover $$?="Nick?" $universpass($$!)
+  ...Soltar: msgn release $$?="Nick?" $universpass($$!)
+  ..-
+  ..Ignorar
+  ...Añadir: msgn ignore add $$?="Nick?"
+  ...Borrar: msgn ignore del $$?="Nick? $crlf (o numero de la lista)"
+  ...Ver lista: msgn ignore list
+
+  .(M)ensajería
+  ..Enviar mensaje
+  ...A un canal: msgm send $$active $$?="Mensaje?"  
+  ...A un nick: msgm send $$?="Nick?" $$?="Mensaje?"  
+  ..-
+  ..Lista recibidos
+  ...Propios: msgm list
+  ...Canal: msgm list $$active 
+  ..Leer
+  ...Propios
+  ....Por número: msgm read $$?="Número?" 
+  ....Todos!: msgm read all
+  ...Canal
+  ....Por número: msgm read $$active $$?="Número?" 
+  ....Todos!: msgm read $$active all
+  ..Borrar
+  ...Propios
+  ....Por número: msgm del $$?="Número?" 
+  ....Todos!: msgm del all
+  ...Canal
+  ....Por número: msgm del $$active $$?="Número?" 
+  ....Todos!: msgm del $$active all
+  ..Reenviar recibido
+  ...Propio: msgm forward $$?="Número?" $$?="A quién? (o #canal)"
+  ...Canal: msgm forward $$active $$?="Número?" $$?="A quién? (o #canal)"
+}
+
+menu Nicklist {
+  [Univers BOTS]
+  .Dar @p: msgc op $$active $$1
+  .Quitar @p: msgc deop $$active $$1
+  .Dar [ % ] $+ halfop: msgc halfop $$active $$?="Nick?"
+  .Quitar [ % ] $+ halfop: msgc dehalfop $$active $$?="Nick?"
+  .Dar +voz: msgc voice $$active $$1
+  .Quitar +voz: msgc devoice $$active $$1
+  .Quitar BAN: msgc unban $$active $$1
+  .-
+  .Información $$1: msgn info $$1
+  .-
+  ;  .Registrar canal: msgc register $$active $$?="Password?" $$?="Descripción?"
+  .Identificar fundador: msgc identify $$active $universpass.c($active)
+  .Desregistrar canal: msgc drop $$active
+  .-
+  .Usuarios reg.
+  ..Añadir: msgc access $$active add $$1 $$?="Nivel?"
+  ..Borrar: msgc access $$active del $$1
+  ..Cambiar level: msgc access $$active add $$1 $$?="Nuevo nivel?"
+  ..-
+  ..Lista 
+  ...Todos: msgc access $$active list
+  ...-
+  ...Patrón: msgc access $$active list $$?="Patrón? $crlf Puede ser un nick, o una mascara"
+  .Auto-Kick
+  ..Añadir: msgc akick $$active add $$1 $$?="Motivo?"
+  ..Borrar: msgc akick $$active del $$1
+  ..-
+  ..Lista: msgc akick $$active list
+  .Quitar todos
+  ..Bans: msgc clear $$active bans
+  ..+Voices: msgc clear $$active voices
+  ..@ps: msgc clear $$active ops
+  ..Users (mass kick): msgc clear $$active users
+  ..Modos (reinicia): msgc clear $$active modes
+  .-
+  .Admin.
+  ..Cambia topic: msgc set $$active topic $$?="Nuevo Topic?"
+  ..-
+  ..Cambia fundador: msgc set $$active founder $$1
+  ..Cambia password: msgc set $$active passwords $$?="Nuevo password?" 
+  ..Cambia descripción: msgc set $$active desc $$?="Nueva descripción?"
+  ..Cambia URL: msgc set URL $$?="Nueva URL?"
+  ..
+  ..Bloquea modos: msgc set $$active mlock $$?="Modos? $crlf Ej: +nt"
+  ..Borrar topic al salir
+  ...on: msgc set $$active keeptopic off
+  ...off: msgc set $$active keeptopic on
+  ..Bloquear topic
+  ...on: msgc set $$active topiclock on
+  ...off: msgc set $$active topiclock off
+  ..-
+  ..Acceso seguro
+  ...on: msgc set $$active secure on
+  ...off: msgc set $$active secure off
+  ..Solo @ registrados
+  ...on: msgc set $$active secureops on
+  ...off: msgc set $$active secureops off
+  ..Solo registrados entran
+  ...on: msgc set $$active restricted on
+  ...off: msgc set $$active restricted off
+  ..Aparece en lista
+  ...on: msgc set $$active private on
+  ...off: msgc set $$active private off
+  ..-
+  ..Revenge
+  ...Desactivar: msgc set $$active revenge none
+  ...-
+  ...Devuelve: msgc set $$active revenge reverse
+  ...Deop: msgc set $$active revenge depo
+  ...Kickea: msgc set $$active revenge kick
+  ...Banea nick: msgc set $$active revenge nickban
+  ...Banea máscara: msgc set $$active revenge maskban
+  ...Banea IP: msgc set $$active revenge hostban
+  ...Mirror: msgc set $$active revenge mirror
+  ..-
+  ..Meter a C
+  ...on: msgc set $$active join on
+  ...off: msgc set $$active join off
+  .-
+  .Niveles
+  ..Lista: msgc LEVEL $$active list
+  ..-
+  ..Auto-@p
+  ...Cambiar: msgc LEVEL $$active set autoop $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autoop
+  ..Autovoice
+  ...Cambiar: msgc LEVEL $$active set autovoice $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autovoice
+  ..Auto-de@p
+  ...Cambiar: msgc LEVEL $$active set autodeop $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset autodeop
+  ..Leer Noticias
+  ...Cambiar: msgc LEVEL $$active set newsread $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newsread
+  ..Enviar Noticias
+  ...Cambiar: msgc LEVEL $$active set newspost $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newspost
+  ..Borrar Noticias
+  ...Cambiar: msgc LEVEL $$active set newsdel $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset newsdel
+  ..Ignora baneos server
+  ...Cambiar: msgc LEVEL $$active set bounce $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset bounce
+  ..Cambiar opciones
+  ...Cambiar: msgc LEVEL $$active set set $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset set
+  ..Invitar
+  ...Cambiar: msgc LEVEL $$active set invite $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset invite
+  ..Modificar AKICK
+  ...Cambiar: msgc LEVEL $$active set akick $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset akick
+  ..Limpiar modos (clear)
+  ...Cambiar: msgc LEVEL $$active set clear $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset clear
+  ..Invitar
+  ...Cambiar: msgc LEVEL $$active set invite $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset invite
+  ..Desbanear (unban)
+  ...Cambiar: msgc LEVEL $$active set unban $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset unban
+  ..Dar @p
+  ...Cambiar: msgc LEVEL $$active set op $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset op
+  ..Dar +voz
+  ...Cambiar: msgc LEVEL $$active set voice $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset voice
+  ..Añadir/borrar registros
+  ...Cambiar: msgc LEVEL $$active set access $$?="Nivel?"
+  ...-
+  ...Resetear: msgc LEVEL $$active reset access
+  .-
+  .Info canal: msgc info $$active
+  .Modos puestos: msgc mode $$active
+  .Lista canales reg.
+  ..Todos: msgc list *
+  ..Patrón: msgc list $$?="Patrón?"
+  .Users en canal: msgc users $$active
+  .Invitar a canal: msgc invite $$active $$1
+  ; .Lista IRCops: msgc ircops
+  .-
+  .(N)icks
+  ..Registrar nick: msgn register $$?="Password?"
+  ..Desregistrar: msgn drop
+  ..Identificar ( $+ $me $+ ): identify $universpass($me)
+  ..Cambia pass.: msgn set password $$?="Nuevo password?"
+  ..-
+  ..Config $me
+  ...Máscaras
+  ....Añadir
+  .....Actual: msgn access current
+  .....Otra: msgn access add $$?="Mascara a añadir"
+  ....Borrar: msgn access del $$?="Máscara o num. de $crlf máscara a borrar"
+  ....Lista: msgn access list
+  ...-
+  ...Linkar: msgn link $$?="Con qué nick?" $universpass($$!)
+  ...Lista links: msgn slaves
+  ...Deslinkar: msgn dropslave $$1
+  ...-
+  ...Cambiar email: msgn set email $$?="Nuevo email?"
+  ...Cambiar URL:msgn set url $$?="Nueva URL?"
+  ...Recibir mensajes
+  ....En query: msgn set privmsg on
+  ....En notice: msgn set privmsg off
+  ...Privado
+  ....on: msgn set private on
+  ....off: msgn set private off
+  ..-
+  ..Protección
+  ...Kill
+  ....on: msgn set kill on
+  ....off: msgn set kill off
+  ...Identificarse siempre (secure)
+  ....on: msgn set secure on
+  ....off: msgn set secure off
+  ..-
+  ..Información: msgn info $$1
+  ..Buscar nicks: msgn list $$?="Criterio de búsqueda? $crlf por ej. *pep*"
+  ..Ghost: msgn ghost $$1 $universpass($$!)
+  ..Recuperar nick
+  ...Recuperar: msgn recover $$1 $universpass($$!)
+  ...Soltar: msgn release $$1 $universpass($$!)
+  ..-
+  ..Ignorar
+  ...Añadir: msgn ignore add $$1
+  ...Borrar: msgn ignore del $$1
+  ...Ver lista: msgn ignore list
+
+  .(M)ensajería
+  ..Enviar mensaje
+  ...A un canal: msgm send $$active $$?="Mensaje?"  
+  ...A un nick: msgm send $$1 $$?="Mensaje?"  
+  ..-
+  ..Lista recibidos
+  ...Propios: msgm list
+  ...Canal: msgm list $$active 
+  ..Leer
+  ...Propios
+  ....Por número: msgm read $$?="Número?" 
+  ....Todos!: msgm read all
+  ...Canal
+  ....Por número: msgm read $$active $$?="Número?" 
+  ....Todos!: msgm read $$active all
+  ..Borrar
+  ...Propios
+  ....Por número: msgm del $$?="Número?" 
+  ....Todos!: msgm del all
+  ...Canal
+  ....Por número: msgm del $$active $$?="Número?" 
+  ....Todos!: msgm del $$active all
+  ..Reenviar recibido
+  ...Propio: msgm forward $$?="Número?" $$?="A quién? (o #canal)"
+  ...Canal: msgm forward $$active $$?="Número?" $$?="A quién? (o #canal)"
+}

@@ -1,0 +1,81 @@
+;Info
+4,1·15:4· 15join 14[15Kronos 14(15xtorm@Fds.virtual14)]
+4,1·15:4· 15part 14[15Mengu 14(15f-infinita@hsd.virtual14)]
+15>15 alguien despierto??
+14,1(15MaTyAs66614)15 No!
+4,1·15:4· 15quit14 [ (15 M0M0 14)15 itsux@flsd.virtual 14]
+4,1·15:4· 15nick15 change [(15 Your nick is now 0X-user14]
+4» 15Topic:15 Welcome to the hell!
+;Fin info
+;TEMA DarK-Red PARA PANTERA Y X-TORM
+on 1:load: {
+  fuentes 10 Verdana
+  set.colores pone 16777215,0,8388608,37888,255,128,10485920,33023,65535,64512,9475072,16776960,16711680,16711935,8817286,13685968,16777215,0,8388608,37888,255,128,10485920,33023,65535,64512,9475072,16776960,16711680,16711935,9672595,13685968
+  clear -s
+  colour action 14 | colour ctcp 4 | colour highlight 14 | colour info 15 | colour info2 15 | colour invite 15 | colour join 15
+  colour kick 15 | colour mode 15 | colour nick 4 | colour normal 0 | colour notice 14 | colour notify 14 | colour other 15 
+  colour own 15 | colour part 15 | colour quit 15 | colour topic 15 | colour wallops 14 | colour whois 0 | colour listbox 1 
+  colour editbox 1 | colour background 1 | colour editbox text 0 | colour listbox text 0 | colour grayed text 15 | credit
+  background -sx
+}
+alias nresalt return 15
+alias resalt return 9
+alias logo return 15[0X-TorM15]14 Script
+alias alerta { echo -es 4[Alerta4] $1- }
+alias info { echo -es 14[Info14] $1- }
+alias marc return 4,01·0:4·
+alias _m return 4»
+alias _ctcp { echo -es 4[CTCP4] $left($1,1) $+  $+ $right($1,$calc($len($1) - 1)) $+ : $2- }
+alias _notice { echo -es 4[Notice4] $1 $+ : $2- }
+alias bnotice { echo -es 4[ $+ $left($1,1) $+  $+ $right($1,$calc($len($1) - 1)) $+ 4] $2- }
+alias _join { 
+  echo $1 $marc 0join 14[00 $2 14(15 $+ $3 $+ 14)] $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return
+}
+alias cjoin { echo $1 $marc 10joins $2 10( $+ $3 $+ ) - Clones: 10 $4- }
+alias _part { echo $1 $marc 0part14 [00 $+ $2 14(15 $+ $3 $+ 14)] }
+alias _quit { 
+  if ($1 == -split) { return $marc 0quit14 [ (00 $2 14)15 $+ $3 $+ 14] (15 Split 14) }
+  if ($3 == $null) { return $marc 0quit14 [ (00 $1 14)15 $+ $2 $+ 14] }
+  else { return $marc 0quit14 [ (00 $1 14)15 $+ $2 $+ 14] (15 $3- 14) }
+} 
+alias _nick { return $marc 0nick change [(1514 $+ $left($1,1) $+  $+ $right($1,$calc($len($1) - 1))14)15 is now as 00 $+ $left($2,1) $+  $+ $right($2,$calc($len($2) - 1))14] }
+alias _mNick { return $marc 0nick change [(15 Your nick is now 00 $+ $left($1,1) $+  $+ $right($1,$calc($len($1) - 1))14] }
+alias _text { echo $1 14,1(0 $+ $left($2,1) $+  $+ $right($2,$calc($len($2) - 1)) $+ 14) $3- }
+alias _mtext { echo $1 15> $2- | .msg $1 $2- }
+alias _discon { echo -es $_m Not connected to server }
+alias _mode { echo $1 $marc 0mode14(15 $+ $1 $+ 14) [00 $2 $4- by 14(15 $3 14)]  }
+alias _kick { echo $1 $marc 0kick [0 $+ $3 15have been kicked off by 14(00 $+ $2 $+ 14) (15 $+ $4- $+ 14)15] }
+alias _topic { echo $1 $_m Topic: $2- }
+alias _ptopic { echo $1 $_m Put by14(15 $2 14)the14(15 $3 at15 $4- hours 14) | eblanco $1 }
+alias _ctopic { echo $1 $_m 15[00 topic changed15 [00 $2 15[14 $3- 15] }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias mjoin { echo $1 $marc $timestamp You have joined to $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $marc 12Modes:10 $chan($1).mode 12 Users:10 $nick($1,0) 12Ops:10 $nick($1,0,o) 12Voices:10 $nick($1,0,v)
+}
+alias credit {
+  echo 15[0X-TorM15]14  Script By 15MaTyAs666
+  eblanco -s
+  echo -s  14[ 0Http://www.xtorm-script.cjb.net - Http://www.xtorm.com.ar14 ]
+  eblanco -s
+  echo -s 14Version:0 $xversion
+  echo -s 14mIRC:0 $version
+  echo -s 14Theme:0 DarK-Red
+  eblanco -s | eblanco -s
+}
+
+[info]
+autor=^MaNSoN^
+comentarios=Tema basado en rojos, blancos y grises Textos en inglés.
+back=1
+fuente=Verdana 10
+colores=pone 16777215,0,8388608,37888,255,128,10485920,33023,65535,64512,9475072,16776960,16711680,16711935,8817286,13685968,16777215,0,8388608,37888,255,128,10485920,33023,65535,64512,9475072,16776960,16711680,16711935,9672595,13685968

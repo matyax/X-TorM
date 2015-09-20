@@ -1,0 +1,1330 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                    x-torm1.xtr - Eventos en ventanas
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+on 1:start: {
+  echo -a Seekbar, Kickpanel, Gui image, MP3 Player, FireXtorM... fuck!
+  echo -a autojoin por red
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Remotos GUI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+menu @Menu {
+  mouse { menu.mouse $mouse.x $mouse.y }
+  sclick { menu.click $mouse.x $mouse.y }
+}
+alias menu.mouse {
+  var %y = 20, %cant = $numtok($%(gui.menu),226), %w = $window(@Menu).w, %count = 1
+  while (%count <= %cant) {
+    if (($2 > %y) && ($2 < $calc(%y + 16))) {
+      drawrect -nfrd @Menu $%(rgb.normal) 1 3 %y $calc(%w - 5) 16 24 24
+      drawrect -nrd @Menu $%(rgb.oscuro) 1 3 %y $calc(%w - 5) 15 24 24
+      drawrect -nrd @Menu $%(rgb.oscuro) 1 3 %y $calc(%w - 5) 16 24 24
+      texto disable @Menu $calc(%y + 1) $gettok($gettok($%(gui.menu),%count,226),1,95)
+      drawline @Menu
+    }
+    else {
+      drawrect -nfrd @Menu $%(rgb.claro) 1 3 %y $calc(%w - 5) 16 24 24
+      drawrect -nrd @Menu $%(rgb.normal) 1 3 %y $calc(%w - 5) 15 24 24
+      drawrect -nrd @Menu $%(rgb.oscuro) 1 3 %y $calc(%w - 5) 16 24 24
+      texto cent @Menu $calc(%y + 1) $gettok($gettok($%(gui.menu),%count,226),1,95)
+      drawline @Menu
+    }
+    inc %count | inc %y 19 
+  }
+  drawline @Menu
+}
+
+alias menu.click {
+  var %y = 20, %cant = $numtok($%(gui.menu),226), %w = $window(@Menu).w, %count = 1
+  while (%count <= %cant) {
+    if (($2 > %y) && ($2 < $calc(%y + 20))) {
+      drawrect -nfrd @Menu $%(rgb.oscuro) 1 3 %y $calc(%w - 5) 16 24 24
+      drawrect -nrd @Menu $%(rgb.normal) 1 3 %y $calc(%w - 5) 15 24 24
+      texto disable @Menu $calc(%y + 1) $gettok($gettok($%(gui.menu),%count,226),1,95)
+      drawline @Menu
+      menu.do $gettok($gettok($%(gui.menu),%count,226),2,95)
+    }
+    inc %count | inc %y 19
+  }
+  drawline @Menu
+}
+alias menu.do {
+  drawline @Menu
+  var %tmp = 1,%tok = $numtok($1-,47)
+  while (%tmp <= %tok) {
+    if ($gettok($gettok($1-,%tmp,47),1,32) == sub) {
+      window -c @Menu
+      $gettok($gettok($1-,%tmp,47),2-,32)
+      return
+    }
+    .timer -m 1 500 $gettok($1-,%tmp,47)
+    inc %tmp
+  }
+  .timer -m 1 600 window -c @Menu
+}
+
+menu @*ð {
+  leave { cursor normal }
+  mouse {
+    if ($active == @Panelð) && ($%(panel. $+ $active)) { read_panel.mouse $active panel. $+ $active $mouse.x $mouse.y }
+    if ($mouse.key == 1 ) {
+      if ($active == @Setupð) && ($mouse.y > 30) && ($mouse.y < 63) { .timermovewin $+ $active -h 0 10 movewin $active | movewin $active | return }
+      if ($active == @X-AMPð) || ($active == @PLaylistð) {
+        if ($mouse.y > 0 && $mouse.y < 19 && $mouse.x < 250) { .timermovewin $+ $active -h 0 10 movewin $active | movewin $active | return }
+      }
+      else if ($mouse.y > 0 && $mouse.y < 30) { .timermovewin $+ $active -h 0 10 movewin $active | movewin $active }
+    }
+  }
+  sclick { 
+    ;echo -s $getdot($active,$mouse.x,$mouse.y)
+    ;echo -s $mouse.x - $mouse.y
+    if ($active == @X-AMPð) || ($active == @PLaylistð) return
+    gui.anima_ $active | gui.animax $active
+    if ( $%( but. [ $+ [ $active ] ] ) ) { 
+      read_but $active $%( but. [ $+ [ $active ] ] )
+    }
+    if ( %icon. [ $+ [ $active ] ] ) { 
+      read_icon $active %icon. [ $+ [ $active ] ]
+    }
+    :sigue
+    if ($%(check. $+ $active)) { 
+      read_check $active check. $+ $active
+    }
+    if ($%(radio. $+ $active)) { 
+      read_radio $active radio. $+ $active
+      if ($result) return
+      var %n = 1
+      while ($%(radio [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $active ] ] ) != $null) {
+        read_radio $active radio [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $active ] ] | inc %n
+        if ($result) return
+      }
+    }
+    if ($%(edit. $+ $active)) { 
+      read_edit $active edit. $+ $active
+    }
+    if ($%(panel. $+ $active)) { read_panel.click $active panel. $+ $active $mouse.x $mouse.y }
+  }
+}
+;;;;;;;;;; Combo
+menu @Combo {
+  lbclick {
+    if ($gettok($%(alias),1,32) == set) { set % [ $+ [ $gettok($%(alias),2,32) ] ] $sline(@combo,1) }
+    elseif ($gettok($%(alias),1,32) == setv) { setv $gettok($%(alias),2,32) $sline(@combo,1) }
+    elseif (-sline isin $%(alias)) { $%(alias) $sline(@combo,1).ln $sline(@combo,1) }
+    else { $%(alias) $sline(@combo,1) }
+    combo draw $%(coordenadas) $sline(@combo,1)
+    window -c @Combo
+  }
+}
+;;;;;;;;; Check
+alias read_check {
+  ;$1 ventana - $2 variable (check.@Ventana)
+  ;caracter = â (226)
+  ;variable = variable/grupo x y Texto â
+  var %win = $1,%var = $%($2),%n
+  :bucle
+  var %tok = $numtok(%var,226),%tmp = 1
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226)) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      var %w = $calc($2 + 15 + $width($4-,Tahoma,10)),%h = $calc($3 + $height($4,Tahoma,10))
+      if ($mouse.x > $2 && $mouse.x < %w && $mouse.y > $3 && $mouse.y < %h) {
+        if ($left($1,1) == $chr(35)) { $iif($group($1) == on,.disable,.enable) $1 | chek $iif($group($1) == on,a,d) %win $2 $3 $4- }
+        elseif ($right($1,1) == $chr(36)) { var %tmp.var = $remove($1,$chr(36)) | setv %tmp.var $iif($%(%tmp.var) == si,no,si) | chek $iif($%(%tmp.var) == si,a,d) %win $2 $3 $4- }
+        else { set % [ $+ [ $1 ] ] $iif(% [ $+ [ $1 ] ] == si,no,si) | chek $iif(% [ $+ [ $1 ] ] == si,a,d) %win $2 $3 $4- }
+        drawline %win
+        return
+      }
+    }
+    inc %tmp
+  }
+  inc %n
+  var %var2 = $%( check [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  if (%var2) { goto bucle }
+}
+alias do_check {
+  ;$1 ventana - $2 variable
+  ;caracter = â (226)
+  ;variable = variable/grupo x y Texto â
+  var %win = $1,%var = $%($2),%n
+  :bucle
+  var %tok = $numtok(%var,226),%tmp = 1
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226)) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      if ($left($1,1) == $chr(35)) { chek $iif($group($1) == on,a,d) %win $2 $3 $4- }
+      elseif ($right($1,1) == $chr(36)) { var %tmp.var = $remove($1,$chr(36)) | chek $iif($%(%tmp.var) == si,a,d) %win $2 $3 $4- }
+      else { chek $iif(% [ $+ [ $1 ] ] == si,a,d) %win $2 $3 $4- }
+    }
+    inc %tmp
+  }
+  inc %n
+  var %var2 = $%( check [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  if (%var2) { goto bucle }
+}
+
+;;;;;;;;; Radios
+alias read_radio {
+  ;$1 ventana - $2 variable (radio.@Ventana) - $3
+  ;caracter = â (226)
+  ;variable = variable/grupo x y Texto â
+  var %win = $1,%var = $%($2),%tok = $numtok(%var,226),%tmp = 1,%origvar = $2,%disablelse = $3
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226)) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      var %w = $calc($2 + 15 + $width($4-,Tahoma,10)),%h = $calc($3 + $height($4,Tahoma,10))
+      if (%disablelse != $null) {
+        if (%disablelse != %tmp) {
+          radios d %win $2 $3 $4-
+          drawline %win
+        }
+      }
+      elseif ($mouse.x > $2 && $mouse.x < %w && $mouse.y > $3 && $mouse.y < %h) {
+        if ($left($1,1) == $chr(35)) { .enable $1 | radios a %win $2 $3 $4- }
+        elseif ($left($1,1) == $chr(186)) {
+          if ($right($1,1) == $chr(36)) { var %tmp.var $remove($1,$chr(36),$chr(186)) | setv %tmp.var %tmp | radios a %win $2 $3 $4- }
+          else { set % [ $+ [ $remove($1,$chr(186)) ] ] %tmp | radios a %win $2 $3 $4- }
+        }
+        elseif (($right($1,1) == $chr(36)) && ($left($1,1) != $chr(186))) { var %tmp.var $remove($1,$chr(36)) | setv %tmp.var si | radios a %win $2 $3 $4- }
+        else { set % [ $+ [ $1 ] ] si | chek a %win $2 $3 $4- }
+        gotoreadr %win %origvar %tmp
+        drawline %win
+        return Stop
+      }
+    }
+    inc %tmp
+  }
+  drawline %win
+}
+alias gotoreadr { read_radio $1- }
+alias do_radio {
+  ;$1 ventana - $2 variable
+  ;caracter = â (226)
+  ;variable = variable/grupo x y Texto â
+  var %win = $1,%var = $%($2),%tok = $numtok(%var,226),%tmp = 1
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226) != $null) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      if ($left($1,1) == $chr(35)) { radios $iif($group($1) == on,a,d) %win $2 $3 $4- }
+      elseif ($left($1,1) == $chr(186)) {
+        if ($right($1,1) == $chr(36)) { var %tmp.var $remove($1,$chr(36),$chr(186)) | radios $iif($%(%tmp.var) == %tmp,a,d) %win $2 $3 $4- }
+        else { radios $iif(% [ $+ [ $remove($1,$chr(186)) ] ] == %tmp,a,d) %win $2 $3 $4- }
+      }
+      elseif ($right($1,1) == $chr(36)) && ($left($1,1) == $chr(186))) { radios $iif($%(%tmp.var) == si,a,d) %win $2 $3 $4- }
+      else { radios $iif(% [ $+ [ $1 ] ] == si,a,d) %win $2 $3 $4- }
+    }
+    inc %tmp
+  }
+  drawline %win
+}
+
+;;;;;;;;; Edits
+
+alias do_edit {
+  ;$1 ventana - $2 variable
+  ;caracter = â (226)
+  ;variable = variable x y w â
+  var %win = $1,%var = $%($2),%n
+  :bucle
+  var %tok = $numtok(%var,226),%tmp = 1
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226) != $null) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      if ($right($1,1) == $chr(36)) { var %tmp.var = $remove($1,$chr(36)) | edita %win $2 $3 $4 %tmp $%(%tmp.var) }
+      else { edita %win $2 $3 $4 %tmp % [ $+ [ $1 ] ]  }
+    }
+    inc %tmp
+  }
+  inc %n
+  var %var2 = $%( edit [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  if (%var2) { goto bucle }
+}
+
+alias read_edit {
+  ;$1 ventana - $2 variable (edit.@Ventana) - $3 mouse
+  ;caracter = â (226)
+  ;variable = variable x y w
+  var %win = $1,%var = $%($2),%mouse = $3
+  :bucle
+  var %tok = $numtok(%var,226),%tmp = 1
+  while (%tmp <= %tok) {
+    if ($gettok(%var,%tmp,226)) {
+      tokenize 32 $gettok(%var,%tmp,226)
+      var %w = $calc($2 + $4),%h = $calc($3 + 20)
+      if ($mouse.x > $2 && $mouse.x < %w && $mouse.y > $3 && $mouse.y < %h) {
+        if ($right($1,1) == $chr(36)) { var %tmp.var = $remove($1,$chr(36)) | editar %win $2 $3 $4 %tmp $ %tmp.var }
+        elseif ($1 == edid) { editar %win $2 $3 $4 %tmp edid }
+        else { editar %win $2 $3 $4 %tmp % $1 }
+        return
+      }
+    }
+    inc %tmp
+  }
+  inc %n
+  var %var2 = $%( edit [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  if (%var2) { goto bucle }
+}
+
+;;;;;;;; Botones
+alias comp.xy {
+  var %win = $1 | tokenize 32 $2-
+  if ($window(%win) == $null) { .timer  $+ %win $+ $1 off | unset %pulsado }
+  elseif ($mouse.key == 1) {
+    %pulsado = si
+    if ($mouse.x > $1 && $mouse.x < $calc($1 + $3) && $mouse.y > $2 && $mouse.y < $calc($2 + $4)) { $boton(%win,$1,$2,$3,$4,$5-).push | drawline %win }
+    else { $boton(%win,$1,$2,$3,$4,$5-).norm | drawline %win }
+  }
+  else { 
+    $boton(%win,$1,$2,$3,$4,$5-).norm | drawline %win | .timer  $+ %win $+ $1 off | unset %pulsado
+    if ( $mouse.x > $1 && $mouse.x < $calc($1 + $3) && $mouse.y > $2 && $mouse.y < $calc($2 + $4) ) {
+      %uclick = $1 $2 $3 $4
+      if ( $%( but. [ $+ [ $active ] ] ) ) { 
+        read_but_u $active $%( but. [ $+ [ $active ] ] )
+        var %n = 1
+        while ( $%( but [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $active ] ] ) != $null) {
+          read_but_u $active $%( but [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $active ] ] ) | inc %n
+        }
+      }
+    }
+  }
+}
+alias read_but {
+  var %buts = $2- ,%win = $1 ,%n
+  :bucle
+  var %ds = 1
+  while ($gettok(%buts,%ds,226) != $null) {
+    tokenize 32 $gettok($gettok(%buts,%ds,226),1,95)
+    if ( $mouse.x > $1 && $mouse.x < $calc($1 + $3) && $mouse.y > $2 && $mouse.y < $calc($2 + $4) ) {
+      $boton(%win,$1,$2,$3,$4,$5-).push | drawline %win
+      .timer $+ %win $+ $1 -m 0 0 comp.xy %win $1-
+      return
+    }
+    inc %ds
+  }
+  inc %n
+  var %var2 = $%( but [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  %buts = %var2
+  if (%var2) { goto bucle }
+  drawline %win
+}
+alias read_but_u {
+  var %buts = $2-  ,%win = $1,%n
+  if (!%uclick) return
+  :bucle
+  var %ds = 1
+  while ($gettok(%buts,%ds,226) != $null) {
+    tokenize 32 $gettok($gettok(%buts,%ds,226),1,95)
+    if ( ($1 == $gettok(%uclick,1,32)) && ($2 == $gettok(%uclick,2,32)) ) {
+      if ( ($3 == $gettok(%uclick,3,32)) && ($4 == $gettok(%uclick,4,32)) ) {
+        var %tmp = 1,%tmp.toq = $gettok($gettok($gettok(%buts,%ds,226),2,95),%tmp,47) 
+        while (%tmp.toq != $null) {
+          if (%tmp.toq == Ok) { .timer -m 1 350 cierra_win %win } 
+          else { do %tmp.toq } | inc %tmp
+          %tmp.toq = $gettok($gettok($gettok(%buts,%ds,226),2,95),%tmp,47)
+        }
+        unset %uclick | return 
+      }
+    }
+    inc %ds
+  }
+  inc %n
+  var %var2 = $%( but [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  %buts = %var2
+  if (%var2) { goto bucle }
+}
+
+alias do { $1- }
+alias do_but {
+  var %buts = $%($2)
+  var %ds,%win = $1,%n
+  :bucle
+  %ds = 1
+  while ($gettok($gettok(%buts,%ds,226),1,95) != $null) {
+    tokenize 32 $gettok($gettok(%buts,%ds,226),1,95)
+    $boton(%win,$1,$2,$3,$4,$5-).norm
+    inc %ds
+  }
+  inc %n
+  var %var2 = $%( but [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ %win ] ] )
+  %buts = %var2
+  if (%var2) { goto bucle }
+}
+;;;;;;;;;;;;;;;;;; Iconos
+alias do_icon {
+  var %tipo = $2,%buts = $5- ,%win = $1,%dis = $4,%x = $3, %ds = 1
+  while ($gettok($gettok(%buts,%ds,226),1,95) != $null) {
+    tokenize 32 $gettok($gettok(%buts,%ds,226),1,95)
+    if (%tipo == abajo) {
+      if (%ds > 1) { inc %dis 35 }
+      drawpic -nt %win 65280 %x %dis $1
+      if ($2) { drawtext -r %win $%(rgb.setuptxt) $%(Texto) $calc(%x + 39) $calc(%dis + ( ( 32 / 2) - 7)) $2- }
+    }
+    inc %ds 
+  }
+}
+alias read_icon {
+  var %tipo = $2,%buts = $5- ,%ds = 1,%win = $1,%dis = $4,%x = $3
+  while ($gettok(%buts,%ds,226) != $null) {
+    tokenize 32 $gettok($gettok(%buts,%ds,226),1,95)
+    if (%ds > 1) { inc %dis 35 }
+    if ( $mouse.x > %x && $mouse.x < $calc(%x + 32) && $mouse.y > %dis && $mouse.y < $calc(%dis + 32) ) {
+      var %tmp = 1,%tmp.toq = $gettok($gettok($gettok(%buts,%ds,226),2,95),%tmp,47)
+      if ($2) { drawtext -r %win $%(rgb.claro) $%(Texto) $calc(%x + 39) $calc(%dis + ( ( 32 / 2) - 7)) $2- 
+        .timer -m 1 500 drawtext -r %win $%(rgb.setuptxt) $%(Texto) $calc(%x + 39) $calc(%dis + ( ( 32 / 2) - 7)) $2-
+      }
+      while (%tmp.toq != $null) {
+        if (%tmp.toq == Ok) { .timer -m 1 350 cierra_win %win } 
+        else { do %tmp.toq } | inc %tmp
+        %tmp.toq = $gettok($gettok($gettok(%buts,%ds,226),2,95),%tmp,47)
+      }
+      return
+    }
+    inc %ds
+  }
+}
+;;;;;;;; Editbox
+on 1:input:@editbox: {
+  window -c @editbox | .timeredita off
+  colour 9 %var-color | colour editbox 9 |  unset %var-color
+  if ($gettok($%(tmp.toset),1,32) == $chr(37)) { 
+    set % [ $+ [ $gettok($%(tmp.toset),2,32) ] ] $1- 
+    esc-edit $%(coordenadas) % [ $+ [ $gettok($%(tmp.toset),2,32) ] ]
+    if ($%(alias)) $%(alias) % [ $+ [ $gettok($%(tmp.toset),2,32) ] ] 
+  }
+  elseif ($gettok($%(tmp.toset),1,32) == $chr(36)) { 
+    setv $gettok($%(tmp.toset),2,32) $1- 
+    esc-edit $%(coordenadas) $%($gettok($%(tmp.toset),2,32))
+    if ($%(alias)) $%(alias) $%($gettok($%(tmp.toset),2,32))
+  }
+  else {
+    esc-edit $%(coordenadas) $1-
+    if ($%(alias)) $%(alias) $1-
+  }
+  hadd edit $+ $remove($gettok($%(coordenadas),1,32),ð) $%(edid) $replace($1-,$chr(32),$chr(188))
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Fin Remotos Gui ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+menu @creditos {
+  sclick { if ($mouse.x > 2 && $mouse.x < 56 && $mouse.y > 475 && $mouse.y < 500 ) { window -c @creditos } }
+  mouse { 
+    if ($mouse.x > 2 && $mouse.x < 56 && $mouse.y > 475 && $mouse.y < 500 ) { drawtext -c @creditos 0 Arial 9 10 490 999 17 CERRAR }
+    else { drawtext -c @creditos 4 Arial 9 10 490 999 17 CERRAR }
+  }
+}
+menu @logs {
+  dclick { carga.log $logdir $+ $line(@logs,$1,1) }  
+  &Editar este log: run c:\windows\notepad.exe $logdir $+ $sline(@logs,1) 
+  -
+  &Borrar Log: { remove $logdir $+ $sline(@logs,1) | dline -l @logs $sline(@logs,1).ln }
+  &Renombrar Log:{
+    if ($sline(@logs,1) == $null) { 
+      echo @logs $resalt Tenes que elegir el log a renombrar en la lista de la derecha
+    }
+    else { %nuevolog = $$?="¿Nuevo nombre para el archivo? Ej: nombre.log" | rename $logdir $+ $sline(@logs,1) $logdir $+ %nuevolog | rline -l @logs $sline(@logs,1).ln %nuevolog | unset %nuevolog }
+  }
+  -
+  Buscar texto: findtext $$?="¿Texto a buscar?"
+  Buscar log: var %tmp.t = $$?="¿Palabra clave o nombre del log?" | clear @logs | logs %tmp.t
+  -
+  &Limpiar ventana: cls @logs
+  &Cerrar Gestor de Logs: window -c @logs
+}
+;--------------------------------------------- X-Barra Gui ---------------------------------------------;
+alias r.chk { if ($window(-3).w < 800) { 
+    info Tu resolución de pantalla (640 * 480) es demasiado pequeña para soportar la barra de útiles. Hasta que no la cambies por una mayor, la barra no se abrirá 
+    echo -s $_m Para más información consultar la ayuda incluída en el script -> Tecla F1 o comando /ayuda - Sección "Barra de útiles"
+    return FUCK! 
+  }
+}
+alias @barra {
+  if ($r.chk) return
+  window -c @barra | window -c @monitor
+  var %barra.long = $pic($mircdirskins\ $+ $%(barradir) $+ \barra.png).width
+  var %x = $round($calc(($window(-3).w - %barra.long) / 2),0),%y = 0
+  window -phBi +bd @barra %x %y %barra.long 45 @barra
+  drawpic @barra 0 0 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+  e-minimp3 miniMP3 en espera... | window -a @barra | if (%monitor == si) { @monitor | %und.in = y }
+  .timerexp -i 0 0 descript $!mouse.x $!mouse.y
+}
+alias @monitor {
+  window -c @monitor
+  var %x,%w
+  %x = 0 | %w = $calc($pic($mircdirskins\ $+ $%(barradir) $+ \barra.png).width - 62)
+  if (%anima.win == si) { .timerAnimaM -h 0 0 animonitor %w | return }
+
+  window -pBhi +bd @monitor $round($calc(($window(-3).w - %w) / 2),0) 45 %w 20 @monitor
+  drawpic @monitor 0 0 35 45 %w 20 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+  window -a @monitor
+}
+alias animonitor {
+  if (!$window(@monitor)) {
+    window -pBh +bd @monitor $round($calc(($window(-3).w - 5) / 2),0) 45 5 20 @monitor
+    drawpic -s @monitor 0 0 5 20 35 45 $1 20 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+    window -a @monitor | %ac.frst = 1
+  }
+  if (%ac.frst == 1) {
+    if ($window(@monitor).w < $calc($1 + 100)) {
+      window @monitor $round($calc( ($window(-3).w - ($window(@monitor).w + 5) ) / 2 ),0) 45 $calc($window(@monitor).w + 5) 20
+      drawpic -s @monitor 0 0 $window(@monitor).w 20 35 45 $1 20 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+    }
+    else %ac.frst = 2
+  }
+  if (%ac.frst == 2) {
+    if ($window(@monitor).w > $1) {
+      window @monitor $round($calc( ($window(-3).w - ($window(@monitor).w - 5) ) / 2 ),0) 45 $calc($window(@monitor).w - 5) 20
+      drawpic -s @monitor 0 0 $window(@monitor).w 20 35 45 $1 20 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+    }
+    else {
+      window @monitor $calc(($window(-3).w - $1) / 2) 45 $1 20 | drawpic @monitor 0 0 35 45 $1 20 $mircdirskins\ $+ $%(barradir) $+ \barra.png | unset %ac.frst
+      .timerAnimaM off
+      if (%und.in) { e.mon Bienvenido nuevamente al 12[ X-TorM 12] Script $me - Script iniciado a las4 $time del4 $date  | unset %und.in }
+    }
+  }
+}
+alias borrabarra { if ($window(@barra)) drawpic @barra 0 0 $mircdirskins\ $+ $%(barradir) $+ \barra.png }
+alias lag-meter {
+  if ($window(@barra)) {
+    drawpic -s @barra 430 8 82 47 430 8 82 47 $mircdirskins\ $+ $%(barradir) $+ \barra.png
+  }
+}
+alias escribe-lag {
+  if ($$1 > 10) alerta Lag detectado ( $+ $1 segundos)... se recomienda cambio de server...
+  if ($window(@barra)) {
+    lag-meter
+    drawtext -o @barra 0 Verdana 10 477 19 $$1 seg
+    if (($$1 == 0) || ($$1 == 1)) { return }
+    var %tmp = 1,%x = 433,%cont = 3
+    while (%tmp <= $$1) {
+      if (%tmp > 15) return
+      if (2 // %cont) { drawrect @barra 1 1 %x 9 9 8 | drawrect -fr @barra 1 1 $calc(%x + 2) 11 5 4 | inc %x 11 }
+      inc %tmp | inc %cont
+    }
+  }
+  return
+}
+menu @barra {
+  leave { window -c @exp }
+  sclick {
+    if ($mouse.x isnum 7-36 && $mouse.y isnum 7-33) { animar 7 6 6 5 28 30 | conecta }
+    elseif ($mouse.x isnum 43-74 && $mouse.y isnum 7-33) { animar 43 8 42 7 33 27 | logs }
+    elseif ($mouse.x isnum 82-112 && $mouse.y isnum 10-36) { animar 83 9 82 8 29 29 | dialogaway }
+    elseif ($mouse.x isnum 121-144 && $mouse.y isnum 8-33) { animar 122 8 121 7 28 27 | escrituras }
+    elseif ($mouse.x isnum 152-178 && $mouse.y isnum 8-33) { animar 153 9 152 8 28 27 | cpanel }
+    elseif ($mouse.x isnum 186-217 && $mouse.y isnum 3-31) { animar 187 6 186 5 28 30 | temas }
+    elseif ($mouse.x isnum 219-252 && $mouse.y isnum 6-34) { animar 220 7 219 6 34 30 | x-amp }
+    elseif ($mouse.x isnum 260-291 && $mouse.y isnum 5-36) { animar 260 5 259 4 32 30 | ayuda }
+    elseif ($mouse.x isnum 299-332 && $mouse.y isnum 7-35) { animar 300 6 299 5 32 30 | Info Tenés que hacer unos buenos créditos del script... xD }
+    ;-
+    elseif ($mouse.x isnum 514-542 && $mouse.y isnum 6-19) { 
+      animar 514 6 513 5 29 15 | if ($%(c.active)) topic $%(c.active) $$?="¿Qué topic deseas colocar?" | else { error | avisar No has seleccionado ningún canal }
+    }
+    elseif ($mouse.x isnum 546-574 && $mouse.y isnum 6-19) { animar 547 6 546 5 29 15 
+      if ($%(c.active)) mode $%(c.active) $$?="¿Qué modos deseas colocar? $crlf $+ +/- NTILPSKM" | else { error | avisar No has seleccionado ningún canal }
+    }
+    elseif ($mouse.x isnum 577-606 && $mouse.y isnum 6-19) { 
+      animar 578 6 577 5 29 15
+      if ($%(c.active)) && ($snick($%(c.active),0)) {
+        if ($me !isop $%(c.active)) { error | avisar No sos op en $%(c.active) }
+        var %tn = $snick($%(c.active),0), %flt = 1, %timer, %act
+        if (%tn > 6) %timer = 5
+        while (%flt <= %tn) {
+          if ($snick($%(c.active),%flt) isop $%(c.active)) %act = -
+          else %act = +
+          $iif(%timer, .timer -m 1 %timer,) mode $%(c.active) %act $+ o $snick($%(c.active),%flt)
+          inc %flt | if (%timer) %timer = $calc(%timer * 2)
+        }
+      }
+      else { error | avisar No has seleccionado ningún nick o canal }
+    }
+    elseif ($mouse.x isnum 514-542 && $mouse.y isnum 20-34) { 
+      animar 514 21 513 20 29 15
+      if ($%(c.active)) && ($snick($%(c.active),0)) {
+        if ($me !isop $%(c.active)) { error | avisar No sos op en $%(c.active) }
+        var %tn = $snick($%(c.active),0), %flt = 1, %timer
+        if (%tn > 6) %timer = 5
+        while (%flt <= %tn) {
+          if ($snick($%(c.active),%flt) isop $%(c.active)) $iif(%timer, .timer -m 1 %timer,) mode $%(c.active) -o $snick($%(c.active),%flt)
+          $iif(%timer, .timer -m 1 %timer,) mode $%(c.active) +b $snick($%(c.active),%flt)
+          $iif(%timer, .timer -m 1 %timer,) kick $%(c.active) $snick($%(c.active),%flt) $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],)
+          if ($%(kcontador.act) == si) incv cant.kicks 1
+          inc %flt | if (%timer) %timer = $calc(%timer * 2)
+        }
+      }
+      else { error | avisar No has seleccionado ningún nick o canal }
+    }
+    elseif ($mouse.x isnum 546-574 && $mouse.y isnum 20-34) { 
+      animar 547 21 546 20 29 15
+      if ($%(c.active)) && ($snick($%(c.active),1)) { do-xwhois $snick($%(c.active),1) }
+      else { error | avisar No tenés ningún canal o nick seleccionado }
+    }
+    elseif ($mouse.x isnum 577-606 && $mouse.y isnum 20-34) { 
+      animar 578 21 577 20 29 15
+      if ($%(c.active)) && ($snick($%(c.active),1)) { 
+        dcc send $snick($%(c.active),1)
+      }
+      else { error | avisar No tenés ningún canal o nick seleccionado }
+    }
+    ;
+    elseif ($mouse.x isnum 646-662 && $mouse.y isnum 20-30) { animar 646 21 645 20 17 10 | if ($inmp3) .splay -p seek $calc( $inmp3.pos - 5000 ) }
+    elseif ($mouse.x isnum 668-684 && $mouse.y isnum 20-30) { 
+      animar 668 21 667 20 17 10 
+      var %tmp.mp3 = $$sfile($%(last.carp.mp3),Selecciona el mp3,Ejecutar!) 
+      if ($inmp3) .splay stop
+      setv mp3.state no
+      .splay %tmp.mp3
+      setv last.carp.mp3 $nofile(%tmp.mp3)
+      e-minimp3 $iif(*.mp3 iswm %tmp.mp3,$gettok($mp3(%tmp.mp3).artist,1,32) $+ : $+ $mp3(%tmp.mp3).title,$gettok($nopath(%tmp.mp3),1,46))
+    }
+    elseif ($mouse.x isnum 690-706 && $mouse.y isnum 20-30) { 
+      animar 690 21 689 20 17 10 
+      if (($inmp3) && ($%(mp3.state) == si)) { .splay resume | setv mp3.state no | e-minimp3 Reanudar... | return }
+      if (($inmp3) && ($%(mp3.state) == no)) { .splay pause |  setv mp3.state si | e-minimp3 Pausa... }
+    }
+    elseif ($mouse.x isnum 712-718 && $mouse.y isnum 20-30) { animar 712 21 711 20 17 10 | if ($inmp3) { .splay stop | e-minimp3 MiniMP3 en espera... | setv mp3.state no } }
+    elseif ($mouse.x isnum 733-740 && $mouse.y isnum 20-30) { animar 733 21 732 20 17 10 | if ($inmp3) .splay -p seek $calc( $inmp3.pos + 5000 ) }
+  }
+  rclick {
+    menubar
+  }
+}
+
+on 1:active:@barra: { if ($timer(exp) == $null) .timerexp 0 0 descript $!mouse.x $!mouse.y }
+
+alias e-minimp3 { if ($window(@barra)) { drawpic @barra 642 8 642 8 111 10 $mircdirskins\ $+ $%(barradir) $+ \barra.png | drawtext @barra 1 Verdana 10 643 6 $mid($1-,1,19) } }
+on 1:close:@barra: .timerexp off
+alias animar {
+  drawpic @barra $1- $mircdirskins\ $+ $%(barradir) $+ \barra.png | .timer $+ $mouse.dx -m 1 500 drawpic @barra $calc($1 - 1) $calc($2 - 1) $3- $mircdirskins\ $+ $%(barradir) $+ \barra.png
+}
+alias exp {
+  var %barra.long = $calc( ( $window(-3).w - $pic($mircdirskins\ $+ $%(barradir) $+ \barra.png).width ) / 2)
+  var %tmp.x = $calc($1 + %barra.long)
+  if ( $1 == $calc(($window(@exp).x - $window(@barra).x))) return
+  if ($window(@exp) == $null) { window -pBhi +bd @exp %tmp.x $iif($prop,$prop,40) $calc($width($2-,Verdana,10) + 4) 15 | window -a @exp }
+  else window -a @exp %tmp.x $iif($prop,$prop,40) $calc($width($2-,Verdana,10) + 4) 15
+  drawrect -f @exp 0 15 0 0 $calc($width($2-,Verdana,10) + 4) 15 
+  drawrect @exp 1 1 0 0 $calc($width($2-,Verdana,10) + 4) 15 
+  drawtext @exp 1 Verdana 10 2 1 $$2-
+}
+
+alias descript {
+  if ($mouse.win != @barra) { window -c @exp | return }
+  if ($mouse.x isnum 7-36 && $mouse.y isnum 7-33) { exp $mouse.x Ventana de conexión }
+  elseif ($mouse.x isnum 43-74 && $mouse.y isnum 7-33) { exp $mouse.x Visor de logs }
+  elseif ($mouse.x isnum 82-112 && $mouse.y isnum 10-36) { exp $mouse.x Sistema de away }
+  elseif ($mouse.x isnum 121-144 && $mouse.y isnum 8-29) { exp $mouse.x Central de escritura }
+  elseif ($mouse.x isnum 152-178 && $mouse.y isnum 8-33) { exp $mouse.x Panel de control }
+  elseif ($mouse.x isnum 186-217 && $mouse.y isnum 3-29) { exp $mouse.x Temas de texto }
+  elseif ($mouse.x isnum 219-252 && $mouse.y isnum 6-34) { exp $mouse.x Reproductor de mp3 }
+  elseif ($mouse.x isnum 260-291 && $mouse.y isnum 5-36) { exp $mouse.x Ayuda del X-TorM }
+  elseif (($mouse.x isnum 299-332 && $mouse.y isnum 7-35)) { exp $mouse.x Créditos }
+  ;
+  elseif (($mouse.x isnum 430-510 && $mouse.y isnum 8-32)) { exp $mouse.x $iif($server,Lag de $server,Medidor de lag) }
+  ;
+  elseif ($mouse.x isnum 514-542 && $mouse.y isnum 6-19) { $exp($mouse.x,Cambiar el topic del canal activo).30 }
+  elseif ($mouse.x isnum 546-574 && $mouse.y isnum 6-19) { $exp($mouse.x,Cambiar modos del canal activo).30 }
+  elseif ($mouse.x isnum 577-606 && $mouse.y isnum 6-19) { $exp($mouse.x,Dar/Sacar op al nick seleccionado).30 }
+  elseif ($mouse.x isnum 514-542 && $mouse.y isnum 21-35) { $exp($mouse.x,Echar del canal al nick seleccionado).44 }
+  elseif ($mouse.x isnum 546-574 && $mouse.y isnum 21-35) { $exp($mouse.x,Whois al nick seleccionado).44 }
+  elseif ($mouse.x isnum 577-606 && $mouse.y isnum 21-35) { $exp($mouse.x,Enviar archivo al nick seleccionado).44 }
+  ;
+  elseif ($mouse.x isnum 646-662 && $mouse.y isnum 20-30) { $exp($mouse.x,Atrasar).42 }
+  elseif ($mouse.x isnum 668-684 && $mouse.y isnum 20-30) { $exp($mouse.x,Reproducir).42 }
+  elseif ($mouse.x isnum 690-706 && $mouse.y isnum 20-30) { $exp($mouse.x,Pausa).42 }
+  elseif ($mouse.x isnum 712-718 && $mouse.y isnum 20-30) { $exp($mouse.x,Detener).42 }
+  elseif ($mouse.x isnum 733-740 && $mouse.y isnum 20-30) { $exp($mouse.x,Adelantar).42 }
+  ;  
+  else { window -c @exp }
+}
+
+;------------------------------
+;Colores
+alias colores {
+  ventana noc @Coloresð $mouse.mx $mouse.my 160 80 | titulo @Coloresð Colores | %colarias = $1-
+  var %tmp = 0,%x = 5,%y = 35
+  while (%tmp <= 15) {
+    if (%tmp <= 7) { cuadro @Coloresð %tmp %x %y 15 15 | drawtext @Coloresð 0 Tahoma 10 $calc(%x + 4) $calc(%y + 1) %tmp | inc %x 19 | inc %tmp }
+    if (%tmp = 8) { %y = 55 | %x = 5 }
+    if (%tmp > 7) { cuadro @Coloresð %tmp %x %y 15 15 | drawtext @Coloresð 0 Tahoma 10 $calc(%x + 4) $calc(%y + 1) %tmp | inc %x 19 | inc %tmp }
+  }
+  drawline @Coloresð | .timercolores 0 0 comp.colores
+}
+alias comp.colores {
+  if ($active != @Coloresð) { window -c @coloresð | unset %colarias | .timercolores off }
+}
+menu @Coloresð {
+  sclick {
+    if ($mouse.x isnum 5-20 && $mouse.y isnum 35-50) { %colarias 0 | window -c @Coloresð }
+    if ($mouse.x isnum 24-39 && $mouse.y isnum 35-50) { %colarias 1 | window -c @Coloresð }
+    if ($mouse.x isnum 43-57 && $mouse.y isnum 35-50) { %colarias 2 | window -c @Coloresð }
+    if ($mouse.x isnum 62-77 && $mouse.y isnum 35-50) { %colarias 3 | window -c @Coloresð }
+    if ($mouse.x isnum 81-96 && $mouse.y isnum 35-50) { %colarias 4 | window -c @Coloresð }
+    if ($mouse.x isnum 100-115 && $mouse.y isnum 35-50) { %colarias 5 | window -c @Coloresð }
+    if ($mouse.x isnum 119-134 && $mouse.y isnum 35-50) { %colarias 6 | window -c @Coloresð }
+    if ($mouse.x isnum 138-153 && $mouse.y isnum 35-50) { %colarias 7 | window -c @Coloresð }
+    if ($mouse.x isnum 5-20 && $mouse.y isnum 55-70) { %colarias 8 | window -c @Coloresð }
+    if ($mouse.x isnum 24-39 && $mouse.y isnum 55-70) { %colarias 9 | window -c @Coloresð }
+    if ($mouse.x isnum 43-57 && $mouse.y isnum 55-70) { %colarias 10 | window -c @Coloresð }
+    if ($mouse.x isnum 62-77 && $mouse.y isnum 55-70) { %colarias 11 | window -c @Coloresð }
+    if ($mouse.x isnum 81-96 && $mouse.y isnum 55-70) { %colarias 12 | window -c @Coloresð }
+    if ($mouse.x isnum 100-115 && $mouse.y isnum 55-70) { %colarias 13 | window -c @Coloresð }
+    if ($mouse.x isnum 119-134 && $mouse.y isnum 55-70) { %colarias 14 | window -c @Coloresð }
+    if ($mouse.x isnum 138-153 && $mouse.y isnum 55-70) { %colarias 15 | window -c @Coloresð }
+  }
+}
+;------ Sistema de iconos
+alias do_panel {
+  var %tmp = 1, %x = $gettok($%($2),1,32), %y = $gettok($%($2),2,32), %w = $gettok($%($2),3,32), %h = $gettok($%($2),4,32), %icon = $gettok($%($2),5-,32),%tok = $numtok(%icon,226)
+  var %ww = 0,%xx = %x ,%n = 0,%tx,%txc = $.rsk(cpanel,texto)
+  unset %elegido %rehacer | unsetv panel.icon
+  :bucle
+  inc  %n
+  while (%tmp <= %tok) {
+    if (!%width) || (!%height) { var %width = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).width | var %height = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).height }
+    if (%ww >= %w) { var %xx = %x | %y = $calc(%y + %height + 35) | %ww = 0 }
+
+    %tx = $gettok($gettok(%icon,%tmp,226),3,95)
+    drawpic -nt $1 65280 %xx %y $icono($gettok($gettok(%icon,%tmp,226),1,95))
+    if (!$gettok(%tx,2,32)) { drawtext -rn $1 %txc Tahoma 10 $calc( %xx + (%width - $width(%tx,Tahoma,10)) / 2) $calc(%y + %height + 5) %tx }
+    else {
+      var %sum = 1,%inca = 0,%tmpx = $gettok(%tx,1,32),%wi
+      while (%sum <= $numtok(%tx,32)) {
+        if ( $width($gettok(%tx, $calc(%sum + 1),32) ,Tahoma,10) ) %wi = $calc($width(%tmpx ,Tahoma,10) + $ifmatch)
+        if ( %wi < $calc(%width + 30) ) {
+          if (%tmpx != $gettok(%tx,$calc(%sum + 1),32)) %tmpx = %tmpx $+ $chr(32) $+ $gettok(%tx,$calc(%sum + 1),32)
+          drawtext -rn $1 %txc Tahoma 10 $calc( %xx + (%width - $width(%tmpx,Tahoma,10)) / 2) $calc(%y + %height + 5 + %inca) %tmpx
+          inc %inca 13 | inc %wi
+          %tmpx = $gettok(%tx,$calc(%sum + 2),32) 
+          if (!%tmpx) goto salta
+        }
+        else {
+          if (%tmpx) drawtext -rn $1 %txc Tahoma 10 $calc( %xx + (%width - $width(%tmpx,Tahoma,10)) / 2) $calc(%y + %height + 5 + %inca) %tmpx 
+          %tmpx = $gettok(%tx,$calc(%sum + $iif($numtok(%tx,32) > 2,2,1) ),32)
+          inc %inca 13
+          if (!%tmpx) goto salta
+        }
+        inc %sum
+      }
+    }
+    :salta
+    %ww = $calc(%ww + %width + 30) | %xx = $calc(%xx + %width + 30) | inc %tmp
+  }
+  var %var2 = panel [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $1 ] ]
+  if ( $%(%var2) ) { %icon = $%(%var2) | %tok = $numtok(%icon,226) | %tmp = 1 | goto bucle }
+}
+alias read_panel.mouse {
+  var %tmp = 1, %x = $gettok($%($2),1,32), %y = $gettok($%($2),2,32), %w = $gettok($%($2),3,32), %h = $gettok($%($2),4,32), %icon = $gettok($%($2),5-,32),%tok = $numtok(%icon,226)
+  var %ww = 0,%xx = %x ,%n = 0,%tx,%txc = $.rsk(cpanel,texto),%mx = $3,%my = $4,%tmpp = 1
+  unset %elegido
+  :bucle
+  inc  %n
+  while (%tmp <= %tok) {
+    if (!%width) || (!%height) { var %width = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).width | var %height = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).height }
+    if (%ww >= %w) { %xx = %x | %y = $calc(%y + %height + 35) | %ww = 0 }
+    if ( (%mx > %xx) && (%mx < $calc(%xx + %width)) && (%my > %y) && (%my < $calc(%y + %height)) ) {
+      %elegido = si
+    } 
+    %tx = $gettok($gettok(%icon,%tmp,226),3,95)
+    if (%elegido) { 
+      escribe.panel %tmpp
+      return
+    }
+    :salta
+    %ww = $calc(%ww + %width + 30) | %xx = $calc(%xx + %width + 30) | inc %tmp | inc %tmpp
+  }
+  var %var2 = panel [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $1 ] ]
+  if ( $%(%var2) ) { %icon = $%(%var2) | %tok = $numtok(%icon,226) | %tmp = 1 | goto bucle }
+  unset %rehacer
+  drawline $1
+  %alias
+}
+alias read_panel.click {
+  var %tmp = 1, %x = $gettok($%($2),1,32), %y = $gettok($%($2),2,32), %w = $gettok($%($2),3,32), %h = $gettok($%($2),4,32), %icon = $gettok($%($2),5-,32),%tok = $numtok(%icon,226)
+  var %ww = 0,%xx = %x ,%n = 0,%tx,%txc = $.rsk(cpanel,texto),%mx = $3,%my = $4
+  unset %elegido
+  :bucle
+  inc  %n
+  while (%tmp <= %tok) {
+    if (!%width) || (!%height) { var %width = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).width | var %height = $pic($icono($gettok($gettok(%icon,%tmp,32),1,95))).height }
+    if (%ww >= %w) { %xx = %x | %y = $calc(%y + %height + 35) | %ww = 0 }
+    if ( (%mx > %xx) && (%mx < $calc(%xx + %width)) && (%my > %y) && (%my < $calc(%y + %height)) ) {
+      %elegido = si
+      var %alias = $gettok($gettok(%icon,%tmp,226),2,95)
+    } 
+    %tx = $gettok($gettok(%icon,%tmp,226),3,95)
+    if (%elegido) { 
+      drawrect -rfd $1 $%(rgb.oscuro) 1 $calc(%xx - 3) $calc(%y - 3) $calc(%width + 6) $calc(%height + 6)
+      drawpic -nt $1 65280 %xx %y $icono($gettok($gettok(%icon,%tmp,226),1,95))
+      drawline $1
+      .timer -m 1 500 %alias
+      .timer -m 1 900 drawrect -rfd $1 $.rsk(cpanel,list) 1 $calc(%xx - 3) $calc(%y - 3) $calc(%width + 6) $calc(%height + 6)
+      .timer 1 1 drawpic -t $1 65280 %xx %y $icono($gettok($gettok(%icon,%tmp,226),1,95))
+      return 
+    }
+    :salta
+    %ww = $calc(%ww + %width + 30) | %xx = $calc(%xx + %width + 30) | inc %tmp
+  }
+  var %var2 = panel [ $+ [ %n ] ] [ $+ [ . ] ] [ $+ [ $1 ] ]
+  if ( $%(%var2) ) { %icon = $%(%var2) | %tok = $numtok(%icon,226) | %tmp = 1 | goto bucle }
+  unset %rehacer
+  drawline $1
+}
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;Tmp.Guis - @Ventanað
+;$Chr(226) - â
+;$Chr(95) - _
+;$Chr(47) - /
+;ð
+;_/â
+;setv but.@window coordenadas texto_alias1/alias2/â
+;read_but @windo but.@windo
+;setv tmp.@Ventanað @Ventanað x y w entrantes empezar_de seleccionado @Hidenwin alias [header]
+;setv panel.@Ventanað x y w h icon.bmp_aliasâ icon.bmp_aliasâ
+;  winrgn wrSelectWindow $window(@TorMamPð).hwnd
+;  winrgn wrSetMode rmRoundRect
+;  winrgn wrSetRegion 0 0 280 460 100 100
+;rmRect
+
+alias f12 { ampunst | window -c @X-AMPð | X-AMP }
+alias f11 { clipboard @X-AMPð }
+alias f10 { clipboard $remove($editbox($active),/,echo) }
+
+alias X-AMP {
+  if ($window(@X-AMPð)) return
+  window --kpBhwz +b @X-AMPð $%(mp3.x) $%(mp3.y) 301 125
+  drawpic -n @X-AMPð 0 0 $skindir(x-amp.png)
+  drawtext -nr @X-AMPð 16777215 Verdana 8 43 29 KBPS: 
+  drawtext -nr @X-AMPð 16777215 Verdana 8 40 42 ~KHZ: 
+  mp3.mini.st 1 1 | mp3.mini.st 2 d | mp3.mini.st 3 d | mp3.mini.st 4 00:00
+  buts.st @X-AMPð 7 $iif($%(shuffle) == si,p,n) |  buts.st @X-AMPð 8 $iif($%(continuous) == si,p,n) | buts.st @X-AMPð 9 $iif($%(playlist) == si,p,n)
+  drawpic -nt @X-AMPð $rgb(0,255,0) 5 $round($calc((60 - ( (43 / 65535) * $vol(wave) )) + 2 ),0) 15 0 15 14 $skindir(seek.png)
+  if ($hget(xamp)) hfree xamp
+  hmake xamp 10000
+  playlist
+  ampfo X-AMP Armado y listo!
+  window -wa @X-AMPð
+}
+alias playlist {
+  if ($%(playlist) == no) || ($window(@Playlistð)) { abrem3u carga | return }
+  window --kpBhwz +b @Playlistð $%(playlist.x) $%(playlist.y) 301 310
+  drawfill -rn @Playlistð 5189409 0 130 0 150
+  relleno otro 180 187 198 33 47 79 @Playlistð 0 0 300 135 | relleno otro 33 47 79 180 187 198 @Playlistð 0 175 300 135
+  drawpic -nt @Playlistð $rgb(0,255,0) 1 1 2 0 299 18 $skindir(buts2.png)
+  ;
+  drawrect -ndrf @Playlistð 8472620 1 5 25 263 254 20 20
+  drawrect -ndr @Playlistð 1 2 5 25 265 256 20 20 
+  ;
+  drawrect -frdn @Playlistð 11512740 1 282 43 4 222 5 5
+  drawrect -frdn @Playlistð 1 1 282 43 3 221 5 5
+  drawpic -nt @Playlistð $rgb(0,255,0) 274 23 0 18 20 19 $skindir(buts2.png)
+  drawpic -tn @Playlistð $rgb(0,255,0) 274 265 20 18 20 19 $skindir(buts2.png)
+  drawpic -nt @Playlistð $rgb(0,255,0) 276 44 15 0 15 14 $skindir(seek.png)
+  ;
+  buts.st @Playlistð 13 n | buts.st @Playlistð 14 n | buts.st @Playlistð 15 n
+  abrem3u carga
+  window -wa @Playlistð  
+}
+alias mp3.mini.st {
+  if ($1 == 1) {
+    drawrect -rf @X-AMPð $iif($2 == 1,14802390,8538412) 1 120 31 5 5
+    drawrect -rf @X-AMPð $iif($2 == 2,14802390,8538412) 1 120 38 2 5 | drawrect -rf @X-AMPð $iif($2 == 2,14802390,8538412) 1 123 38 2 5
+    drawtext -r @X-AMPð $iif($2 == 3,14802390,8538412) Webdings 11 117 38 4
+  }
+  elseif ($1 == 2) {
+    drawrect -nfrd @X-AMPð $iif($2 == a,14802390,10907733) 1 70 31 21 7 4 4 | dotbox @X-AMPð 69 30 21 8 $iif($2 == a,16777215,8737081)
+    drawrect -nfrd @X-AMPð $iif($2 == a,14802390,10907733) 1 70 44 21 7 4 4 | dotbox @X-AMPð 69 43 21 8 $iif($2 == a,16777215,8737081)
+    if ($3) { drawtext -onr @X-AMPð 1 Verdana 7 $calc(70 + ( (21 - $width($3,Verdana,7,1) ) / 2) ) 30 $3 | drawtext -onr @X-AMPð 1 Verdana 7 $calc(70 + ( (21 - $width($4,Verdana,7,1) ) / 2) ) 43 $4 }
+  }
+  elseif ($1 == 3) {
+    drawrect -nfrd @X-AMPð $iif($2 == e,14802390,10907733) 1 238 31 41 7 4 4 | dotbox @X-AMPð 237 30 41 8 $iif($2 == a,16777215,10052941)
+    drawrect -nfrd @X-AMPð $iif($2 == m,14802390,10907733) 1 238 44 41 7 4 4 | dotbox @X-AMPð 237 43 41 8 $iif($2 == a,16777215,10052941)
+    drawtext -onr @X-AMPð $iif($2 == e,1,8079151) Verdana 7 244 30 ESTÉREO | drawtext -onr @X-AMPð $iif($2 == m,1,8079151) Verdana 7 249 43 MONO
+  }
+  elseif ($1 == 4) {
+    drawpic @X-AMPð 128 29 128 29 75 24 $skindir(x-amp.png)
+    drawtext -r @X-AMPð 14802390 System 24 130 24 $2-
+  }
+}
+alias ampfo {
+  .timerampfo off
+  unset %ampfo+ %ampfo- %count %ampfob %ampfob+ %ampfob-
+  if ($width($1-,Terminal,10) <= 234) { %ampfo+ = $true | %count = 0 }
+  else { %ampfob = $true | window -kpBhwz +d @ampm 0 0 234 11 | %ampfob- = $true | %count = -1 }
+  .timerampfo -m 0 50 animpfo $1-
+}
+alias animpfo {
+  var %tmpw = $width($1-,Terminal,10)
+  drawpic -n @X-AMPð 40 54 40 54 247 12 $skindir(x-amp.png)
+  if (%ampfo+) {
+    if (%count <= $round($calc(234 - %tmpw),0)) { drawtext -nr @X-AMPð 14802390 Terminal 10 $calc(42 + %count) 56 $1- | inc %count }
+    else { dec %count | drawtext -nr @X-AMPð 14802390 Terminal 10 $calc(42 + %count) 56 $1- | unset %ampfo+ | %ampfo- = $true }
+  }
+  if (%ampfo-) {
+    if (%count >= 0) { drawtext -nr @X-AMPð 14802390 Terminal 10 $calc(42 + %count) 56 $1- | dec %count }
+    else { inc %count | drawtext -nr @X-AMPð 14802390 Terminal 10 $calc(42 + %count) 56 $1- | unset %ampfo- | %ampfo+ = $true }
+  }
+  if (%ampfob) {
+    drawfill -r @ampm $rgb(0,255,0) 0 0 235 0 0 11
+    if (%ampfob-) {
+      if (%count <= $round($calc(%tmpw - 234),0)) { inc %count }
+      else { dec %count | unset %ampfob- | %ampfob+ = $true }
+      drawtext -nr @ampm 14802390 Terminal 10 $calc(0 - %count) 1 $1-
+      drawcopy -nt @ampm $rgb(0,255,0) 0 1 234 8 @X-AMPð 42 56 
+    }
+    if (%ampfob+) {
+      drawtext -nr @ampm  14802390 Terminal 10 $calc(0 - %count) 1 $1-
+      drawcopy -nt @ampm $rgb(0,255,0) 0 1 234 8 @X-AMPð 42 56 
+      if (%count >= 0) { dec %count }
+      else { inc %count | unset %ampfob+ | %ampfob- = $true }
+    }
+  }
+  drawline @X-AMPð
+}
+alias buts.st {
+  if $2 == 1 && $3 == p drawpic $1 13 87 13 34 34 38 $skindir(Buts.png)
+  if $2 == 1 && $3 == n drawpic $1 13 87 13 87 34 38 $skindir(X-AMP.png)
+
+  if $2 == 2 && $3 == p drawpic $1 50 87 50 34 34 38 $skindir(Buts.png)
+  if $2 == 2 && $3 == n drawpic $1 50 87 50 87 34 38 $skindir(X-AMP.png)
+
+  if $2 == 3 && $3 == p drawpic $1 87 87 87 34 34 38 $skindir(Buts.png)
+  if $2 == 3 && $3 == n drawpic $1 87 87 87 87 34 38 $skindir(X-AMP.png)
+
+  if $2 == 4 && $3 == p drawpic $1 124 87 124 34 34 38 $skindir(Buts.png)
+  if $2 == 4 && $3 == n drawpic $1 124 87 124 87 34 38 $skindir(X-AMP.png)
+
+  if $2 == 5 && $3 == p drawpic $1 161 87 161 34 34 38 $skindir(Buts.png)
+  if $2 == 5 && $3 == n drawpic $1 161 87 161 87 34 38 $skindir(X-AMP.png)
+
+  if $2 == 6 && $3 == p drawpic $1 198 87 198 34 27 38 $skindir(Buts.png)
+  if $2 == 6 && $3 == n drawpic $1 198 87 198 87 27 38 $skindir(X-AMP.png)
+  ;-
+  if $2 == 7 && $3 == p drawpic $1 240 96 240 43 25 20 $skindir(Buts.png)
+  if $2 == 7 && $3 == n drawpic $1 240 96 240 96 25 20 $skindir(X-AMP.png)
+
+  if $2 == 8 && $3 == p drawpic $1 267 96 267 43 26 20 $skindir(Buts.png)
+  if $2 == 8 && $3 == n drawpic $1 267 96 267 96 26 20 $skindir(X-AMP.png)
+
+  if $2 == 9 && $3 == p drawpic $1 240 73 240 20 25 20 $skindir(Buts.png)
+  if $2 == 9 && $3 == n drawpic $1 240 73 240 73 25 20 $skindir(X-AMP.png)
+
+  if $2 == 10 && $3 == p drawpic $1 267 73 267 20 26 20 $skindir(Buts.png)
+  if $2 == 10 && $3 == n drawpic $1 267 73 267 73 26 20 $skindir(X-AMP.png)
+  ;-
+  if $2 == 11 && $3 == p drawpic $1 258 5 258 5 13 10 $skindir(Buts.png)
+  if $2 == 11 && $3 == n drawpic $1 258 5 258 5 13 10 $skindir(X-AMP.png)
+
+  if $2 == 12 && $3 == p drawpic $1 278 5 278 5 13 10 $skindir(Buts.png)
+  if $2 == 12 && $3 == n drawpic $1 278 5 278 5 13 10 $skindir(X-AMP.png)
+  ;-
+  if $2 == 13 && $3 == p drawpic -t @Playlistð $rgb(0,255,0) 10 284 40 37 70 19 $skindir(buts2.png)
+  if $2 == 13 && $3 == n drawpic -t @Playlistð $rgb(0,255,0) 10 284 40 18 70 19 $skindir(buts2.png)
+
+  if $2 == 14 && $3 == p drawpic -t @Playlistð $rgb(0,255,0) 105 284 110 37 70 19 $skindir(buts2.png)
+  if $2 == 14 && $3 == n drawpic -t @Playlistð $rgb(0,255,0) 105 284 110 18 70 19 $skindir(buts2.png)
+
+  if $2 == 15 && $3 == p drawpic -t @Playlistð $rgb(0,255,0) 197 284 180 37 70 19 $skindir(buts2.png)
+  if $2 == 15 && $3 == n drawpic -t @Playlistð $rgb(0,255,0) 197 284 180 18 70 19 $skindir(buts2.png)
+}
+alias ampdo {
+  if ($1 == rew) {
+    if ($%(shuffle) == si) {
+      var %tmp.next,%mult = 0
+      inc %mp3rew
+      %tmp.next = $gettok(%mp3z.ejecutados,$calc($numtok(%mp3z.ejecutados,44) - %mp3rew),44)
+      if (%tmp.next) {
+        if ($inmp3) reproduce $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) $iif(%tmp.next < 18,%tmp.next,9)
+        else {
+          ;did-lamp $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) 
+          did-lamp $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) $iif(%tmp.next < 18,%tmp.next,9)
+        }
+      }
+      else unset %mp3.rew
+      return
+    }
+    elseif ($%(continuous) == si) {
+      var %next = $calc((%mp3.todraw - 18) + $%(mp3.next) - 1)
+      if (%next <= $%(mp3.total)) && (%next > 0) {
+        if ($inmp3) reproduce $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9)
+        else { 
+          did-lamp $iif(%next > 18 ,$calc(%next  - 9),0) 
+          ;did-lamp $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9)
+        }
+      }
+    }
+  }
+  elseif ($1 == stop) {
+    if ($inmp3) { splay stop | ampfo X-AMP Parado | .timerseek off | drawpic -n @X-AMPð 20 77 21 77 226 10 $skindir(x-amp.png) | mp3.mini.st 1 1 | mp3.mini.st 2 d | mp3.mini.st 3 d | mp3.mini.st 4 00:00 }
+  }
+  elseif ($1 == play) {
+    if ($2- != $null) {
+      var %nuevo = $3
+      var %draw = $calc($2 + 18)
+    }
+    else { var %nuevo = $%(mp3.lastclick) | var %draw = %mp3.todraw }
+    if (%draw) && (%nuevo) {
+      setv mp3.next %nuevo
+      .timerseek off | drawpic -n @X-AMPð 20 77 21 77 226 10 $skindir(x-amp.png)
+      if (!$istok(%mp3z.ejecutados,$calc((%draw - 18) + %nuevo),44)) && ($%(shuffle) == si) && (!%mp3rew) %mp3z.ejecutados = %mp3z.ejecutados $+ $calc((%draw - 18) + %nuevo) $+ ,
+      var %file = $gettok($hget(xamp,$calc((%draw - 18) + %nuevo)),2-,32)
+      if ($exists(%file)) goto next
+      if ($left(%file,1) == \) %file = C: $+ %file
+      else %file = $%(amp.lastcarp) $+ %file
+      if (!$exists(%file)) { ampfo El archivo no fue encontrado | if ($inmp3) { splay stop | mp3.mini.st 1 1 | mp3.mini.st 2 d | mp3.mini.st 3 d | mp3.mini.st 4 00:00 } | return }
+      :next
+      drawpic -t @X-AMPð $rgb(0,255,0) 22 77 0 2 14 12 $skindir(seek.png)
+      %mp3.inc = $calc( 203 / $round($calc($mp3(%file).length / 1000),0) ) | %mp3.x = 28 | dec %mp3.x %mp3.inc
+
+      var %text,%dur,%artist,%title,%nombre
+      %text = $replace($gettok($hget(xamp, $calc( (%draw - 18) + %nuevo)),1,32),$chr(226),$chr(32))
+      %dur = $gettok(%text,1,44)
+      %text = $gettok(%text,2,44)
+      %artist = $mp3(%file).artist
+      %title = $mp3(%file).title
+      if (!%artist) || (!%title) %nombre = $remove($nopath(%file),.mp3)
+      else %nombre = %artist - %title
+      if (%text != %nombre) || (%dur != $round($calc($mp3(%file).length / 1000),0)) {
+        hadd xamp $calc( (%draw - 18) + %nuevo) $round($calc($mp3(%file).length / 1000),0) $+ , $+ $replace(%nombre,$chr(32),$chr(226)) $gettok($hget(xamp, $calc( (%draw - 18) + %nuevo)),2-,32)
+        did-lamp $calc(%draw - 18) %nuevo
+      }
+      ampfo %nombre
+      .splay %file
+      .timerSEEK 0 1 seek
+      mp3.mini.st 2 a $mp3(%file).bitrate $round($calc($mp3(%file).sample / 1000),0)
+      mp3.mini.st 3 $iif(*stereo* iswm $mp3(%file).mode,e,m)
+      mp3.mini.st 1 3
+
+      if ($2- != $null) { did-lamp $calc(%draw - 18) | did-lamp $calc(%draw - 18) %nuevo }
+    }
+  }
+  elseif ($1 == pause) {
+    if ($inmp3) {
+      if (%mp3.pausa == si) { .splay resume | unset %mp3.pausa | .timerSEEK 0 1 seek | mp3.mini.st 1 3 }
+      else { .splay pause | %mp3.pausa = si | .timerSEEK off | mp3.mini.st 1 2 }
+    }
+    else { unset %mp3.pausa | mp3.mini.st 1 1 }
+  }
+  elseif ($1 == fow) {
+    if ($%(shuffle) == si) { 
+      var %tmp.next
+      if ($numtok(%mp3z.ejecutados,44) >= $%(mp3.total)) unset %mp3z.ejecutados
+      if (%mp3rew > 0) { dec %mp3rew | %tmp.next = $gettok(%mp3z.ejecutados,$calc($numtok(%mp3z.ejecutados,44) - %mp3rew),44) | goto reproduce }
+      else unset %mp3rew
+      :inicio
+      %tmp.next = $rand(1,$%(mp3.total))
+      if (!$istok(%mp3z.ejecutados,%tmp.next,44)) {
+        :reproduce
+        if ($inmp3) { reproduce $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) $iif(%tmp.next < 18,%tmp.next,9) }
+        else { %mp3z.ejecutados = %mp3z.ejecutados $+ %tmp.next $+ , | did-lamp $iif(%tmp.next > 18 ,$calc(%tmp.next  - 9),0) | did-lamp $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) $iif(%tmp.next < 18,%tmp.next,9) }
+      }
+      else goto inicio
+      if (%mp3rew == 0) unset %mp3rew
+      return
+    }
+    elseif ($%(continuous) == si) {
+      var %next = $calc((%mp3.todraw - 18) + $%(mp3.next) + 1)
+      if (%next > $%(mp3.total)) %next = 1
+      if (%next <= $%(mp3.total)) && (%next > 0) {
+        if ($inmp3) reproduce $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9)
+        else { did-lamp $iif(%next > 18 ,$calc(%next  - 9),0) | did-lamp $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9) }
+        ;echo -s $iif(%next > 18,$calc(%next  - 9),0) - $iif(%next <= 18,%next,9)
+      }
+    }
+  }
+  elseif ($1 == open) {
+    write -c $mircdirSistema\tmp.m3u
+    if ($hget(xamp)) hfree xamp
+    hmake xamp 10000
+    setv mp3.total 1
+    var %file = $$sfile($iif($%(amp.lastcarps),$%(amp.lastcarps) $+ *.mp3,c:\*.mp3),Selecciona el archivo,Cargar)
+    setv amp.lastcarps $nofile(%file)
+    var %artist = $mp3(%file).artist, %title = $mp3(%file).title, %dur = $mp3(%file).length
+    %dur = $round($calc(%dur / 1000),0)
+    if (%artist) || (%title) var %put = %dur $+ , $+ %artist - %title
+    else var %put = %dur $+ , $+ $gettok($remove($nopath(%file),.mp3),1,32) - $gettok($remove($nopath(%file),.mp3),2,32) 
+
+    hadd xamp $%(mp3.total) $replace(%put,$chr(32),$chr(226)) %file
+    hsave -on xamp $mircdirSistema\tmp.m3u
+    did-lamp 0
+  }
+  elseif ($1 == playlist) {
+    if ($%(playlist) == si) playlist
+    else playunst
+  }
+  elseif ($1 == menu) {
+    info Menuing
+  }
+  elseif ($1 == cerrar) { ampunst | window -c @X-AMPð }
+  elseif ($1 == agregar) {
+    var %file = $$sfile($iif($%(amp.lastcarps),$%(amp.lastcarps) $+ *.mp3,c:\*.mp3),Selecciona el archivo,Cargar)
+    setv amp.lastcarps $nofile(%file)
+    incv mp3.total 1
+    var %artist = $mp3(%file).artist, %title = $mp3(%file).title, %dur = $mp3(%file).length
+    %dur = $round($calc(%dur / 1000),0)
+    if (%artist) || (%title) var %put = %dur $+ , $+ %artist - %title
+    else var %put = %dur $+ , $+ $gettok($remove($nopath(%file),.mp3),1,32) - $gettok($remove($nopath(%file),.mp3),2,32) 
+
+    hadd xamp $%(mp3.total) $replace(%put,$chr(32),$chr(226)) %file
+    hsave -on xamp $mircdirSistema\tmp.m3u
+    did-lamp $calc(%mp3.todraw - 18)
+  }
+  elseif ($1 == quitar) {
+    if (!$%(mp3.lastclick)) return
+    var %tmp.del = $calc((%mp3.todraw -18) + $%(mp3.lastclick))
+    hdel xamp %tmp.del
+    while (%tmp.del <= $%(mp3.total)) {
+      hadd xamp %tmp.del $hget(xamp,$calc(%tmp.del + 1))
+      inc %tmp.del
+    }
+    did-lamp $calc(%mp3.todraw - 18)
+    decv mp3.total 1
+    hsave -on xamp $mircdirSistema\tmp.m3u
+    if ($lines($mircdirSistema\tmp.m3u) == 0) unsetv mp3.lastclick
+  }
+  elseif ($1 == playcontrol) {
+    abrem3u
+  }
+}
+alias reproduce ampdo play $1-
+alias seek {
+  if (!$window(@X-AMPð)) || (!$inmp3) { .timerSEEK off | unset %mp3.x %mp3.inc | return }
+  inc %mp3.x %mp3.inc
+  mp3.mini.st 4 $gettok($remove($duration($calc($inmp3.pos / 1000),3),mins,min,secs,sec),2-,58)
+  if ($%(mp3.seekpulsado) == si) return
+  drawpic -n @X-AMPð 20 77 21 77 226 10 $skindir(x-amp.png)
+  drawpic -t @X-AMPð $rgb(0,255,0) $calc(%mp3.x - 7) 77 0 2 14 12 $skindir(seek.png)
+}
+on 1:mp3end: { 
+  setv mp3.state no
+  .timerSEEK off 
+  if ($window(@X-AMPð)) { 
+    drawpic -n @X-AMPð 20 77 21 77 226 10 $skindir(x-amp.png)
+    if ($%(shuffle) == si) { 
+      var %tmp.next
+      if ($numtok(%mp3z.ejecutados,44) >= $%(mp3.total)) unset %mp3z.ejecutados
+      if (%mp3rew > 0) { dec %mp3rew | %tmp.next = $gettok(%mp3z.ejecutados,$calc($numtok(%mp3z.ejecutados,44) - %mp3rew),44) | goto reproduce }
+      else unset %mp3rew
+      :inicio
+      %tmp.next = $rand(1,$%(mp3.total))
+      if (!$istok(%mp3z.ejecutados,%tmp.next,44)) {
+        :reproduce
+        reproduce $iif(%tmp.next > 18,$calc(%tmp.next  - 9),0) $iif(%tmp.next < 18,%tmp.next,9)
+      }
+      else goto inicio
+      if (%mp3rew == 0) unset %mp3rew
+      return
+    }
+    elseif ($%(continuous) == si) {
+      var %next = $calc((%mp3.todraw - 18) + $%(mp3.next) + 1)
+      if (%next == $%(mp3.total)) %next = 1
+      if (%next <= $%(mp3.total)) && (%next > 0) {
+        if ($inmp3) reproduce $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9)
+        else { did-lamp $iif(%next > 18 ,$calc(%next  - 9),0) | did-lamp $iif(%next > 18,$calc(%next  - 9),0) $iif(%next <= 18,%next,9) }
+        ;echo -s $iif(%next > 18,$calc(%next  - 9),0) - $iif(%next <= 18,%next,9)
+      }
+    }
+  }
+}
+
+menu @X-AMPð {
+  mouse {
+    if ($mouse.key == 1 && $mouse.x isnum 11-16 && $mouse.y isnum 24-62) {
+      drawpic -n @X-AMPð 6 19 6 19 15 65 $skindir(X-AMP.png)
+      drawpic -nt @X-AMPð $rgb(0,255,0) 5 $calc($mouse.y - 5) 15 0 15 14 $skindir(seek.png)
+      vol -w $round($calc((65535 / 38) * (62 - $mouse.y) ),0)
+      drawline @X-AMPð
+    }
+    elseif ($mouse.key == 1 && $mouse.x isnum 28-234 && $mouse.y isnum 79-85) {
+      setv mp3.seekpulsado si
+      drawpic -n @X-AMPð 20 77 21 77 226 10 $skindir(x-amp.png)
+      drawpic -nt @X-AMPð $rgb(0,255,0) $calc($mouse.x - 7) 77 0 2 14 12 $skindir(seek.png)
+      %mp3.x = $mouse.x
+      drawline @X-AMPð
+    }
+    else { setv mp3.seekpulsado no }
+  }
+  sclick {
+    if ($mouse.x isnum 14-45 && $mouse.y isnum 90-121) { .timerampp 0 0 ampp @X-AMPð 1 13 87 34 38 ampdo rew }
+    elseif ($mouse.x isnum 52-82 && $mouse.y isnum 90-121) { .timerampp 0 0 ampp @X-AMPð 2 50 87 34 38 ampdo stop }
+    elseif ($mouse.x isnum 89-119 && $mouse.y isnum 90-121) { .timerampp 0 0 ampp @X-AMPð 3 87 87 34 38 ampdo play }
+    elseif ($mouse.x isnum 126-156 && $mouse.y isnum 90-121) { .timerampp 0 0 ampp @X-AMPð 4 124 87 34 38 ampdo pause }
+    elseif ($mouse.x isnum 163-193 && $mouse.y isnum 90-121) { .timerampp 0 0 ampp @X-AMPð 5 161 87 34 38 ampdo fow }
+    elseif ($mouse.x isnum 202-222 && $mouse.y isnum 97-117) { .timerampp 0 0 ampp @X-AMPð 6 198 87 27 38 ampdo open }
+    ;-
+    elseif ($mouse.x isnum 242-262 && $mouse.y isnum 100-112) { setv shuffle $iif($%(shuffle) == si,no,si) | buts.st @X-AMPð 7 $iif($%(shuffle) == si,p,n) }
+    elseif ($mouse.x isnum 270-290 && $mouse.y isnum 100-112) { setv continuous $iif($%(continuous) == si,no,si) | buts.st @X-AMPð 8 $iif($%(continuous) == si,p,n) }
+    elseif ($mouse.x isnum 242-262 && $mouse.y isnum 76-88) { setv playlist $iif($%(playlist) == si,no,si) | buts.st @X-AMPð 9 $iif($%(playlist) == si,p,n) | ampdo playlist }
+    elseif ($mouse.x isnum 270-290 && $mouse.y isnum 76-88) {  .timerampp 0 0 ampp @X-AMPð 10 267 73 26 20 ampdo menu }
+    ;
+    elseif ($mouse.x isnum 258-271 && $mouse.y isnum 6-16) { .timerampp 0 0 ampp @X-AMPð 11 258 5 13 10 window -n @X-AMPð }
+    elseif ($mouse.x isnum 278-291 && $mouse.y isnum 6-16) { .timerampp 0 0 ampp @X-AMPð 12 278 5 13 10 ampdo cerrar }
+    ;
+  }
+  uclick {
+    if ($mouse.x isnum 22-28  && $mouse.y isnum 79-85) {
+      %mp3.x = 28 | splay seek 0 | setv mp3.seekpulsado no
+    }
+    elseif ($mouse.x isnum 28-234 && $mouse.y isnum 79-85) {
+      splay seek $round($calc(((($mouse.x - 28) * $calc($inmp3.length / 1000)) / 203) * 1000),0) | setv mp3.seekpulsado no
+      %mp3.x = $mouse.x
+    }
+  }
+}
+on 1:keydown:@Playlistð:*: { if ($keyval == 16) setv mp3.presionado si }
+on 1:keyup:@Playlistð:*: { if ($keyval == 16) setv mp3.presionado no }
+menu @Playlistð {
+  mouse {
+    if ($mouse.key != 1) return
+    if ($mouse.x isnum 14-264 && $mouse.y isnum 27-281) { 
+      var %tmp = 0, %click = $mouse.y
+      %click = $calc( ( 17 - $round($calc( ( 254 - (%click - 28) ) / 13.7),0) ) + 2)
+      did-lamp $iif(%mp3.todraw > 0,$calc(%mp3.todraw - 18),0) %click
+    }
+    if ($mouse.x isnum 281-286 && $mouse.y isnum 45-252) {
+      setv mp3.lpos $mouse.y
+      drawcopy -n @Playlistð 273 45 1 220 @Playlistð 277 45 20 220
+      drawrect -frdn @Playlistð 11512740 1 282 43 4 222 5 5
+      drawrect -frdn @Playlistð 1 1 282 43 3 221 5 5
+      drawpic -nt @Playlistð $rgb(0,255,0) 276 $%(mp3.lpos) 15 0 15 14 $skindir(seek.png)
+      did-lamp $round($calc( ($mouse.y - 45 ) / ( 207 / ($%(mp3.total) - 18 ) ) ),0)
+    }
+  }
+  sclick {
+    if ($mouse.x isnum 278-291 && $mouse.y isnum 6-16) { .timerampp 0 0 ampp @Playlistð 12 278 5 13 10 playunst }
+    elseif ($mouse.x isnum 12-78 && $mouse.y isnum 279-303) { .timerampp 0 0 ampp @Playlistð 13 12 279 66 18 ampdo agregar }
+    elseif ($mouse.x isnum 107-173 && $mouse.y isnum 279-303) {  .timerampp 0 0 ampp @Playlistð 14 107 279 66 18 ampdo quitar }
+    elseif ($mouse.x isnum 200-266 && $mouse.y isnum 279-303) { .timerampp 0 0 ampp @Playlistð 15 200 279 66 18 ampdo playcontrol }
+    elseif ($mouse.x isnum 14-264 && $mouse.y isnum 27-281) {
+      var %tmp = 0, %click = $mouse.y
+      %click = $calc( ( 17 - $round($calc( ( 254 - (%click - 28) ) / 13.7),0) ) + 2)
+      did-lamp $calc(%mp3.todraw - 18) %click
+    }
+    elseif ($mouse.x isnum 276-294 && $mouse.y isnum 24-42) { 
+      if ($%(mp3.did) > 0) { 
+        decv mp3.did 1
+        decv mp3.lpos $calc( 207 / ($%(mp3.total) - 18 ) )
+        drawcopy -n @Playlistð 273 45 1 220 @Playlistð 277 45 20 220
+        drawrect -frdn @Playlistð 11512740 1 282 43 4 222 5 5
+        drawrect -frdn @Playlistð 1 1 282 43 3 221 5 5
+        drawpic -nt @Playlistð $rgb(0,255,0) 276 $%(mp3.lpos) 15 0 15 14 $skindir(seek.png)
+        did-lamp $%(mp3.did)
+      }
+    }
+    elseif ($mouse.x isnum 276-294 && $mouse.y isnum 268-284) { 
+      if ($%(mp3.did) < $calc($%(mp3.total) - 18)) { 
+        incv mp3.did 1 
+        incv mp3.lpos $calc( 207 / ($%(mp3.total) - 18 ) )
+        drawcopy -n @Playlistð 273 45 1 220 @Playlistð 277 45 20 220
+        drawrect -frdn @Playlistð 11512740 1 282 43 4 222 5 5
+        drawrect -frdn @Playlistð 1 1 282 43 3 221 5 5
+        drawpic -nt @Playlistð $rgb(0,255,0) 276 $%(mp3.lpos) 15 0 15 14 $skindir(seek.png)
+        did-lamp $%(mp3.did)
+      }
+    }
+  }
+}
+alias ampp {
+  if ($mouse.key == 0) {
+    .timerampp off
+    buts.st $1 $2 n
+    if ($mouse.x > $3 && $mouse.x < $calc($3 + $5) && $mouse.y > $4 && $mouse.y < $calc($4 + $6)) $7-
+    return
+  }
+  if ($mouse.x > $3 && $mouse.x < $calc($3 + $5) && $mouse.y > $4 && $mouse.y < $calc($4 + $6))  { buts.st $1 $2 p }
+  else buts.st $1 $2 n
+}
+alias ampunst { .timerampfo off | window -c @ampm | unset %ampfo+ %ampfo- %count %ampfob %ampfob+ %ampfob- %mp3.* %mp3z.ejecutados %mp3rew | window -c @Playlistð | if ($hget(xamp)) hfree xamp | unsetv mp3.presionado mp3.lastclick }
+alias playunst { setv playlist no | buts.st @X-AMPð 9 n | window -c @Playlistð }
+on 1:close:@Playlistð: { playunst }
+:---------------
+alias abrem3u {
+  if ($window(@Playlistð)) {
+    drawrect -ndrf @Playlistð 8472620 1 5 25 263 254 20 20
+    drawrect -ndr @Playlistð 1 2 5 25 265 256 20 20 
+    drawrect -ndr @Playlistð 10907733  1 231 27 1 252
+    drawcopy -n @Playlistð 273 45 1 220 @Playlistð 277 45 20 220
+    drawrect -frdn @Playlistð 11512740 1 282 43 4 222 5 5
+    drawrect -frdn @Playlistð 1 1 282 43 3 221 5 5
+    drawpic -nt @Playlistð $rgb(0,255,0) 276 44 15 0 15 14 $skindir(seek.png)
+  }
+  if (!$1) {
+    var %file = $$sfile($iif($%(amp.lastcarp),$%(amp.lastcarp) $+ *.m3u,c:\*.m3u),Selecciona el archivo,Cargar)
+    if ($lines(%file) <= 1) || (!$lines(%file)) { avisar El archivo $nopath(%file) está vació pero quedará como "lista activa" para que le agregues canciones | return }
+    setv amp.m3u %file
+    setv amp.lastcarp $nofile(%file)
+  }
+  else  var %file = $mircdirSistema\tmp.m3u
+
+  unset %mp3z.ejecutados
+
+  if ($hget(xamp)) hfree xamp
+  hmake xamp 10000
+  if (!%file) || (%file == $mircdirSistema\tmp.m3u) {
+    var %count = $lines($mircdirSistema\tmp.m3u)
+    hload -on xamp $mircdirSistema\tmp.m3u
+    if ($window(@Playlistð)) did-lamp 0
+  }
+  else {
+    var %linein = 2,%read,%read2,%count = 0,%text,%dur,%trip = 0
+    %read = $read -l $+ %linein %file
+    while (%read) {
+      %read = $read -l $+ %linein %file
+      %read2 = $read -l $+ $calc(%linein + 1) %file
+      if ($left(%read,8) == #EXTINF:) {
+        inc %count
+        hadd xamp %count $replace($right(%read,$calc($len(%read) - 8)),$chr(32),$chr(226)) %read2
+        if (%trip <= 17) && ($window(@Playlistð)) {
+          %text = $gettok(%read,2,44)
+          %dur = $gettok($duration($gettok($right(%read,$calc($len(%read) - 8)),1,44),3),2-,58)
+          if (%trip > 0) drawrect -nr @Playlistð 10907733 1 13 $calc(26 + (14 * %trip)) 249 1
+          drawtext -nroc @Playlistð 14802390 Verdana 8 14 $calc(28 + (14 * %trip)) 214 10 %text
+          drawtext -nro @Playlistð 14802390 Verdana 8 235 $calc(28 + (14 * %trip)) $replace($remove(%dur,mins,secs,sec,min),$chr(32),:)
+          inc %trip
+        }
+      }
+      inc %linein 2
+    }
+    hsave -on xamp $mircdirSistema\tmp.m3u
+    hload -on xamp $mircdirSistema\tmp.m3u
+  }
+  %mp3.todraw = 18
+  setv mp3.total %count | if ($window(@Playlistð)) drawline @Playlistð
+}
+alias did-lamp {
+  if (!$window(@Playlistð)) return
+  if (!$2) {
+    drawrect -ndrf @Playlistð 8472620 1 5 25 263 254 20 20
+    drawrect -ndr @Playlistð 1 2 5 25 265 256 20 20 
+  }
+  setv mp3.did $$1
+  %mp3.todraw = $1
+  var %trip = 0,%text,%dur
+  while (%trip <= 17) {
+    inc %mp3.todraw
+    %text = $replace($gettok($hget(xamp,%mp3.todraw),1,32),$chr(226),$chr(32))
+    %dur = $gettok($duration($gettok(%text,1,44),3),2-,58)
+    %text = $gettok(%text,2,44)
+    if (%text) {
+      if (!$2) {
+        if (%trip > 0) drawrect -nr @Playlistð 10907733 1 13 $calc(26 + (14 * %trip)) 249 1
+        drawtext -nroc @Playlistð 14802390 Verdana 8 14 $calc(28 + (14 * %trip)) 214 10 %text
+        drawtext -cnro @Playlistð 14802390 Verdana 8 235 $calc(28 + (14 * %trip)) 30 10 $replace($remove(%dur,mins,secs,sec,min),$chr(32),:)
+      }
+      elseif ($calc(%trip + 1) == $%(mp3.lastclick)) && ($%(mp3.lastclick) != $2) {
+        drawrect -nrf @Playlistð 8472620 1 13 $calc(26 + (14 * %trip) + 1) 249 13
+        drawtext -nroc @Playlistð 14802390 Verdana 8 14 $calc(28 + (14 * %trip)) 214 10 %text
+        drawtext -nro @Playlistð 14802390 Verdana 8 235 $calc(28 + (14 * %trip)) $replace($remove(%dur,mins,secs,sec,min),$chr(32),:)
+      }
+      elseif ($calc(%trip + 1) == $2) {
+        drawrect -nrf @Playlistð 1 1 13 $calc(26 + (14 * %trip) + 1) 249 13
+        drawtext -nroc @Playlistð 14802390 Verdana 8 14 $calc(28 + (14 * %trip)) 214 10 %text
+        drawtext -nro @Playlistð 14802390 Verdana 8 235 $calc(28 + (14 * %trip)) $replace($remove(%dur,mins,secs,sec,min),$chr(32),:)
+      }
+    }
+    inc %trip
+  }
+  drawrect -ndr @Playlistð 10907733  1 231 27 1 252
+  setv mp3.lastclick $2
+  drawline @Playlistð
+}

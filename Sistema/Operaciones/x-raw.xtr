@@ -1,0 +1,255 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                        x-raw.xtr - Eventos RAW
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;raw 424:*: echo -s MIRAW 424: $resalt $+ $1- | alerta
+;raw 431:*: echo -s MIRAW 431: $resalt $+ $1- | alerta
+;raw 441:*: echo -s MIRAW 441: $resalt $+ $1- | alerta
+;raw 442:*: echo -s MIRAW 442: $resalt $+ $1- | alerta
+;raw 443:*: echo -s MIRAW 443: $resalt $+ $1- | alerta
+raw 0:*: if ($left($1,1) isin +-) { echo -s $marc Silence $+ $resalt $1- | halt }
+raw 332:*: { _topic $2 $3- | halt }
+raw 333:*: { _ptopic $2 $3 $gettok($asctime($4),1-3,32) $gettok($asctime($4),4,32) | halt }
+raw 438:*: { error | info Nick cambiado demasiado rápido. Por favor espera $+ $resalt $9 $+  segundos | halt }
+raw 432:*: { error | info El nick que has elegido ( $+ $resalt $+ $2 $+ ) tiene carácteres inválidos. Elegi otro | halt }
+raw 464:*: { error | info Contraseña incorrecta | halt }
+raw 477:*: { info No podes entrar en $resalt $+ $2 $+  sólo se permite la entrada a nicks registrados $resalt $+ [+R] | halt }
+raw 366:*: halt
+raw 441:*: halt
+raw 436:* { 
+  nick $read Sistema\nicks.txt | error
+  alerta Colisión de nick detectada! Cambiando de nick...
+}
+raw 381:* { 
+  info Ahora sos $resalt $+ IRCop $+  | halt
+}
+raw 405:* { 
+  e.mon Has entrado a demasiados canales, no puedes entrar en más
+  error | halt
+}
+raw 465:* { 
+  error |  info Te han hecho K-Line $resatl $+ ( $+ $1- $+ ) $+  - Estás BANEADO de ese server | halt
+}
+raw 471:* { 
+  error | e.mon El canal12 $2 no admite mas usuarios (10modo +l). Espera que salga alguien, o que quiten el modo +l
+  halt
+}
+raw 473:* { 
+  error | e.mon El canal12 $2 es solo para usuarios invitados modo +i. Para poder acceder te tienen que Invitar
+  halt
+}
+raw 475:* { 
+  error | e.mon El canal12 $2 está bloqueado (10modo +k) - se requiere la Clave correcta para entrar | halt
+}
+raw 481:* { error | info No estás autotizado ha hacer eso, no sos $resalt $+ IRCop | halt }
+raw 353:*: { halt }
+raw 482:*: { error | e.mon No sos @P en12 $2 | halt }
+raw 442:*: {
+  error
+  e.mon No estas en el canal (12 $+ $2 $+ )
+  halt
+}
+raw 433:*: {
+  if (irc-hispano.org isin $server) {
+    if (($nick2.pass($2) != $null) && (%iden.nick2 == si)) {
+      set -u4 %estoy.identificando si
+      .timerchnick -m 1 200 nick $2 $+ : $+ $nick2.pass($2) | halt 
+    }
+  }
+  error
+  e.mon Nick en uso:12 $2
+  halt
+}
+raw 421:*: {
+  error
+  e.mon Comando desconocido12 $2
+  halt
+}
+raw 329:*: halt
+raw 251:*: {
+  echo -s ___________________________________________________________
+  echo -s ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  echo -s $_m Hay $+ $resalt $4 $+  usuarios - $+ $resalt $7 $+  invisibles en $+ $resalt $10 $+  servidores
+  halt
+}
+raw 375:*: halt
+raw 252:*: { echo -s $_m $+ $resalt $2 $+  operadores en linea | halt }
+raw 253:*:  { echo -s $_m $+ $resalt $2 $+  conexiones desconocidas | halt }
+raw 254:*: { echo -s $_M $+ $resalt $2 $+  canales encontrados | halt }
+raw 255:*: {
+  echo -s $_m Hay $+ $resalt $4 $+  clientes en $+ $resalt $7 $+  servidores
+  echo -s ___________________________________________________________
+  echo -s ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  halt
+}
+raw 401:*:{
+  error
+  e.mon 12 $+ $2 no esta en el IRC
+  halt
+}
+raw 474:*: { 
+  var %tmp.timer = join $+ $2
+  if ($timer(%tmp.timer) == $null) { error | e.mon No se puede reentrar a12 $2 - estas4 BANEADO  }
+  halt 
+}
+raw 372:*:halt
+raw 306:*:halt
+raw 376:*: halt
+raw 1:*: echo -s $_m $1- | halt
+raw 2:*: echo -s $_m $1- | halt
+raw 3:*: echo -s $_m $1- | halt
+raw 4:*: echo -s $_m $1- | halt
+raw 5:*: echo -s $_m $1- | halt
+
+#whois on
+raw 318:*: { halt }
+raw 311:*: {
+  eblanco -s
+  echo -s :: Whois ::
+  echo -s $_m $resalt $+ Nick: $2
+  echo -s $_m $resalt $+ Identd: $3
+  echo -s $_m $resalt $+ Ip o host: $4
+  echo -s $_m $resalt $+ Address: $3 $+ @ $+ $4
+  echo -s $_m $resalt $+ Nombre real: $6- 
+  halt
+}
+raw 307:*: { haltdef }
+raw 312:*: { echo -s $_m $resalt $+ Conectado a: $3- | halt }
+raw 313:*:{ echo -s $_m $resalt $+ IRCop: $4- | halt }
+raw 317:*: { 
+  echo -s $_m $resalt $+ Idle: $duration($3)
+  halt
+}
+raw 330:*: { 
+  echo -s $_m $resalt $+ Logueado con el nombre de: $3 | halt
+}
+
+raw 319:*: { echo -s $_m $resalt $+ Canales: $3- | halt }
+raw 378:*: { echo -s $_m $+ $resalt $3- | halt
+}
+raw 301:*: {
+  if ($2 == $me) && ($timer(Lag) != $null) halt
+  if ($2 != $me) { 
+    echo -s $_m $+ $resalt Ausente: $3- 
+    halt
+  }
+}
+314: { echo -s WhoWas $+ $resalt $3 $+  $+ $4 $+ @ $+ $5 4* $7- | haltdef }
+#whois end
+#xwhois off
+raw 318:*: { halt }
+raw 311:*: {
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  did -ra xwhois 4 $2
+  did -ra xwhois 6 $6-
+  did -ra xwhois 8 $3 $+ @ $+ $4
+  did -ra xwhois 10 $ve.script($3)
+  halt
+}
+raw 307:*: { haltdef }
+raw 312:*: { 
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  did -ra xwhois 16 $3- 
+  halt
+}
+raw 313:*:{ 
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  var %tmp.nick = $did(xwhois,4).text
+  did -ra xwhois 4 %tmp.nick (IRCop)
+  halt
+}
+raw 317:*: { 
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  did -ra xwhois 12 $duration($3)
+  halt
+}
+raw 319:*: { 
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  xwhois.chan $3- 
+  halt
+}
+raw 378:*: { halt }
+raw 301:*: {
+  if ($dialog(xwhois) == $null) { .enable #whois | .disable #xwhois | halt }
+  did -ra xwhois 14 $3- 
+  halt
+}
+#xwhois end
+
+raw 305:*: halt
+#who on
+raw 352:*:{ eblanco -s
+  if (%dns == buscar.ip) { e.mon 4Search Engine: Nick encontrado:12 $6 ( $+ $3 $+ @ $+ $4 ) | unset %dns | halt }
+  echo -s $+ $resalt $6 ( $+ $resalt $3 $+ @ $+ $resalt $+ $4 ) - Servidor: $+ $resalt $5
+  halt
+}
+raw 315:*: { echo -s Fin del $+ $resalt /who | unset %dns | halt }
+#who end
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#buscador off
+alias buscador.vent {
+  window -ol @Resultados 200 200 450 200
+  aline @resultados Comenzando busqueda...
+}
+raw 352:*:{
+  inc %resultados
+  if ($window(@resultados) != $null) {
+    aline @resultados $6 ( $3 $+ @ $+ $4 ) - Servidor: $5
+    halt
+  }
+}
+raw 315:*: { 
+  if ($window(@resultados) != $null) {
+    aline @resultados Total ( $+ %resultados $+ ) - Fin de la busqueda
+    unset %resultado | .disable #buscador | .enable #who | halt
+  }
+}
+#buscador End
+#busca.host off
+raw 352:*:{
+  set %se.encontro $6 
+  if (%whogente == null) { set %whogente 1 }
+  else inc %whogente 1
+  set %hostb $4
+  halt
+}
+raw 315:*:{ 
+  if ((%se.encontro != $null) && (%whogente == 1)) {
+    sonido $%(info)
+    e.mon 4Search Engine: Nick encontrado: $+ $resalt %se.encontro
+    whois %se.encontro
+  }
+  elseif (%whogente > 1) { 
+    sonido $%(info)
+    e.mon 4Search Engine: Se encontraron varios nicks con el host especificado
+    .disable #busca.host
+    unset %whogente %se.encontro
+    who %hostb
+  }
+  else { 
+    error | e.mon 4Search Engine: La persona con ese host no se encuentra en el IRC o está en modo invisible (+i)
+  }
+  unset %whogente %se.encontro
+  .disable #busca.host
+  halt
+}
+#busca.host end
+on 1:dns: {
+  if (%dns == busca.ip) { 
+    if ($iaddress != $null) { who $iaddress } 
+    if ($naddress != $null) { 4Search Engine: Host resuelto en12 $naddress  - Localizando nick... | who $naddress }
+    else { noip }
+    .timerdisDNS off
+    unset %dns
+    haltdef
+  }
+  if (%dns == xwhois) {
+    haltdef
+    if ($dialog(xwhois) == $null) { unset %dns | halt }
+    if ($iaddress != $null) { did -a xwhois 37 DNS $+ $chr(9) $+ Ip: $iaddress | unset %dns | halt }
+    if ($raddress != $null) { did -a xwhois 37 DNS $+ $chr(9) $+ $raddress | unset %dns | halt }
+    if ($raddress == $null) { did -a xwhois 37 DNS $+ $chr(9) $+ No se pudo resolver | unset %dns | halt }
+  }
+}

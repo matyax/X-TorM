@@ -1,0 +1,69 @@
+Cine©{BSoD}«¿En que año ganó pedro Almodóvar su primer oscar?*En el 2000
+Infantil©{BSoD}«¿Cuantos pelos tiene homer simpson?*Tres
+Literatura©{BSoD}«¿Quien escribió Alfanhuí?*Rafael Sanchez Ferlosio
+Literatura©{BSoD}«¿Quien escribió Rimas y leyendas?*Gustavo Adolfo Becquer
+Literatura©{BSoD}«¿Quien escribió El lazarillo de Tormes?*Es anonimo
+Ciencia©{BSoD}«¿Quien descubrió la penicilina?*Fleming
+ciencia©{BSoD}«¿Qué sustáncia es la encargada de llevar el oxígeno a las células?*La hemoglobina
+Ciencia©{BSoD}«¿Qué es el astrálago?*Un hueso del pie
+Ciencia©{BSoD}«¿Quien definió las leyes de la herencia?*Mendel
+Espectaculos©{BSoD}«¿Qué letra precedia todas las obras de mozart?*K
+Historia©{BSoD}«¿En que año piso el hombre la luna por primera vez?*En 1969
+Historia©{BSoD}«¿Como se llamaba el primer can que salió al espacio?*Laika
+Historia©{BSoD}«¿Quien paseó el cadáver de su marido por España durante dos años?*Juana la loca
+Historia©{BSoD}«¿Quien dió la primera vuelta al mundo?*Juan Sebastian Elcano
+Espectaculos©{BSoD}«¿Quien ganó el festival de Eurovisión en 1968?*Masiel
+Espectaculos©{BSoD}«¿Quien fue el guionista de la pelicula Raza?*Francisco Franco
+Espactaculos©{BSoD}«¿Donde se rodó la vaquilla?*En Sos del Rey Catolico
+Espectáculos©{BSoD}«¿Qué grupo tiene nombre de tejido?*Estopa
+Geografía©{BSoD}«¿Qué rio da nombre a la península Ibérica?*El Ebro
+Geografía©{BSoD}«¿Cual es la última región que queda en España?*La region de murcia
+Geografía©{BSoD}«¿Cual es el país más pequeño de Europa?*Ciudad del vaticano
+Literatura©^Isildur^«Quien escribió Cien años de soledad?*Gabriel Garcia Marquez
+Geografia©^Isildur^«Cual es la capital de Afganistan?*Kabul
+Politica©^Isildur^«Quien lidera el EZLN?*El subcomandante Marcos
+Cine©^Isildur^«Quien era el director de El hombre que sabia demasiado?*Alfred Hitchcock
+Musica©^Isildur^«Quien compuso la cancion American Pie?*Don McLean
+Historia©^Isildur^«Quien ganó la Guerra del Peloponeso?*Esparta
+Política©^Isildur^«Quien fue el presidente del gobierno en España entre los años 1931 y 1933?*Manuel Azaña
+Cultura general©^Isildur^«Como se llama el paraiso budista?*Nirvana
+Mitologia©^Isildur^«Cual era la diosa griega de la inteligencia?*Atenea
+Espectáculos©{BSoD}«¿En que año se separaron los beatles?*En 1970
+Geografía©{BSoD}«¿Por qué es famosa carrara?*Por su marmol
+Geografía©{BSoD}«¿Qué país es el mayor productor de petróleo de Suramérica*Venezuela
+Politica©^Isildur^«Que tres lideres (por orden alfabetico) estaban en la reparticion del mundo tras la segunda guerra mundial?*Churchill, Roosevelt y Stalin
+Mitologia©^Isildur^«Como se llama el complejo por el cual un hijo se enamora de su madre?*complejo de Edipo
+Historia©^Isildur^«Cual fue el último rey musulmán en la península?*Boabdil
+Alpinismo©^Isildur^«Quien fue el primer hombre en coronar el Everest?*Edmund Hillary
+Cultura©^Isildur^«Que explorador descubrio las ruinas incas de Macchu Picchu?*Hiram Bingham
+Cultura©^Isildur^«Cual es el nombre y apellido del Che?*Ernesto Guevara
+Ciencia©{BSoD}«¿de qué material, a parte del latex, puede estar hecho un preservativo?*De poliuretano
+Ciencia©{BSoD}«¿Por donde tiene que pasar el sol para que la sombra de un objeto sea totalmente perpendicular al suelo?*Zenit
+historia©{BSoD}«¿Quie pronunció la frase "tu también hijo mio...?" al ser asesinado?*Julio Cesar
+Política©{BSoD}«¿Qué político español se crió en el mar, vivió en la tierra y murió en el aire?*Carrero Blanco
+literatura©{BSoD}«¿Quien, sin cortarse ninguna oreja, obtuvo más éxito muerto que vivo con sus obras?*Kafka
+Literatura©{BSoD}«¿Como se llama el libro que predijo el hundimiento del Titanic?*the Wreck of the Titan
+Idiomas©{BSoD}«¿Como se dice pantalla en francés?*Ecran
+Tradición©{BSoD}«¿Porque se decia antiguamente "los niños hablan cuando mean la gallinas"?*Porque las gallinas no mean
+Ciencia©{BSoD}«¿Quien describió el tipo de orbita que recorren los planestas alrededor de las estrellas?*kepler
+Espectáculos©{BSoD}«¿Quien compuso Macarena?*los del rio
+Tradición©{BSoD}«En España, los supersticiosos temen al martes trace, en cambio, en el resto de Europa temen al...*viernes trece
+Idiomas©{BSoD}«¿Como se dice undimiento en inglés?*Wreck
+Espectáculos©{BSoD}«¿De qué murió Elvis?*De sobredosis
+Literatura©^Isildur^«Quien es el autor de Los gozos y las sombras?*Gonzalo Torrente Ballester
+Musica©^Isildur^«De quien es la cancion Across the universe?*The Beatles
+Política©^Isildur^«Que rey español fue el maximo representante del despotismo ilustrado?*Carlos III*
+Historia©^Isildur^«De donde era originario Alejandro Magno?*Macedonia
+Cultura©^Isildur^«Cual es el segundo pais mas poblado del mundo?*India
+Literatura©^Isildur^«Quien es el aitor de El señor de los anillos?*JRR Tolkien
+Cultura©^Isildur^«Cual es la quinta letra del alfabeto griego?*Epsilon
+Cine©^Isildur^«Quien es el director de películas como Tierra y libertad, Mi nombre es Joe o Pan y rosas?*Ken Loach
+Politica©^Isildur^«Que primera ministra británica fue denominada la Dama de hierro?*Margaret Thatcher
+Informatica©^Isildur^«Como se denomina técnicamente el microprocesador?*CPU
+Informatica©{BSoD}«¿Cual es el numero ascii del signo ~?*126
+Informatica©{BSoD}«¿Cuantos bytes forman un megabyte?*1024
+Informatica©{BSoD}«¿Como se llama la versión gratuita de Unix?*Linux
+Ciencia©{BSoD}«¿Qué tipo de organismo es el SIDA?*Un virus
+Idiomas©{BSoD}«¿Como se dice hardware en catalán?*Maquinari
+Idiomas©{BSoD}«¿Como se dice software en catalán?*Programari
+Deportes©{BSoD}«¿Donde se celebraron las olimpiadas de 1988?*En Berlin

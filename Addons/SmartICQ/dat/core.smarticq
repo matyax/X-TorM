@@ -1,0 +1,1501 @@
+; ______________________________________________________________________________________________________
+;
+;   SmartICQ v1.091
+;   copyright (c) 2001-02 tronicer
+;
+;   url, http://icq.irctools.com/
+;   e-mail, tronicer@freebox.com
+; _________________________________________________________________________________________________________
+;
+;  icq core functions
+; _________________________________________________________________________________________________________
+;
+; aliases
+
+alias icq { _icq }
+alias smarticq { _icq } 
+
+alias _icq.signal { if ($version >= 6.0) { .signal $1- } }
+alias _icq.sock { return $sock(smarticq_*,0) }
+alias _icq.qs {
+  ; - queue for sending 
+  ; - /_icq.qs <command>
+  if ($sock(smarticq_*,0)) { $1- }
+  else { 
+    writeini $+(",$_icq.dir,$_icq.a,\queue.ini") queue $ctime $1-
+  }
+}
+
+alias _icq.qr {
+  ; - read the queue
+  ; - /_iq.qr
+  var %file = $+(",$_icq.dir,$_icq.a,\queue.ini")
+  while ($ini(%file,queue,1)) {
+    $readini(%file,queue,$ini(%file,queue,1))
+    remini %file queue $ini(%file,queue,1)
+  }
+}
+
+alias _icq.autoaway {
+  if ($1 == -on) { .timer_icq.autoaway -o 0 10 _icq.autoaway -check }
+  if ($1 == -off) { .timer_icq.autoaway off }
+  if ($1 == -check) { 
+    var %file = $+(",$_icq.dir,$_icq.a,\settings.ini,")
+    var %away = $readini(%file,settings,away_autoaway-time)
+    var %na = $readini(%file,settings,away_autona-time)
+    var %xy = $mouse.dx $mouse.dy
+
+    if (%xy != $hget(smarticq,idle.xy)) {
+      if ($hget(smarticq,autoaway)) && ($hget(smarticq,idle) <= $calc(%away *60)) && ($readini(%file,settings,away_autoback)) { hdel smarticq autoaway | hadd smarticq idle 0 | _icq.away online | _icq.signal smarticq.auto back }
+      hadd smarticq idle 0
+    }
+
+    if (%xy == $hget(smarticq,idle.xy)) { 
+      hadd smarticq idle $calc($hget(smarticq,idle) +10)
+      if ($hget(smarticq,status) == online) || ($hget(smarticq,status) == f4c) || ($hget(smarticq,autoaway))  {
+        if ($readini(%file,settings,away_autoaway)) && ($hget(smarticq,idle) == $calc(%away *60)) { hadd smarticq autoaway 1 | _icq.away away User is currenly Away $+ $crlf $+ You can leave him/her a message | _icq.signal smarticq.auto away }
+        if ($readini(%file,settings,away_autona)) && ($hget(smarticq,idle) == $calc(%na *60)) { hadd smarticq autoaway 1 | _icq.away na User is currenly N/A $+ $crlf $+ You can leave him/her a message  | _icq.signal smarticq.auto na }
+      }
+    }
+    ;    echo -s a $hget(smarticq,idle)
+    hadd smarticq idle.xy $mouse.dx $mouse.dy
+  }
+}
+
+alias _icq.notice_do {
+  if ($1 == s) && ($group(#_icq.notice) == off) { return }
+  if ($_icq.notice($1,$2).eq) { _icq.earthquake -on $iif($_icq.notice($1,$2,eq).sa,$_icq.notice($1,$2,eq).sa-time,-forever) $calc($_icq.notice($1,$2,eq).speed *50) }
+  if ($_icq.notice($1,$2).fmirc) { flash @smarticq SmartICQ }
+  if ($_icq.notice($1,$2).fsicq) { drawdot -h @smarticq }
+  if ($_icq.notice($1,$2).popup) { _icq.notice.popup $1 $2 $3 $replace($4,_,$chr(32)) }
+  if ($_icq.notice($1,$2).echo) { echo -at $5- }
+  if ($_icq.notice($1,$2).sound) && $_icq.notice($1,$2,sound).beep) { beep 5 50 }
+  if ($_icq.notice($1,$2).sound) && ($_icq.notice($1,$2,sound).file) { 
+    .splay -w $_icq.notice($1,$2,sound).file
+    if ($_icq.notice($1,$2,sound).repeat) { .timer_icq.notice. $+ $ticks -o $_icq.notice($1,$2,sound).times 3 .splay -w $_icq.notice($1,$2,sound).file  }
+  }
+}
+
+alias _icq.____deleteaccount {
+  ; - deletes account from icq
+  ; - /_icq.____deleteaccount <uin> <password>
+  if ($2 == $null) { return }
+  var %uin = $_icq.uin2le($1), %passwd = $2-
+
+  var %type = D007, %subtype = C404
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %uin $gettok(%passwd,0,32) %passwd
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+  var %sock = smarticq_ $+ $_icq.a
+  if ($_icq.sock) { sockwrite %sock &snac }
+}
+
+alias _icq.setpermissions {
+  ; - sets permissions
+  ; - /_icq.setpermissions <auth> <web>
+
+  var %auth = $1, %web = $2
+  if ($1 == $null) {
+    %auth = $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,security_authreq),$ifmatch,0)
+    %web = $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,security_webaware),$ifmatch,0)
+  }
+
+  var %type = D007, %subtype = 2404
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %auth %web 1 0
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  if ($_icq.sock) { sockwrite %sock &snac }
+}
+
+
+alias _icq.changepasswd {
+  ; - changes password
+  ; - /_icq.changepasswd <new password>
+
+  var %type = D007, %subtype = 2E04
+  hadd smarticq NEW_PASSWORD $1-
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) $_icq.lnts($1-)
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  if ($_icq.sock) { sockwrite %sock &snac }
+}
+
+alias _icq.away {
+  ; - change your status
+  ; - /_icq.away <status> <message>
+  if (!$sock(smarticq_*)) { return }
+  hadd smarticq $+(msg.,$1) $2-
+  _icq.debug -st _icq.away $1 $hget(smarticq,autoaway)
+  if ($1 != online) && ($1 != f4c) && (!$hget(smarticq,autoaway)) { _icq.autoaway -off }
+  if (($1 == online) || ($1 == f4c)) && (!$hget(smarticq,autoaway)) { _icq.autoaway -on }
+
+  if ($1 == online) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 0 }
+  if ($1 == f4c) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 32 }
+  if ($1 == away) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 1 }
+  if ($1 == na) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 5 }
+  if ($1 == occupied) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 17 }
+  if ($1 == dnd) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 0 19 }
+  if ($1 == invisible) { hadd smarticq status $1 | _icq.drw_obj -show icqbutton up | _icq.status 1 0 }
+  _icq.signal smarticq.mystatus $1
+}
+
+alias _icq.update_mydetails {
+  ; /_icq.update_mydetails <uin>
+  _icq.update_mydetails.home $1
+  _icq.update_mydetails.work $1
+  _icq.update_mydetails.more $1
+  _icq.update_mydetails.about $1
+}
+
+alias _icq.update_mydetails.home {
+  var %uin = $1, %nick = $_icq.lnts($_icq.g(%uin,%uin,NICK)), %first = $_icq.lnts($_icq.g(%uin,%uin,FNAME)), %last = $_icq.lnts($_icq.g(%uin,%uin,LNAME)), %email = $_icq.lnts($_icq.g(%uin,%uin,E-MAIL)), %city = $_icq.lnts($_icq.g(%uin,%uin,CITY)), %state = $_icq.lnts($_icq.g(%uin,%uin,STATE)), %phone = $_icq.lnts($_icq.g(%uin,%uin,PHONE)), %fax = $_icq.lnts($_icq.g(%uin,%uin,FAX))
+  var %street = $_icq.lnts($_icq.g(%uin,%uin,STREET)), %cellular = $_icq.lnts($_icq.g(%uin,%uin,CELLULAR)), %zip = $_icq.lnts($_icq.g(%uin,%uin,ZIP)), %country = $_icq.d2le($_icq.g(%uin,%uin,COUNTRY)), %gmt = $_icq.g(%uin,%uin,GMT), %pub_email = 0
+
+  var %type = D007, %subtype = EA03
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %nick %first %last %email %city %state %phone %fax %street %cellular %zip %country %gmt %pub_email
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.update_mydetails.work {
+  var %uin = $1, %city = $_icq.lnts($_icq.g(%uin,%uin,WORK-CITY)), %state = $_icq.lnts($_icq.g(%uin,%uin,WORK-STATE)) 0 0 0 0, %street = $_icq.lnts($_icq.g(%uin,%uin,WORK-STREET)), %zip = $_icq.lnts($_icq.g(%uin,%uin,WORK-ZIP))
+  var %country = $_icq.d2le($_icq.g(%uin,%uin,WORK-COUNTRY)), %name = $_icq.lnts($_icq.g(%uin,%uin,WORK-NAME)), %dep = $_icq.lnts($_icq.g(%uin,%uin,WORK-DEP)), %pos = $_icq.lnts($_icq.g(%uin,%uin,WORK-POS)), %occ = $_icq.d2le($_icq.g(%uin,%uin,WORK-OCC)), %web = $_icq.lnts($_icq.g(%uin,%uin,WORK-WEB))
+
+  var %type = D007, %subtype = F303
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %city %state %street %zip %country %name %dep %pos %occ %web
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+
+alias _icq.update_mydetails.more {
+  var %uin = $1, %age = $calc($_icq.g(%uin,%uin,AGE) +0) 0, %gender = $calc($replace($_icq.g(%uin,%uin,GENDER),female,1,male,2) +0), %url = $_icq.lnts($_icq.g(%uin,%uin,HOMEPAGE))
+  var %year = $_icq.d2le($gettok($_icq.g(%uin,%uin,BIRTHDATE),1,32)), %month = $calc($gettok($_icq.g(%uin,%uin,BIRTHDATE),2,32) +0), %day = $calc($gettok($_icq.g(%uin,%uin,BIRTHDATE),3,32) +0)
+  var %lang1 = $calc($gettok($_icq.g(%uin,%uin,LANGUAGES),1,32) +0), %lang2 = $calc($gettok($_icq.g(%uin,%uin,LANGUAGES),2,32) +0), %lang3 = $calc($gettok($_icq.g(%uin,%uin,LANGUAGES),3,32) +0)
+  if (%year == $null) { %year = 0 0 }
+
+  var %type = D007, %subtype = FD03
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %age %gender %url %year %month %day %lang1 %lang2 %lang3
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.update_mydetails.about {
+  var %uin = $1, %about = $_icq.lnts($_icq.g(%uin,%uin,ABOUT))
+
+  var %type = D007, %subtype = 0604
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) %about
+
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+
+
+alias _icq.search {
+  ; - search users by nick/first/last
+  ; - /_icq.search <nick> $chr(254) <first> $chr(254) <last>
+
+  var %nick2 = $gettok($1-,1,254), %first2 = $gettok($1-,2,254), %last2 = $gettok($1-,3,254)
+  if (%nick2 == -) { unset %nick2 }
+  if (%first2 == -) { unset %last2 }
+  if (%last2 == -) { unset %first2 }
+  var %nick = $_icq.lnts(%nick2), %first = $_icq.lnts(%first2), %last = $_icq.lnts(%last2)
+
+  var %type = D007, %subtype = 1505
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 149 0 $_icq.d2be($_icq.hex2dec(%subtype)) %first %last %nick
+
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.searchwp {
+  ; - search users on whitepages
+  ; - /_icq.searchwp
+
+  var %first = $_icq.lnts($did($dname,17).text), %last = $_icq.lnts($did($dname,18).text), %nick = $_icq.lnts($did($dname,19).text), %email = $_icq.lnts($did($dname,20).text)
+  var %minage = $_icq.d2le($iif($gettok($did($dname,23).seltext,1,45),$ifmatch,0)), %maxage = $_icq.d2le($iif($gettok($did($dname,23).seltext,2,45),$ifmatch,0))
+  var %gender = $calc($did($dname,26).sel -1), %language = $remove($gettok($did($dname,100,$did($dname,28).sel).text,-1,32),n), %city = $_icq.lnts($did($dname,32).text)
+  var %state = $_icq.lnts($did($dname,34).text), %country = $_icq.d2le($remove($gettok($did($dname,101,$did($dname,30).sel).text,-1,32),n))
+
+  var %type = D007, %subtype = 3305
+
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 21 0 2 0 0 0 13 0 2 
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 154 0 $_icq.d2be($_icq.hex2dec(%subtype)) %first %last %nick %email %minage %maxage %gender %language %city %state %country 1 0 0 1 0 0 1 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 $did($dname,35).state
+
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.print_system_msg {
+  ; - prints system msg
+  ; - /_icq.print_system_msg <message>
+  _icq.drw_obj -hide statusbar
+  drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 8 238 147 14 $1-
+  drawdot @SmartICQ
+}
+
+alias _icq.update_system_msg {
+  ; - updates system msg
+  ; - /_icq.update_system_msg
+  _icq.drw_obj -hide statusbar
+  drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 9 239 147 14 $gettok($hget(smarticq,systemnotice),2-,32)
+  if ($1 != hide) { drawdot @smarticq }
+  return
+}
+
+alias _icq.run {
+  ; - runs application
+  ; - /_icq.run <app>
+  if ($lock(run)) { _icq.dlg_error /run - locked. $crlf $+ please unlock so smarticq can run this external application ( $+ $1- $+ ) $crlf $+ Type </help lock> for more help. | return }
+  run $1-
+}
+
+alias _icq.get_away-msg {
+  ; request contacts away/etc/etc message
+  ; /_icq.get_away-msg <uin> 
+  var %wc = $+(*,$chr(1),$1,$chr(1),*), %type = $gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1)
+  if ($2) { %type = $2 }
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 4 0 6 0 0 0 1 0 6
+  bset &snac 17 10 0 19 0 9 98 0 0
+  bset &snac 25 0 2
+  bset &snac 27 $_icq.buin($1)
+  bset &snac $calc($bvar(&snac,0) +1) 0 5 0 94 0 0 10 0 19 0 9 98 0 0 9 70 19 73 76 127 17 209 130 34 68 69 83 84 0 0
+  bset &snac $calc($bvar(&snac,0) +1) 0 10 0 2 0 1 0 15 0 0 39 17 0 54 27 0 7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+  bset &snac $calc($bvar(&snac,0) +1) 3 0 0 0 0 255 255 14 0 255 255 0 0 0 0 0 0 0 0 0 0 0 0
+  bset &snac $calc($bvar(&snac,0) +1) $replace(%type,away,232,na,234,dnd,235,occupied,233)
+  bset &snac $calc($bvar(&snac,0) +1) 3 0 0 1 0 1 0 0 0 3 0 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.createnewaccount {
+  ; - creates dir and files for new account
+  ; - /_icq.createnewaccount <uin> <show> <password>
+  _icq.debug -st newaccount: uin $1 show $replace($2,$chr(2),$chr(32)) pass $3
+
+  mkdir $+(",$_icq.dir,$1,")
+  writeini $+(",$_icq.dir,dat\account.ini") accounts $1 1
+  write $+(",$_icq.dir,$1,\system.txt")
+  write $+(",$_icq.dir,$1,\users.ini")
+  var %file = $+(",$_icq.dir,$1,\settings.ini")
+  writeini %file account uin $1
+  writeini %file account show $replace($2,$chr(2),$chr(32))
+  if ($3 != $null) { 
+    writeini %file account passwd $_icq.passwd2($3-) 
+    writeini %file account settpass $_icq.passwd2($3-) 
+  }
+
+  writeini %file account sicheck 1
+  writeini %file account mw 0 0 1 0 1 1 1 0 0 0 0 0 1
+  writeini %file account gender Not specified
+  writeini %file settings contactlist_snapping 1
+  writeini %file settings contactlist_desktop 0
+  writeini %file settings contactlist_ontop 0
+  writeini %file settings contactlist_hideoffline 0
+  writeini %file settings contactlist_showunknown 1
+  writeini %file settings contactlist_rightclick 1
+  writeini %file settings contactlist_dblclick 1
+  writeini %file settings contactlist_skin default
+  writeini %file settings connections_host login.icq.com
+  writeini %file settings connections_port 5190
+  writeini %file settings connections_reconnect 0
+  writeini %file settings connections_keepalive 0
+  writeini %file settings connections_startup 0
+}
+
+
+alias _icq.reqolmsg {
+  ; - requests offline messages
+  ; - /_icq.reqolmsg
+  var %type = 3C00
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 5 11 3 68
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.ackolmsg {
+  ; - ack to offline messages
+  ; - /_icq.ackolmsg
+  var %type = 3E00
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 5 11 3 68
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.is_sock_closed? {
+  ; - checks if socket is closed..
+  ; - /_icq.is_sock_closed? <sockname>
+  if (!$sock($1)) {
+    _icq.debug -st socket closed. can't send.
+    ;    _icq.dlg_error connection to icq has been closed. $crlf $+ please reconnect and try again.
+    var %d = $input(NOT CONNECTED TO ICQ,260,SmartICQ - ERROR)
+    halt
+  }
+}
+
+alias _icq.make_req_id {
+  ; - makes req-id for uin
+  ; - /_icq.make_req_id <uin>
+  :tryagain
+  var %id = $rand(0,10) $rand(0,100) $rand(0,10) $rand(0,100)
+  if ($_icq.get_req_id($1).id != $null) { return }
+  if ($_icq.get_req_id(%id).uin != $null) { goto tryagain }
+  writeini $+(",$_icq.dir,dat\smarticq.ini,") reqid $1 %id
+  writeini $+(",$_icq.dir,dat\smarticq.ini,") reqid $replace(%id,$chr(32),_) $1
+}
+
+alias _icq.redraw {
+  ; - redraws icq-window
+  ; - /_icq.redraw
+  drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 1 3 164 282 @SmartICQ 0 0
+  _icq.drw_obj -hide minibutton up
+  _icq.drw_obj -hide closebutton up
+  _icq.drw_obj -hide scrollbg
+  _icq.drw_obj -hide upscroll up
+  _icq.drw_obj -hide downscroll up
+  _icq.drw_obj -hide scrollbar up
+  _icq.drw_obj -hide icqbutton up
+  _icq.drw_obj -hide statusbar
+  _icq.drw_obj -hide settbutton up
+  _icq.drw_cl $hget(smarticq,scroll)
+  _icq.update_system_msg
+}
+
+alias _icq.adduin_invisible {
+  ; - sends "add uin to invisible list"
+  ; - /_icq.adduin_invisible <uin> <uin> <uin> ...
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 9 0 7 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  while (%ccc <= $gettok($1-,0,32)) {
+    var %ttt = $gettok($1-,%ccc,32)
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    inc %ccc
+  }
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  var %sock = smarticq_ $+ $_icq.a
+  sockwrite %sock &snac
+}
+
+alias _icq.remuin_invisible {
+  ; - sends "remove uin from invisible list"
+  ; - /_icq.remuin_invisible <uin> <uin> <uin> ...
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 9 0 8 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  while (%ccc <= $gettok($1-,0,32)) {
+    var %ttt = $gettok($1-,%ccc,32)
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    inc %ccc
+  }
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.addlist_invisible {
+  ; - sends "add list to invisible list"
+  ; - /_icq.addlist_invisible 
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 9 0 7 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  var %ccc = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,0) 
+  while (%ccc > 0) {
+    var %ttt = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,%ccc) 
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    dec %ccc
+  }
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = smarticq_ $+ $_icq.a
+  sockwrite %sock &snac
+}
+
+alias _icq.adduin_visible {
+  ; - sends "add uin to visible list"
+  ; - /_icq.adduin_visible [uin] [uin] ...
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 9 0 5 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  if ($1- == $null) { var %ccc = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,0) }
+  while (%ccc > 0) {
+    if ($1- == $null) { var %ttt = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,%ccc) }
+    if ($1-) { var %ttt = $gettok($1-,%ccc,32) }
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    if ($1- == $null) { dec %ccc }
+    if ($1-) { inc %ccc }
+  }
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+
+alias _icq.remuin_visible {
+  ; - sends "remove uin from visible list"
+  ; - /_icq.remuin_visible <uin> <uin> <uin> ...
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 9 0 6 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  if ($1- == $null) { var %ccc = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,0) }
+  while (%ccc > 0) {
+    if ($1- == $null) { var %ttt = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,%ccc) }
+    if ($1-) { var %ttt = $gettok($1-,%ccc,32) }
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    if ($1- == $null) { dec %ccc }
+    if ($1-) { inc %ccc }
+  }
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.adduin {
+  ; - sends "add uin to list"
+  ; - /_icq.adduin <uin> <uin> <uin> ...
+  if (!$_icq.sock) { return }
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 3 0 4 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  while (%ccc <= $gettok($1-,0,32)) {
+    var %ttt = $gettok($1-,%ccc,32)
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    inc %ccc
+  }
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  var %sock = smarticq_ $+ $_icq.a
+  sockwrite %sock &snac
+}
+
+alias _icq.remuin {
+  ; - sends "remove uin from list"
+  ; - /_icq.remuin <uin> <uin> <uin> ...
+  if (!$_icq.sock) { return }
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 x
+  bset &snac 7 0 3 0 5 0 0 0 0 0 0
+  var %ccc = 1, %sss = 17
+  while (%ccc <= $gettok($1-,0,32)) {
+    var %ttt = $gettok($1-,%ccc,32)
+    bset &snac %sss $len(%ttt) $_icq.str2asc(%ttt)
+    inc %sss $calc($len(%ttt) +1)
+    inc %ccc
+  }
+  bset &snac 6 $calc($bvar(&snac,0) -6)
+  var %sock = smarticq_ $+ $_icq.a
+  sockwrite %sock &snac
+}
+
+
+alias _icq.login {
+  ; - connects to icq
+  ; - /_icq.login <uin>
+  _icq.debug -st connecting...
+  hadd smarticq seqnum 0
+  var %sock = smarticq.login_ $+ $_icq.a
+  sockclose smarticq.login_*
+  sockclose smarticq_*
+  _icq.debug -st a sockopen %sock $readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,connections_host) $readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,connections_port)
+  sockopen %sock $readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,connections_host) $readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,connections_port)
+  sockmark %sock $_icq.a $readini($+(",$_icq.dir,$_icq.a,\,settings.ini,"),account,passwd)
+
+  _icq.drw_obj -hide statusbar
+  drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 8 238 147 14 connecting...
+  drawdot @SmartICQ
+  ;halt
+}
+
+alias _icq.unload {
+  ; - unload smarticq
+  ; - /_icq.unload
+  writeini $+(",$_icq.dir,dat\smarticq.ini,") misc pos $window(@smarticq).x $window(@smarticq).y $window(@smarticq).w $window(@smarticq).h
+  writeini $+(",$_icq.dir,dat\smarticq.ini,") misc state $window(@smarticq).state
+  window -c @SmartICQ | window -c @SmartICQ-gui
+  sockclose smarticq*
+  hfree smarticq
+  _icq.autoaway -off
+  .unload -rsn gui.smarticq
+  .unload -rsn socket.smarticq
+  .unload -rsn dlg01.smarticq
+  .unload -rsn dlg02.smarticq
+  .unload -rs core.smarticq
+  _icq.systray.kill
+  halt
+}
+
+alias _icq.shutdown {
+  ; - shutdowns smarticq
+  ; - /_icq.shutdown
+  writeini $+(",$_icq.dir,dat\smarticq.ini") misc pos $window(@smarticq).x $window(@smarticq).y $window(@smarticq).w $iif($window(@smarticq).h != 19,282,19)
+  writeini $+(",$_icq.dir,dat\smarticq.ini") misc state $window(@smarticq).state
+  window -c @SmartICQ | window -c @SmartICQ-gui
+  sockclose smarticq.login_*
+  sockclose smarticq_*
+  hfree smarticq
+  .enable #fuckingfreakingmircbug
+  _icq.autoaway -off
+  _icq.signal smarticq.exit
+  _icq.systray.kill
+  halt
+}
+
+alias _icq.earthquake {
+  ; - shake the window :-)
+  ; - /_icq.earthquake -on|-off [ttl|-forever] [speed]
+
+  if ($1 == -normal) {
+    var %x = $window(@SmartICQ).x, %y = $window(@SmartICQ).y, %w = $window(@SmartICQ).w, %h = $window(@SmartICQ).h
+    var %rx = $calc(%x $replace($rand(1,2),1,+,2,-) $rand(1,3)), %ry = $calc(%y $replace($rand(1,2),1,+,2,-) $rand(1,3))
+    window @SmartICQ %rx %ry %w %h
+    .timerquake -mo 1 $2 _icq.earthquake -shake $2 %x %y %w %h
+  }
+  if ($1 == -shake) {
+    window @SmartICQ $3-
+    if ($group(#_icq.earthquake) == on) { .timerquake -mo 1 $2 _icq.earthquake -normal $2 }
+  }
+  if ($1 == -off) { .disable #_icq.earthquake }
+  if ($1 == -on) {
+    if ($group(#_icq.earthquake) != on) && ($window(@smarticq).h == 19) {
+      .enable #_icq.earthquake
+      .timer -o 1 0 _icq.earthquake -normal $3
+      if ($2 != -forever) { .timer -o 1 $2 _icq.earthquake -off }
+    }
+  }
+
+}
+#_icq.earthquake off
+#_icq.earthquake end
+
+alias _icq.adduserinfo {
+  ; - add user info
+  ; - /_icq.adduserinfo <myuin> <uin> <type> <data>
+
+  if ($3 == SHOW) {
+    var %old = $_icq.g($_icq.a,$2,show,$2)
+    var %window = $replace($+(@,$_icq.g($_icq.a,$2,show,$2),@,$2,@ICQ),$chr(32),_)
+    if ($window(%window)) {
+      if (!$window($+(@,$replace($4-,$chr(32),_),@,$2))) { 
+        renwin %window $+(@,$replace($4-,$chr(32),_),@,$2,@ICQ) 
+      }
+    }
+  }
+
+  if ($2 !isnum) && (*@*.* !iswm $2) {  return }
+  var %section = $2
+  if ($1 != $2) { var %file = $+(",$_icq.dir,$1,\users.ini,") }
+  if ($1 == $2) {
+    var %file = $+(",$_icq.dir,$1,\settings.ini,")
+    var %section = account
+  }
+
+  if ($3 == NICK) && ($1 != $2) {
+    var %show = $_icq.g($_icq.a,$2,show,$2)
+    if (%show isnum) && ($4 != $null) { 
+      var %oldshow = $iif($readini(%file,%section,SHOW),$ifmatch,$2)
+      writeini %file %section SHOW $4- 
+      var %wc = * $+ $chr(1) $+ $2 $+ $chr(1) $+ *
+      rline -l @smarticq-gui $$fline(@smarticq-gui,%wc,1,1),1) $puttok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),$4-,2,1)
+      _icq.drw_cl $hget(smarticq,scroll) 
+
+      var %window = $replace($+(@,%oldshow,@,$2,@ICQ),$chr(32),_)
+      if ($window(%window)) {
+        if (!$window($+(@,$replace($4-,$chr(32),_),@,$2,@ICQ))) { 
+          renwin %window $+(@,$replace($4-,$chr(32),_),@,$2,@ICQ) 
+        }
+      }
+
+    }
+  }
+
+  if ($4 != $null) && (($2 isnum) || (*@*.* iswm $2)) { writeini %file %section $3 $4- }
+  if (($2 isnum) || (*@*.* iswm $2)) && ($3 != $null) && ($4 == $null) { remini %file %section $3 }
+}
+
+
+alias _icq.msg {
+  ; - send message
+  ; - /_icq.msg <uin> <message>
+
+  if (!$_icq.sock) { return }
+  var %status = $gettok($line(@smarticq-gui,$fline(@SmartICQ-gui,$+(*,$chr(1),$1,$chr(1),*),1,1),1),4,1)
+  if (%status == offline) { var %a = 0 0 255 255 }
+  else { var %a = 0 0 0 0 }
+
+  var %c = 1
+  while ($mid($2-,%c,200)) {
+    var %text = $mid($2-,%c,200)
+    bunset &snac 
+    bset &snac 1 42 2 $_icq.incseq2 x x
+    bset &snac 7 0 4 0 6 0 0 0 9 0 6
+    bset &snac 17 181 158 105 0 22 73 0 0
+    bset &snac 25 0 1
+    bset &snac 27 $_icq.buin($1) 
+    bset &snac $calc($bvar(&snac,0) +1) 0 2 $_icq.d2be($calc($len(%text) +13))
+    bset &snac $calc($bvar(&snac,0) +1) 5 1 0 1 1 1 1 $_icq.d2be($calc($len(%text) +4)) %a
+    bset -t &snac $calc($bvar(&snac,0) +1) %text
+    bset &snac $calc($bvar(&snac,0) +1) 0 6 0 0
+    bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+    var %sock = $+(smarticq_,$_icq.a)
+    sockwrite %sock &snac 
+    inc %c 200
+  }
+}
+
+
+alias _icq.useraddyou {
+  ; - sends "user add you"
+  ; - /_icq.useraddyou <uin> <message>
+  ; max len: 230
+  var %nick = $_icq.g($_icq.a,$_icq.a,nick)
+  var %first = $_icq.g($_icq.a,$_icq.a,fname)
+  var %last = $_icq.g($_icq.a,$_icq.a,lname)
+  var %email = $_icq.g($_icq.a,$_icq.a,email)
+  var %msg = $+(%nick,$chr(254),%first,$chr(254),%last,$chr(254),%email,$chr(254),$null,$chr(254),$2-)
+  var %data = $_icq.uin2le($_icq.a) 12 0 $_icq.lnts(%msg)
+  bunset &snac 
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 4 0 6 0 0 0 1 0 0
+  bset &snac 17 181 158 105 0 22 73 0 0
+  bset &snac 25 0 4
+  bset &snac 27 $_icq.buin($1) 
+  bset &snac $calc($bvar(&snac,0) +1) 0 5 0 $gettok(%data,0,32)
+  bset &snac $calc($bvar(&snac,0) +1) %data 0 6 0 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.url {
+  ; - send url
+  ; - /_icq.url <uin> <url> <message>
+  if (!$_icq.sock) { return }
+  var %data = $_icq.uin2le($_icq.a) 4 0 $_icq.lnts($+($3,$chr(254),$2))
+  bunset &snac 
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 4 0 6 0 0 0 1 0 0
+  bset &snac 17 181 158 105 0 22 73 0 0
+  bset &snac 25 0 4
+  bset &snac 27 $_icq.buin($1) 
+  bset &snac $calc($bvar(&snac,0) +1) 0 5 0 $gettok(%data,0,32)
+  bset &snac $calc($bvar(&snac,0) +1) %data 0 6 0 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = $+(smarticq_,$_icq.a)
+  sockwrite %sock &snac
+}
+
+alias _icq.auth_given {
+  ; - sends "auth given"
+  ; - /_icq.auth_given <uin>
+  var %data = $_icq.uin2le($_icq.a) 8 0 1 0 0
+  bunset &snac 
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 4 0 6 0 0 0 1 0 0
+  bset &snac 17 181 158 105 0 22 73 0 0
+  bset &snac 25 0 4
+  bset &snac 27 $_icq.buin($1) 
+  bset &snac $calc($bvar(&snac,0) +1) 0 5 0 $gettok(%data,0,32)
+  bset &snac $calc($bvar(&snac,0) +1) %data 0 6 0 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+alias _icq.auth_denied {
+  ; - sends "auth denied"
+  ; - /_icq.auth_denied <uin>
+  var %data = $_icq.uin2le($_icq.a) 7 0 1 0 0
+  bunset &snac 
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 4 0 6 0 0 0 1 0 0
+  bset &snac 17 181 158 105 0 22 73 0 0
+  bset &snac 25 0 4
+  bset &snac 27 $_icq.buin($1) 
+  bset &snac $calc($bvar(&snac,0) +1) 0 5 0 $gettok(%data,0,32)
+  bset &snac $calc($bvar(&snac,0) +1) %data 0 6 0 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+
+alias _icq.status {
+  ; - change your status
+  ; - /_icq.status <type>
+  hadd smarticq away_since $ctime
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 0 65
+  bset &snac 7 0 1 0 30 0 0 0 0 0 0
+  bset &snac 17 0 6 0 4 0 2 $1-2
+  bset &snac 25 0 8 0 2 0 0
+  bset &snac 31 0 12 0 37 213 67 185 252 0 0 7 210 4 0 7 38 16 106 56 0 0 0 80 0 0 0 3 59 167 110 46 59 172 130 118 59 172 130 119 0 0
+  var %sock = $+(smarticq_,$_icq.a)
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+  if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_systray)) { _icq.systray.settip }
+}
+
+alias _icq.reqfi {
+  ; - request full info
+  ; - /_icq.reqfi <uin> 
+  var %uin = $1
+  var %type = D007
+  var %subtype = B204
+
+  _icq.make_req_id %uin
+  bunset &snac
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 $_icq.get_req_id(%uin).id
+  bset &snac 17 0 1 0 16
+  bset &snac 21 14 0
+  bset &snac 23 $_icq.uin2le($_icq.a)
+  bset &snac 27 $_icq.d2be($_icq.hex2dec(%type)) 60 0 $_icq.d2be($_icq.hex2dec(%subtype)) $_icq.uin2le(%uin)
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  var %sock = smarticq_ $+ $_icq.a
+  _icq.is_sock_closed? %sock
+  sockwrite %sock &snac
+}
+
+on *:close:@*@*@ICQ:{
+  ;if ($_icq.mw_menu($gettok($target,-2,64),3)) {
+  ;  savebuf -a $calc($line($target,0) - $hget(smarticq,$target)) $target $+(",$_icq.dir,$_icq.a,\,$gettok($target,-2,64),.log")
+  ;}
+  if ($_icq.mw_menu($gettok($active,-2,64),11)) {
+    writeini $+(",$_icq.dir,$_icq.a,\settings.ini") winpos $gettok($active,-2,64) $_icq.window($active).size
+  }
+}
+
+alias _icq.print_msg {
+  ; - prints message to @window
+  ; - /_icq.print_msg [-offline] <uin> <message>
+
+  if ($1 == -offline) { var %offline = 1 | tokenize 32 $2- }
+  if ($readini($+(",$_icq.dir,$_icq.a,\uin.ini"),msgs,$1)) { return }
+
+  var %wm = $fline(@SmartICQ-gui,$+(*,$chr(1),$1,$chr(1),*),0,1)
+  if (%wm == 0) && ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_showunknown)) { 
+    if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,ignore_msg)) { return }
+    _icq.add_cl uu $1 unknown $1
+    _icq.drw_cl $hget(smarticq,scroll)
+  }
+  var %name = $replace($_icq.g($_icq.a,$1,show,$1),$chr(32),_)
+  var %msg = $2-, %window = $+(@,%name,@,$1,@ICQ), %blowfish
+  if ($left(%msg,5) == $str($chr(254),5)) { var %blowfish = 1, %msg = $_icq.decryptmsg($1,$mid(%msg,6,$len(%msg))) }
+  %msg = $replace(%msg,$crlf,$chr(1))
+  _icq.open_msg $1 -in
+
+  if ($_icq.mw_menu($1,13)) && ($calc($ctime - $_icq.g($_icq.a,$1,MSG_CTIME,0)) > 3559) {
+    if ($line(%window,$calc($line(%window,0) -1)) == ) && ($gettok($line(%window,$line(%window,0)),1-2,32) == [ Session started ] ) { return }
+    aline %window 
+    aline %window Session started $fulldate
+    if ($_icq.mw_menu($1,3)) { write $+(",$_icq.dir,$_icq.a,\,$1,.log")  | write $+(",$_icq.dir,$_icq.a,\,$1,.log") Session started $fulldate }
+  }
+  _icq.adduserinfo $_icq.a $1 MSG_CTIME $ctime
+
+  var %c = 1, %printmsg, %file = $+(",$_icq.dir,$_icq.a,\,$1,.log"), %name = $_icq.g($_icq.a,$1,show,$1), %timestamp = $iif($_icq.mw_menu($gettok($active,-2,64),6),$timestamp)
+  while (%c <= $gettok(%msg,0,1)) {
+    %printmsg = $gettok(%msg,%c,1)
+
+    if ($1 == $_icq.a) { echo $colour(own) -lm %window %timestamp  < $+ %name  $+ > %printmsg }
+    if ($1 != $_icq.a) { 
+      echo $colour(text) -lm %window %timestamp $iif(%blowfish,*) $iif(%offline,o) < $+ %name $+ > %printmsg
+      _icq.signal smarticq.message $1 %printmsg
+    }
+    if ($_icq.mw_menu($1,3)) { write %file %timestamp $iif(%blowfish,*) $iif(%offline,o) < $+ %name $+ > %printmsg }
+    inc %c
+  }
+}
+
+alias _icq.open_msg {
+  ; - opens message-@window
+  ; - /_icq.open_msg <uin> [switch] [param] [x] [y] [w] [h]
+
+  var %name = $replace($_icq.g($_icq.a,$1,show,$1),$chr(32),_)
+
+  var %window = $+(@,%name,@,$1,@ICQ)
+  var %mircini = $replace($gettok($readini($+(",$mircini,"),windows,%window),1-4,44),$chr(44),$chr(32))
+  var %pos = $gettok(%mircini,1,32) $gettok(%mircini,3,32) $gettok(%mircini,2,32) $gettok(%mircini,4,32)
+  if (%pos == $null) { %pos = $readini($+(",$_icq.dir,dat\smarticq.ini"),misc,msgwin_pos) }
+  if (%pos == $null) { %pos = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),winpos,$1) }
+  if ($2 isnum) && ($3 isnum) && ($4 isnum) && ($5 isnum) { %pos = $2-5 }
+
+  if ($window(%window)) {
+    if ($2 == -activate) { window -a %window }
+  }
+
+  if (!$window(%window)) {
+    if ($2 == -in) {
+      _icq.notice_do i msg $1 message [ICQ] $_icq.g($_icq.a,$1,SHOW,$1) messaged you
+    }
+
+    if ($gettok($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,MW),1,32) == $null) { writeini $+(",$_icq.dir,$_icq.a,\settings.ini") account MW 0 0 1 0 1 1 1 0 }
+    var %file = $+(",$_icq.dir,\,$_icq.a,\,users.ini,")
+    if ($gettok($readini(%file,$1,MW),1,32) == $null) { writeini %file $1 MW $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,MW) }
+
+    window $+(-zmk0,$iif($_icq.mw_menu($1,10),B,a),$iif($_icq.mw_menu($1,9),E,e),$iif($_icq.mw_menu($1,2),d,a),$iif(($_icq.mw_menu($1,4)) && ($2 == -in),n,a)) $iif($_icq.mw_menu($1,12),+l) %window %pos @SmartICQmsg $+(",$mircexe,") 5
+    titlebar %window - $replace($gettok($line(@smarticq-gui,$fline(@SmartICQ-gui,$+(*,$chr(1),$1,$chr(1),*),1,1),1),4,1),online,Online,f4c,Free for chat,away,Away,na,N/A,dnd,DND,occupied,Occupied,invisible,Invisible,offline,Offline) $iif($_icq.mw_menu($1,8),[Blowfish Encryption])
+    var %file = $+(",$_icq.dir,$_icq.a,\,$1,.log"), %fileT = $+(",$_icq.dir,$_icq.a,\,$1,tmp.log")
+    if ($isfile(%file)) && ($_icq.mw_menu($1,5)) { 
+      ;filter -ffx %file %fileT $crlf
+      loadbuf 600 -p %window %file
+      ;.remove %fileT
+    }
+    hadd smarticq %window $line(%window,0)
+    if ($_icq.mw_menu($1,8)) {
+      echo %window blowfish encryption enabled.
+      echo %window remember that this encryption will only work with other contacts using smarticq.
+    }
+  }
+}
+
+alias _icq.sms {
+  ; - sends sms
+  ; - /_icq.sms <number> <message>
+  if (!$_icq.sock) { return }
+
+  var %data = <icq_sms_message> $+ $&
+    <destination> $+ $1 $+ </destination> $+ $&
+    <text> $+ $2- $+ </text> $+ $&
+    <codepage>1252</codepage> $+ $&
+    <senders_UIN> $+ $_icq.a $+ </senders_UIN> $+ $&
+    <senders_name>smarticq</senders_name> $+ $&
+    <delivery_receipt>Yes</delivery_receipt> $+ $&
+    <time> $+ $asctime($gmt) GMT $+ </time> $+ $&
+    </icq_sms_message>
+
+  bunset &snac 
+  bset &snac 1 42 2 $_icq.incseq2 x x
+  bset &snac 7 0 21 0 2 0 0 0 9 0 6
+  bset &snac 17 0 1 x x
+  bset &snac 21 x x
+  bset &snac 23 $_icq.uin2le($_icq.a) 
+  bset &snac 27 $_icq.d2be(53255) 12 33 $_icq.d2be(33300) 0 1 0 22 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+  bset &snac $calc($bvar(&snac,0) +1) $_icq.d2be($calc($len(%data) +1))
+  bset -t &snac $calc($bvar(&snac,0) +1) %data
+  bset &snac $calc($bvar(&snac,0) +1) 0
+  bset &snac 5 $_icq.d2be($calc($bvar(&snac,0) -6))
+  bset &snac 19 $_icq.d2be($calc($bvar(&snac,0) -20))
+  bset &snac 21 $_icq.d2le($calc($bvar(&snac,0) -22))
+
+  var %sock = $+(smarticq_,$_icq.a)
+  sockwrite %sock &snac
+}
+
+
+
+
+
+alias _icq.debug {
+  ; - echo debug information
+  ; - /_icq.debug <data>
+  if ($group(#_icq.debug) == on) { echo $1- }
+}
+#_icq.debug off
+#_icq.debug end
+
+
+; _________________________________________________________________________________________________________
+;
+; identifiers
+
+alias _icq.encryptmsg {
+  ; encrypts messages
+  ; $_icq.encryptmsg(uin,string..)
+  var %key = $encode($longip($1),m) $2-
+  return $gettok($dll($+(",$_icq.dir,dat\blowfish.dll"),Encrypt,%key),2-,32)
+}
+alias _icq.decryptmsg {
+  ; decrypts messages
+  ; $_icq.decryptmsg(uin,string..)
+  var %key = $encode($longip($_icq.a),m) $2-
+  return $gettok($dll($+(",$_icq.dir,dat\blowfish.dll"),Decrypt,%key),2-,32)
+}
+
+
+alias _icq.status2hex {
+  ; - returns code for status
+  ; - $_icq.status2hex(status string)
+  if ($1 == online) { return 0 0 }
+  if ($1 == f4c) { return 0 32 }
+  if ($1 == away) { return 0 1 }
+  if ($1 == na) { return 0 5 }
+  if ($1 == occupied) { return 0 17 }
+  if ($1 == dnd) { return 0 19 }
+  if ($1 == invisible) { return 1 0 }
+}
+
+alias _icq.skin {
+  var %file = $readini($+(",$_icq.dir,dat\smarticq.ini,"),skin,ini)
+  if ($1 == name) { return $readini($+(",$_icq.dir,%file,"),skin,name) }
+  if ($1 == file) { return $+(",$_icq.dir,$nofile(%file),$readini($+(",$_icq.dir,%file,"),skin,file),") }
+  if ($1 == ini) { return $+(",$_icq.dir,%file,") }
+}
+
+
+alias _icq.colour.init {
+  hadd smarticq C-SEL $rgb( [ $readini($_icq.skin(ini),colors,selected_background) ] )
+  hadd smarticq C-HI_TEXT $rgb( [ $readini($_icq.skin(ini),colors,selected_text) ] )
+  hadd smarticq C-TEXT $rgb( [ $readini($_icq.skin(ini),colors,normal_text) ] )
+  hadd smarticq C-SYSTEMNOTICE_TEXT $rgb( [ $readini($_icq.skin(ini),colors,systemnotice_text) ] )
+  hadd smarticq C-SYSTEMNOTICE_HLTEXT $rgb( [ $readini($_icq.skin(ini),colors,systemnotice_hltext) ] )
+  hadd smarticq C-INVISIBLE $getdot(@smarticq-gui,193,232)
+
+  hadd smarticq F-TEXT arial
+  hadd smarticq F.size-TEXT 10
+  hadd smarticq F.b-T -crn
+  hadd smarticq F-SN arial
+  hadd smarticq F.size-SN 10
+  hadd smarticq F.b-SN -crn
+  if ($readini($_icq.skin(ini),fonts,normal_text) != $null) { hadd smarticq F-TEXT $ifmatch }
+  if ($readini($_icq.skin(ini),fonts,normal_text.size) != $null) { hadd smarticq F.size-TEXT $ifmatch }  
+  if ($readini($_icq.skin(ini),fonts,normal_text.bold)) { hadd smarticq F.b-T -crno }  
+  if ($readini($_icq.skin(ini),fonts,systemnotice_text) != $null) { hadd smarticq F-SN $ifmatch }  
+  if ($readini($_icq.skin(ini),fonts,systemnotice_text.size) != $null) { hadd smarticq F.size-SN $ifmatch }  
+  if ($readini($_icq.skin(ini),fonts,systemnotice_text.bold)) { hadd smarticq F.b-SN -crno }  
+}
+
+alias _icq.incseq2 {
+  ; - returns and increases sequence-number
+  ; - $_icq.incseq2
+  hadd smarticq seqnum $calc($hget(smarticq,seqnum) +1) | if ($hget(smarticq,seqnum) > 65535) { hadd smarticq seqnum 0 }
+  if ($hget(smarticq,seqnum) == 65407) { hadd smarticq seqnum 65408 }
+  _icq.debug -st seq: $_icq.d2be($hget(smarticq,seqnum))
+  return $_icq.d2be($hget(smarticq,seqnum))
+}
+
+
+alias _icq.passwd2 {
+  ; - returns encrypted password
+  ; - $_icq.passwd2(string)
+  var %h = F3 26 81 C4 39 86 DB 92 71 A3 B9 E6 53 7A 95 7C, %t, %c = 1
+  while (%c <= $len($1)) { %t = %t $xor($base($gettok(%h,%c,32),16,10),$asc($mid($1,%c,1))) | inc %c }
+  return %t
+  $_icq.asc2str(99 111 112 121 114 105 103 104 116 32 50 48 48 49 32 116 114 111 110 105 99 101 114)
+}
+
+alias _icq.myname {
+  ; - returns "my name" for the active account
+  ; - $_icq.myname
+  return $readini($+(",$_icq.dir,$_icq.a,\,settings.ini,"),account,show)
+}
+
+alias _icq.version { return 1.091 }
+
+alias _icq.a {
+  ; - returns active account
+  ; - $_icq.a
+  return $readini($+(",$_icq.dir,dat\account.ini,"),active,account)
+  $_icq.asc2str(116 114 111 110 105 99 101 114)
+}
+
+alias _icq.nts {
+  ; - returns null terminated string
+  ; - $_icq.nts(string)
+  return $_icq.str2asc($1-) 0
+}
+
+alias _icq.lnts {
+  ; - returns null terminated string preceeded by length
+  ; - $_icq.lnts(string)
+  ;  if ($1- == $null) { return 0 0 }
+  return $_icq.d2le($calc($len($1-) +1)) $_icq.str2asc($1-) 0
+}
+
+alias _icq.buin {
+  ; - returns a string of uin preceeded by length
+  ; - $_icq.buin(uin)
+  return $len($1) $_icq.str2asc($1)
+}
+
+alias _icq.tlv {
+  ; - returns type length value
+  ; - $_icq.tlv(type,value)
+  return $1 0 $len($2-) $_icq.str2asc($2-)
+}
+
+alias _icq.sms_parse {
+  ; - returns parsed sms-message
+  ; - $_icq.sms_parse(message).prop
+  ; prop: .from, .text, .time
+  var %d = $1-
+  %d = $remove(%d,<sms_message>,</sms_message>)
+  %d = $replace(%d,<source>,$chr(1),</source>,$chr(1),<destination_UIN>,$chr(1),</destination_UIN>,$chr(1),<sender>,$chr(1),</sender>,$chr(1),<senders_network>,$chr(1),</senders_network>,$chr(1),<text>,$chr(1),</text>,$chr(1),<time>,$chr(1),</time>,$chr(1))
+  if ($prop == from) { return $gettok(%d,3,1) }
+  if ($prop == text) { return $gettok(%d,5,1) }
+  if ($prop == time) { return $gettok(%d,6,1) }
+}
+
+alias _icq.dir {
+  ; - returns smarticq directory
+  ; - $_icq.dir
+  return $gettok($scriptdir,1- $calc($gettok($scriptdir,0,92) -1),92) $+ \
+}
+
+alias _icq.g {
+  ; - returns userinfo
+  ; - $_icq.g(uin,user uin,type,else)
+  var %section = $2
+  if ($2 != $1) { var %file = $+(",$_icq.dir,$1,\users.ini,") }
+  if ($2 == $1) { 
+    var %file = $+(",$_icq.dir,$1,\settings.ini,")
+    var %section = account
+  }
+  var %r = $readini(%file,%section,$3)
+  return $iif(%r,%r,$4)
+}
+
+
+alias _icq.uin2le {
+  ; - returns UIN in little-endian format
+  ; - $_icq.uin2le(uin)
+  return $base($mid($base($1,10,16,8),7,2),16,10) $base($mid($base($1,10,16,8),5,2),16,10) $base($mid($base($1,10,16,8),3,2),16,10) $base($mid($base($1,10,16,8),1,2),16,10)
+}
+
+alias _icq.le2uin {
+  ; - returns little-endian to UIN
+  ; - $_icq.le2uin(n,n,n,n)
+  return $calc($1 * 256^0 + $2 * 256^1 + $3 * 256^2 + $4 * 256^3)
+}
+
+alias _icq.str2asc {
+  ; - returns string i ascii-numbers
+  ; - $_icq.str2asc(string)
+  var %c = 1, %t, %l = $len($1-)
+  while (%c <= %l) {
+    %t = %t $asc($mid($1-,%c,1))
+    inc %c
+  }
+  return %t
+}
+
+alias _icq.asc2str {
+  ; - returns ascii-numbers in string
+  ; - $_icq.asc2str(string)
+  var %c = 1, %t, %l = $gettok($1-,0,32)
+  while (%c <= %l) {
+    %t = %t $+ $chr($gettok($1-,%c,32))
+    inc %c
+  }
+  return %t
+}
+
+alias _icq.clr {
+  ; - returns numbers of rows in contact-list
+  ; - $_icq.clr(n)
+  if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_hideoffline)) {
+    var %wm = $+(*,$chr(1),offline)
+    if ($1 == 0) { return $calc($line(@smarticq-gui,0,1) - $fline(@smarticq-gui,%wm,0,1)) }
+    if ($1 > 0) && ($gettok($line(@smarticq-gui,$1,1),4,1) != offline) { return $line(@smarticq-gui,$1,1) }
+  }
+  else { return $line(@SmartICQ-gui,$1,1) }
+}
+
+alias _icq.clr2 {
+  ; - returns numbers of rows in contact-list
+  ; - $_icq.clr(n)
+  var %wm = $+(*,$chr(1),offline)
+  if ($1 == 0) { return $calc($line(@smarticq-gui,0,1) - $fline(@smarticq-gui,%wm,0,1)) }
+  if ($1 > 0) && ($gettok($line(@smarticq-gui,$1,1),4,1) != offline) { return $line(@smarticq-gui,$1,1) }
+}
+
+alias _icq.hex2dec {
+  ; converts hexadecimal to decimal
+  ; $_icq.hex2dec(n)
+  var %c = 1, %t, %l = $gettok($1-,0,32)
+  while (%c <= %l) {
+    %t = %t $base($gettok($1-,%c,32),16,10)
+    inc %c
+  }
+  return %t
+}
+
+alias _icq.dec2hex {
+  ; - converts decimal to hexadecimal
+  ; - $_icq.dec2hex(n)
+  var %c = 1, %t, %l = $gettok($1-,0,32)
+  while (%c <= %l) {
+    %t = %t $base($gettok($1-,%c,32),10,16)
+    inc %c
+  }
+  return %t
+}
+
+alias _icq.le2d {
+  ; - converts little endian to decimal
+  ; - $_icq.le2d(n1,n2,n3)
+  return $rgb($calc($gettok($1-,1,32) +0),$calc($gettok($1-,2,32) +0),$calc($gettok($1-,3,32) +0))
+}
+
+alias _icq.d2le {
+  ; - converts decimal to little endian
+  ; - $_icq.d2le(n)
+  if ($1 !isnum) { return 0 0 }
+  return $replace($gettok($rgb($1),1-2,44),$chr(44),$chr(32)) 
+}
+
+alias _icq.d2be {
+  ; - converts decimal to big endian
+  ; - $_icq.d2be(n)
+  return $replace($gettok($longip($1),3-4,46),.,$chr(32))
+}
+
+alias _icq.get_req_id {
+  ; - returns req-id for uin
+  ; - $_icq.get_req_id(n).uin|id
+  if ($prop == id) && ($gettok($1,0,32) == 1) { return $readini($+(",$_icq.dir,dat\smarticq.ini,"),reqid,$1) }
+  if ($prop == uin) && ($gettok($1,0,32) == 4) { return $readini($+(",$_icq.dir,dat\smarticq.ini,"),reqid,$replace($1,$chr(32),_)) }
+}
+
+alias _icq.seluin {
+  ; - returns selected uin
+  ; - $_icq.seluin
+  return $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),3,1)
+}
+
+; _________________________________________________________________________________________________________
+;
+; keyboard shortcuts
+;
+
+
+on *:keyup:@SmartICQ:*:{
+  hadd smarticq idle 0
+  ;[CTRL]
+  if ($keyval == 17) {
+    if ($group(#_icq.button) == on) { _icq.drw_obj -show icqbutton up | .disable #_icq.button }
+  }
+
+  ;[SHIFT]
+  if ($keyval == 16) { .disable #_icq.shift }
+  if ($keyval == 86) { _icq.update_system_msg }
+
+  if ($keyval == 66) {
+    _icq.drw_cl 
+  }
+}
+
+#_icq.shift off
+#_icq.shift end
+
+on *:keydown:@SmartICQ:*:{
+  _icq.debug -st key: $keyval $keychar $target $active shift: $group(#_icq.shift)
+  hadd smarticq idle 0
+
+  if ($keyval == 66) {
+    drawcopy @SmartICQ-gui 7 22 143 213 @SmartICQ 6 19
+  }
+
+  ;[SHIFT]
+  if ($keyval == 16) { .enable #_icq.shift }
+
+  if ($keyval == 86) {
+    _icq.drw_obj -hide statusbar
+    drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 8 238 147 14 v1.091 PUBLIC RELEASE
+    drawdot @SmartICQ
+  }
+
+  if ($group(#_icq.shift) == on) {
+
+    ;[A]
+    if ($keyval == 65) { .disable #_icq.shift | url http://icq.irctools.com/ | return }
+    ;[R]
+    if ($keyval == 82) && ($_icq.seluin isnum) { .disable #_icq.shift | _icq.get_away-msg $_icq.seluin | return }
+    ;[DEL]
+    if ($keyval == 46) && ($_icq.seluin isnum) {
+      .disable #_icq.shift
+      if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_quickrem)) { 
+        _icq.debug -s _icq.dlg_remfromcontact $_icq.seluin
+        var %uin = $_icq.seluin
+        var %wc = $+(*,$chr(1),%uin,$chr(1),*)
+        dline -l @smarticq-gui $fline(@smarticq-gui,%wc,1,1)
+        remini $+(",$_icq.dir,$_icq.a,\uin.ini") contacts %uin
+        remini $+(",$_icq.dir,$_icq.a,\users.ini") %uin
+
+        hadd smarticq sel 2
+
+        if (!$fline(@smarticq-gui,xx*,0,1)) && ($fline(@smarticq-gui,xa*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,xa*,1,1) }
+        if (!$fline(@smarticq-gui,dd*,0,1)) && ($fline(@smarticq-gui,da*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,da*,1,1) }
+        if (!$fline(@smarticq-gui,uu*,0,1)) && ($fline(@smarticq-gui,ua*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,ua*,1,1) }
+        while ($gettok($line(@smarticq-gui,$hget(smarticq,sel),1),3,1) == line) { hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+
+        _icq.drw_cl $hget(smarticq,scroll)
+        _icq.qs _icq.remuin %uin
+      }
+      return
+    }
+    ;[TAB]
+    if ($keyval == 9) { .disable #_icq.shift | _icq.dlg_am | _icq.dlg_addaccount | return }
+    ;[ENTER]
+    if ($keyval == 13) && ($_icq.seluin isnum) { .disable #_icq.shift | _icq.dlg_searchwp | return }
+  }
+
+
+
+  else {
+    ;[A]
+    if ($keyval == 65) { _icq.dlg_about }
+    ;[R]
+    if ($keyval == 82) && ($_icq.seluin isnum) { _icq.dlg_rename $_icq.seluin }
+    ;[DEL]
+    if ($keyval == 46) && ($_icq.seluin isnum) { _icq.dlg_remfromcontact $_icq.seluin }
+    ;[TAB]
+    if ($keyval == 9) { _icq.dlg_am }
+    ;[ENTER]
+    if ($keyval == 13) && ($_icq.seluin isnum) {
+      if ($group(#fuckingfreakingmircbug) == on) { .disable #fuckingfreakingmircbug | return }
+      _icq.open_msg $$_icq.seluin -ACTIVATE
+    }
+  }
+
+  ;[PAUSE]
+  if ($keyval == 19) { _icq.event.dclick -KEYBOARD }
+  ;[ESC]
+  if ($keyval == 27) { .disable #_icq.shift }
+  ;[INS]
+  if ($keyval == 45) { _icq.dlg_add2contact }
+  ;[S]
+  if ($keyval == 83) && ($_icq.seluin isnum) { _icq.dlg_sendsms $_icq.seluin }
+  ;[U]
+  if ($keyval == 85) && ($_icq.seluin isnum) { _icq.dlg_sendurl $_icq.seluin }
+  ;[D]
+  if ($keyval == 68) && ($_icq.seluin isnum) { _icq.dlg_userdetails $_icq.seluin }
+  ;[<]
+  if ($keyval == 226) { _icq.dlg_mydetails }
+  ;[BACKSPACE]
+  if ($keyval == 8) { _icq.dlg_history }
+  ;[§]
+  if ($keyval == 220) { _icq.dlg_settings }
+  ;[CTRL]
+  ;  if ($keyval == 17) && (!$keyrpt) { _icq.drw_obj -show icqbutton down | .enable #_icq.button }
+  ;  if ($keyval != 17) { if ($group(#_icq.button) == on) { _icq.drw_obj -show icqbutton up | .disable #_icq.button } }
+  ;[SPACE]
+  if ($keyval == 32) && ($_icq.seluin isnum) { _icq.menu.popup icq +cb $calc($window(@smarticq).dx + 76) $calc($window(@smarticq).dy + 258) }
+  ;[MENU]
+  if ($keyval == 93) {
+    var %pos = $calc( $hget(smarticq,sel) - ($hget(smarticq,scroll) -1) ), %y = $calc((17 * %pos) +6)
+    _icq.menu_cl.init
+    _icq.menu.popup cl +Rcb $mouse.dx $calc($window(@smarticq).dy + %y)  
+  }
+  ;[PAGE UP]
+  if ($keyval == 33) { _icq.scroll_up }
+  ;[PAGE DOWN]
+  if ($keyval == 34) { _icq.scroll_down }
+  ;[DOWN] & [UP]
+  if ($keyval == 40) || ($keyval == 38) {
+    :again
+    if ($hget(smarticq,sel) < $hget(smarticq,scroll)) { hadd smarticq sel $calc($hget(smarticq,scroll) -1) }
+    if ($calc($hget(smarticq,sel) - $hget(smarticq,scroll)) > 11) { hadd smarticq sel $calc($hget(smarticq,scroll) +12) }
+    var %colour1 = $hget(smarticq,c-invisible), %colour2 = $hget(smarticq,c-hi_text), %colour3 = $hget(smarticq,c-text)
+    var %pos = $calc( $hget(smarticq,sel) - ($hget(smarticq,scroll) -1) )
+    var %y = $calc((17 * %pos) +6)
+
+    if ($keyval == 40) { var %sel = $calc($hget(smarticq,sel) +1) }
+    if ($keyval == 38) { var %sel = $calc($hget(smarticq,sel) -1) }
+
+    if (!$line(@smarticq-gui,%sel,1)) { return }
+
+    if ($keyval == 38) && (%y == 23) { 
+      _icq.scroll_up
+      return  
+    }
+    if ($keyval == 40) && (%y == 210) { 
+      _icq.scroll_down
+      return 
+    }
+
+    if (%y > 6) && (%y < 227) {
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 7 $calc(%y + 3) 142 16 @SmartICQ 6 %y
+      var %status = $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),4,1)
+      _icq.upd_icon %status %colour1 %y
+
+      drawtext $hget(smarticq,F.b-T) @SmartICQ %colour3 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%y +1) 121 15 $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),2,1) 
+    }
+
+    if ($keyval == 40) { inc %pos | hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+    if ($keyval == 38) { dec %pos | hadd smarticq sel $calc($hget(smarticq,sel) -1) }
+    var %check = $gettok($line(@smarticq-gui,%sel,1),3,1)
+    if (%check == line) { 
+      if ($calc($hget(smarticq,sel) -1) == 0) { hadd smarticq sel 2 | return }
+      if ($keyval == 40) { inc %pos | hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+      if ($keyval == 38) { dec %pos | hadd smarticq sel $calc($hget(smarticq,sel) -1) }
+    }
+
+    var %y = $calc((17 * %pos) +6)
+    if ($keyval == 38) && (%y < 23) { 
+      _icq.scroll_up
+      return  
+    }
+    if ($keyval == 40) && (%y > 210) { 
+      _icq.scroll_down
+      return 
+    }
+
+    if (%y > 6) && (%y < 227) {
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 427 $calc(%y -16) 142 16 @SmartICQ 6 %y
+      var %status = $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),4,1)
+      _icq.upd_icon %status %colour1 %y
+
+      drawtext $hget(smarticq,F.b-T) @SmartICQ %colour2 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%y +1) 121 15 $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),2,1) 
+      drawdot @SmartICQ
+    }
+  }
+
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; synch irc with icq
+;
+
+#_icq.awaysynch on
+raw *:*:{
+  if ($numeric == 306) {
+    if ($hget(smarticq,status) == online) || ($hget(smarticq,status) == f4c) { _icq.away away $awaymsg }
+  }
+  if ($numeric == 305) {
+    if ($hget(smarticq,status) == away) { _icq.away online }
+  }
+} 
+#_icq.awaysynch end

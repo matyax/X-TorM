@@ -1,0 +1,6 @@
+  Desactivar el cambio de fuentes
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Si queres desactivar estas opciones, tenés que ir al diálogo de 
+  configuración del script (F3), sección apariencia y desactivar las 
+  opciones Colorear diálogos, Cambiar fuente o Colorear edits, según tu 
+  gusto o conveniencia.

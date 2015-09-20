@@ -1,0 +1,1334 @@
+; ______________________________________________________________________________________________________
+;
+;   SmartICQ v1.091
+;   copyright (c) 2001-02 tronicer
+;
+;   url, http://icq.irctools.com/
+;   e-mail, tronicer@freebox.com
+; _________________________________________________________________________________________________________
+;
+; smarticq dialogs
+; _________________________________________________________________________________________________________
+;
+; * LIST OF DIALOGS
+
+; /_icq.dlg_am				account manager
+; /_icq.dlg_awaymsg				read ppl's away-msgs
+; /_icq.dlg_recvurl				recv url
+; /_icq.dlg_about				about
+; /_icq.dlg_searchwp				search icq white pages
+; /_icq.dlg_settings				settings
+
+; _________________________________________________________________________________________________________
+;
+; account manager
+
+alias _icq.dlg_am {
+  if ($dialog(_icq.am)) { dialog -v _icq.am }
+  else { dialog -m _icq.am _icq.am }
+}
+
+dialog _icq.am {
+  title "SmartICQ - Account Manager"
+  size -1 -1 143 112
+  option dbu
+  list 1, 7 15 63 73, size
+  button "Add Account", 2, 73 17 62 12
+  button "Register New Account", 3, 73 31 62 12
+  button "Remove Account", 4, 73 45 62 12
+  button "Connect", 6, 98 97 41 12
+  button "Close", 7, 55 97 37 12, cancel
+  check "Popup on start", 8, 4 98 49 10
+  box "Accounts", 9, 2 4 137 90
+  button "Change Account", 10, 73 64 62 12
+}
+
+on *:dialog:_icq.am:init:*:{
+  if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,am_popup)) { did -c $dname 8 }
+  var %c = $ini($+(",$_icq.dir,dat\account.ini"),accounts,0), %read, %read_a
+  while (%c > 0) {
+    %read = $ini($+(",$_icq.dir,dat\account.ini"),accounts,%c)
+    %read_a = $readini($+(",$_icq.dir,\,%read,\settings.ini"),account,show)
+    did -a $dname 1 %read $iif(%read_a != %read,%read_a)
+    if (%read == $_icq.a) { did -c $dname 1 $did($dname,1).lines }
+    dec %c
+  }
+
+}
+
+on *:dialog:_icq.am:sclick:2,3,4,6,8,10:{
+  if ($did == 2) { _icq.dlg_addaccount }
+  if ($did == 3) { 
+    if ($sock(smarticq*,0)) {
+      var %d = $input(You must disconnect from ICQ before you can register a new account.,4)
+      return
+    }
+    _icq.dlg_registration 
+  }
+  if ($did == 4) { 
+    if (!$gettok($did($dname,1,$did($dname,1).sel).text,1,32)) { return }
+    if ($input(Are you sure you want $+ $crlf $+ to remove account $gettok($did($dname,1,$did($dname,1).sel).text,1,32) $+ ? $+ $crlf $+ $crlf $+ You can not undo this!,8,- SmartICQ)) {
+      var %d = $findfile($+(",$_icq.dir,$gettok($did($dname,1,$did($dname,1).sel).text,1,32),"),*.*,0,.remove $+(",$1-,") )
+      .rmdir $+(",$_icq.dir,$gettok($did($dname,1,$did($dname,1).sel).text,1,32),")
+      remini $+(",$_icq.dir,dat\account.ini") accounts $did($dname,1).seltext
+      did -d $dname 1 $did($dname,1).sel
+      if ($did($dname,1).lines) { did -c $dname 1 1 }
+      if (!$did($dname,1).lines) { remini $+(",$_icq.dir,dat\account.ini") active account }
+    }
+  }
+
+  if ($did == 8) { writeini $+(",$_icq.dir,$_icq.a,\settings.ini,") settings am_popup $did($dname,8).state }
+
+  if ($did == 6) || ($did == 10) {
+    if (!$did($dname,1).sel) { return }
+    if ($gettok($did($dname,1,$did($dname,1).sel).text,1,32) == $_icq.a) && ($window(@smarticq)) { 
+      if ($did == 6) { dialog -x $dname | hadd smarticq status online | _icq.drw_obj -show icqbutton up | _icq.login }
+      return 
+    }
+    writeini $+(",$_icq.dir,dat\account.ini") active account $gettok($did($dname,1,$did($dname,1).sel).text,1,32)
+
+    if (!$window(@smarticq)) { 
+      if ($did == 10) { _icq }
+      if ($did == 6) { dialog -x $dname | _icq -connect }
+      return 
+    }
+
+    sockclose smarticq_*
+    dline -l @SmartICQ-gui $+(1,-,$line(@SmartICQ-gui,0,1))
+
+    var %c = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,0), %read
+    while (%c > 0) {
+      %read = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,%c)
+      _icq.add_cl xx %read offline $_icq.g($_icq.a,%read,show,%read)
+      dec %c
+    }
+
+    hadd smarticq state normal
+    hadd smarticq status $iif($did == 6,online,offline)
+    hadd smarticq scroll 1
+    hadd smarticq sel 2
+    hadd smarticq seqnum 1
+    hadd smarticq click.dx -
+    hadd smarticq click.dy - 
+    hadd smarticq msg.away $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,msg.away),$ifmatch,User is currenly Away $+ $crlf $+ You can leave him/her a message)
+    hadd smarticq msg.na $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,msg.na),$ifmatch,User is currenly N/A $+ $crlf $+ You can leave him/her a message)
+    hadd smarticq msg.occupied $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,msg.occupied),$ifmatch,User is currenly Occupied $+ $crlf $+ You can leave him/her a message)
+    hadd smarticq msg.dnd $iif($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,msg.dnd),$ifmatch,User is currenly DND $+ $crlf $+ You can leave him/her a message)
+
+    _icq.colour.init
+    drawpic -c @SmartICQ-gui -1 -1 $_icq.skin(file)
+    drawcopy -t @SmartICQ-gui $hget(smarticq,c-invisible) 1 3 165 283 @SmartICQ 0 0
+    _icq.drw_obj -hide minibutton up
+    _icq.drw_obj -hide closebutton up
+    _icq.drw_obj -hide scrollbg
+    _icq.drw_obj -hide upscroll up
+    _icq.drw_obj -hide downscroll up
+    _icq.drw_obj -hide scrollbar up
+    _icq.drw_obj -hide icqbutton up
+    _icq.drw_obj -hide statusbar
+    _icq.drw_obj -hide settbutton up
+    _icq.drw_cl $hget(smarticq,scroll)
+    _icq.update_system_msg
+    if ($did == 6) { dialog -x $dname | hadd smarticq status online | _icq.drw_obj -show icqbutton up | _icq.login }
+  }
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; away msg
+
+alias _icq.dlg_awaymsg {
+  dialog -m _icq.awaymsg $+ $1 _icq.awaymsg
+}
+
+dialog _icq.awaymsg {
+  title "SmartICQ"
+  size -1 -1 133 96
+  option dbu
+  button "Ok", 5, 88 83 43 12, ok
+  edit "", 13, 3 41 128 40, read autovs multi vsbar
+  text "UIN#:", 14, 8 5 35 8, right
+  text "Nickname:", 15, 8 17 35 8, right
+  text "Status mode:", 16, 8 29 35 8, right
+  edit "", 17, 48 4 83 10, read autohs center
+  edit "", 18, 48 16 83 10, read autohs
+  edit "", 19, 48 28 83 10, read autohs
+}
+
+; _________________________________________________________________________________________________________
+;
+; recv url
+
+alias _icq.dlg_recvurl {
+  if ($dialog(_icq.recvurl)) { dialog -v _icq.recvurl }
+  else { set %_icq.recvurl $1 | set %_icq.recvurl.h $2 | dialog -m _icq.recvurl _icq.recvurl } 
+}
+
+dialog _icq.recvurl {
+  title "SmartICQ"
+  size -1 -1 159 126
+  option dbu
+  button "Close", 5, 114 112 43 12, ok
+  box "Incoming URL Message", 19, 3 3 154 106
+  text "ICQ#:", 20, 8 12 14 8
+  text "Nick:", 21, 8 23 13 8
+  text "E-Mail:", 22, 74 12 16 8
+  text "Date:", 23, 74 23 13 8
+  text "Time:", 24, 74 34 13 8
+  edit "", 25, 8 45 144 26, autohs
+  text "URL Description:", 26, 8 36 41 8
+  text "URL:", 27, 8 73 13 8
+  edit "", 28, 8 82 144 10, autohs
+  button "Go to url", 29, 115 94 37 12
+  edit "", 30, 25 11 46 10, read autohs
+  edit "", 31, 25 22 46 10, read autohs
+  edit "", 32, 94 11 57 10, read autohs
+  edit "", 33, 94 22 57 10, read autohs
+  edit "", 34, 94 33 57 10, read autohs
+}
+
+on *:dialog:_icq.recvurl:init:*:{
+  if (%_icq.recvurl.h != -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\system.ini"),url,%_icq.recvurl) }
+  if (%_icq.recvurl.h == -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\history.ini"),url,%_icq.recvurl) }
+  var %uin = $gettok(%_icq.recvurl,1,254)
+  did -ra $dname 30 %uin
+  did -ra $dname 31 $_icq.g($_icq.a,%uin,SHOW,%uin)
+  did -ra $dname 32 $_icq.g($_icq.a,%uin,EMAIL,n/a)
+  did -ra $dname 25 $gettok(%read,1,254)
+  did -ra $dname 28 $gettok($gettok(%read,2,254),1,32)
+  did -ra $dname 33 $asctime($gettok($gettok(%read,2,254),2,32),dd mmm yyyy)
+  did -ra $dname 34 $asctime($gettok($gettok(%read,2,254),2,32),HH:mm)
+  if (%_icq.recvurl.h != -history) {
+    remini $+(",$_icq.dir,$_icq.a,\system.ini") url %_icq.recvurl
+    writeini $+(",$_icq.dir,$_icq.a,\history.ini") url $+(%_icq.recvurl,$ticks) %read
+  }
+  unset %_icq.recvurl
+  unset %_icq.recvurl.h
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; about
+
+alias _icq.dlg_about { 
+  if ($dialog(_icq.about)) { dialog -v _icq.about }
+  else { dialog -m _icq.about _icq.about }
+}
+
+dialog _icq.about {
+  title "SmartICQ - About"
+  size -1 -1 105 44
+  option dbu
+  text "SmartICQ v1.091 PUBLIC RELEASE", 1, 9 5 90 8
+  text "- ICQ client for mIRC", 2, 9 13 48 8
+  text "Copyright (c) 2001-02 tronicer", 3, 9 21 70 8
+  link "Visit Homepage", 4, 50 31 37 8
+  link "E-mail tronicer", 5, 9 31 33 8
+  button "Button", 6, 48 78 37 12, hide cancel
+}
+
+on *:dialog:_icq.about:sclick:4,5:{
+  if ($did == 4) { url http://icq.irctools.com/ }
+  if ($did == 5) { url mailto:tronicer@freebox.com?subject=SmartICQ }
+}
+
+; _________________________________________________________________________________________________________
+;
+; search icq white pages
+
+alias _icq.dlg_searchwp { 
+  if ($dialog(_icq.settings)) { dialog -v _icq.searchwp }
+  else { dialog -m _icq.searchwp _icq.searchwp }
+}
+
+
+dialog _icq.searchwp {
+  title "SmartICQ"
+  size -1 -1 215 102
+  option dbu
+  button "Cancel", 4, 134 88 37 12, cancel
+  button "Search", 5, 176 88 37 12
+  box "Search ICQ White Pages", 10, 1 3 212 83
+  text "First name:", 13, 6 14 30 8, right
+  text "Last name:", 14, 6 25 30 8, right
+  text "Nickname:", 15, 6 36 30 8, right
+  text "E-Mail:", 16, 6 47 30 8, right
+  edit "", 17, 38 13 50 10, autohs
+  edit "", 18, 38 24 50 10, autohs
+  edit "", 19, 38 35 50 10, autohs
+  edit "", 20, 38 46 50 10, autohs
+  text "Age:", 21, 91 14 30 8, right
+  ;  text "Max age:", 22, 154 14 22 8
+  combo 23, 123 13 53 100, size drop
+  ;  combo 24, 180 13 26 100, size drop
+  text "Gender:", 25, 91 27 30 8, right
+  combo 26, 123 26 53 100, size drop
+  text "Language:", 27, 91 40 30 8, right
+  combo 28, 123 39 83 100, size drop sort
+  text "Country:", 29, 91 53 30 8, right
+  combo 30, 123 52 83 100, size drop sort
+  text "City:", 31, 6 60 30 8, right
+  edit "", 32, 38 59 50 10, autohs
+  text "State:", 33, 6 72 30 8, right
+  edit "", 34, 38 71 50 10, autohs
+  check "Show only online users", 35, 123 69 69 10
+  button "Clear", 36, 1 88 37 12
+
+  combo 100, 0 0 0 0, hide sort
+  combo 101, 0 0 0 0, hide sort
+}
+
+on *:dialog:_icq.searchwp:init:*:{
+  did -a $dname 26 Not specified
+  did -a $dname 26 Female
+  did -a $dname 26 Male
+  did -c $dname 26 1
+
+  did -a $dname 28
+  did -a $dname 100 a n255
+  loadbuf -otlang $dname 28 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otlang_n $dname 100 $+(",$_icq.dir,\dat\smarticq.dat,")
+  did -c $dname 28 1
+
+  did -a $dname 30
+  did -a $dname 101 a n0
+  loadbuf -otcountry $dname 30 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otcountry_n $dname 101 $+(",$_icq.dir,\dat\smarticq.dat,")
+  did -c $dname 30 1
+
+  did -a $dname 23 
+  did -a $dname 23 18-22
+  did -a $dname 23 23-29
+  did -a $dname 23 30-39
+  did -a $dname 23 40-49
+  did -a $dname 23 50-59
+  did -a $dname 23 60-100
+  did -c $dname 23 1
+}
+
+on *:dialog:_icq.searchwp:sclick:5,36:{
+  if ($did == 5) {
+    if (!$_icq.sock) { var %d = $input(You are OFFLINE!,516,SmartICQ - OFFLINE) | return }
+    _icq.debug -st first $did($dname,17).text
+    _icq.debug -st last $did($dname,18).text
+    _icq.debug -st nick $did($dname,19).text
+    _icq.debug -st email $did($dname,20).text
+    _icq.debug -st city $did($dname,32).text
+    _icq.debug -st state $did($dname,34).text
+    _icq.debug -st min age $iif($gettok($did($dname,23).seltext,1,45),$ifmatch,0)
+    _icq.debug -st max age $iif($gettok($did($dname,23).seltext,2,45),$ifmatch,0)
+    _icq.debug -st gender $calc($did($dname,26).sel -1)
+    _icq.debug -st language $remove($gettok($did($dname,100,$did($dname,28).sel).text,-1,32),n)
+    _icq.debug -st country $remove($gettok($did($dname,101,$did($dname,30).sel).text,-1,32),n)
+    _icq.debug -st only online $did($dname,35).state
+    if ($window(@smarticq-search)) { window -c @smarticq-search }
+
+    if ($window(@smarticq-search) == $null) { 
+      window -zl @SmartICQ-search 
+      aline @smarticq-search $chr(160)
+      aline @smarticq-search uin	nick	first	last	e-mail
+      aline @smarticq-search $str(_,150)
+      aline @smarticq-search $chr(160)
+      aline @smarticq-search $chr(160) 
+      aline @smarticq-search __[searching] $+ $str(_,150)
+    }
+
+    _icq.searchwp
+    ;    dialog -x $dname
+  }
+  if ($did == 36) {
+    did -r $dname 17,18,19,20,32,34
+    did -u $dname 35
+    did -c $dname 23,26,28,30 1
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; settings
+
+alias _icq.dlg_settings { 
+  if ($dialog(_icq.settings)) { dialog -v _icq.settings }
+  else { dialog -m _icq.settings _icq.settings }
+}
+
+dialog _icq.settings {
+  title "SmartICQ - Preferences"
+  size -1 -1 282 149
+  option dbu
+  tab "Contact List", 1, 61 -200 220 149
+  check "Snapping", 10, 73 15 35 10, tab 1
+  check "Desktop", 11, 73 26 32 10, tab 1
+  check "Ontop", 12, 73 38 27 10, disable tab 1
+  check "Hide mIRC", 13, 73 50 39 10, disable tab 1
+  check "Open on start", 98, 115 15 50 10, tab 1
+  check "Minimize on start", 205, 115 26 50 10, tab 1
+  check "Titlebar on start", 206, 115 38 50 10, tab 1
+  check "Minimize to systray", 100, 115 50 57 10, tab 1
+  check "Double-Click for Message", 102, 180 15 75 10, tab 1
+  check "Enable Quick-Remove", 123, 180 26 66 10, tab 1
+  check "Right click for menu", 101, 180 38 60 10, tab 1
+  check "Show unknown ", 14, 180 50 50 10, tab 1
+  combo 4, 71 85 92 100, tab 1 size drop
+  button "Load", 5, 71 98 43 12, tab 1
+  button "Reload", 15, 120 98 43 12, tab 1
+  link "Download skins", 16, 71 112 38 8, tab 1
+  box "Change Skin", 6, 65 74 212 52, tab 1
+  box "Options", 9, 65 3 212 67, tab 1
+  edit "", 124, 168 84 105 36, tab 1 read multi return vsbar
+  link "Create Skins", 125, 120 112 30 8, tab 1
+  tab "Connections", 17
+  edit "", 20, 90 13 67 10, tab 17 autohs
+  edit "", 22, 180 13 24 10, tab 17 autohs
+  button "Reset", 99, 214 13 27 10, tab 17
+  check "Use proxy", 24, 73 44 43 10, disable tab 17
+  combo 25, 73 55 60 100, disable tab 17 size drop
+  edit "", 27, 166 44 60 10, disable tab 17 autohs
+  edit "", 29, 245 44 24 10, disable tab 17 autohs
+  edit "", 32, 166 57 60 10, disable tab 17 autohs
+  edit "", 33, 166 68 60 10, disable tab 17 autohs
+  check "Reconnect", 35, 73 97 50 10, tab 17
+  check "Keep connection alive", 36, 73 109 69 10, tab 17
+  check "Connect on start-up", 97, 143 97 59 10, tab 17
+  box "ICQ Server", 18, 65 2 212 27, tab 17
+  text "Host:", 19, 70 14 13 8, tab 17
+  text "Port:", 21, 163 14 11 8, tab 17
+  box "Proxy", 23, 65 33 212 50, disable tab 17
+  text "Host:", 26, 151 45 13 8, disable tab 17
+  text "Port:", 28, 232 45 11 8, disable tab 17
+  text "Username:", 30, 138 58 26 8, disable tab 17
+  text "Password:", 31, 139 69 25 8, disable tab 17
+  box "Options", 34, 65 85 212 41, tab 17
+  tab "Security", 37
+  check "All users may add me and see my online/offline status", 38, 73 12 176 10, tab 37
+  check "Allow others to view my online/offline status from the web", 40, 73 22 169 10, tab 37
+  check "Request password when returning from away/na/dnd/occupied", 48, 73 32 172 10, tab 37
+  check "Request password before apply changes", 47, 73 42 147 10, tab 37
+  edit "", 44, 121 81 53 10, tab 37 pass autohs
+  edit "", 45, 121 92 53 10, tab 37 pass autohs
+  button "Change Password", 46, 178 90 55 12, disable tab 37
+  button "Delete Account", 49, 65 112 57 12, disable tab 37
+  box "Options", 39, 65 2 212 64, tab 37
+  box "Change Password", 41, 65 70 212 37, tab 37
+  text "Type password:", 42, 73 82 45 8, tab 37
+  text "Re-type password:", 43, 73 93 47 8, tab 37
+  check "All users may see my online/offline status", 122, 73 52 109 10, disable tab 37
+  tab "Ignore", 103
+  box "Global Settings", 104, 65 66 211 60, tab 103
+  list 105, 65 5 80 58, tab 103 size
+  box "Ignore", 106, 149 2 125 47, tab 103
+  check "Msgs", 107, 156 11 25 10, tab 103
+  check "URL", 108, 183 11 21 10, tab 103
+  check "Pager", 109, 208 11 28 10, tab 103
+  check "Requests", 110, 237 11 35 10, tab 103
+  button "Add", 111, 150 51 37 12, tab 103
+  button "Remove", 112, 191 51 37 12, tab 103
+  check "Accept messages only from users on contact list", 113, 71 78 127 10, tab 103
+  text "Expire:", 114, 154 35 16 8, tab 103
+  edit "", 115, 172 34 82 10, tab 103 read autohs
+  button "...", 116, 256 33 14 12, tab 103
+  check "I'm invisible", 117, 156 22 40 10, tab 103
+  check "Save to log", 118, 208 22 39 10, tab 103
+  check "Do not accept pager messages", 119, 71 88 88 10, tab 103
+  check "Do not accept emailxpress messages", 120, 71 98 112 10, tab 103
+  check "Do not accept SMS messages", 121, 71 108 87 10, tab 103
+  tab "Notices", 126
+  combo 127, 65 6 99 100, tab 126 size drop
+  box "Options", 129, 65 19 211 41, tab 126
+  check "Echo in active window", 130, 73 31 67 10, tab 126
+  check "Sound", 131, 73 43 50 10, tab 126
+  check "Popup notice", 132, 145 31 50 10, tab 126
+  check "Earthquake", 133, 145 43 50 10, tab 126
+  check "Flash mIRC", 152, 198 31 50 10, tab 126
+  check "Flash SmartICQ", 153, 198 43 50 10, tab 126
+  check "Desktop", 145, 141 75 32 10, tab 126
+  check "Close on-click", 147, 141 86 50 10, tab 126
+  check "Close after", 148, 141 97 37 10, tab 126
+  check "Random position", 151, 141 108 50 10, tab 126
+  check "Ontop", 146, 173 75 27 10, tab 126
+  text "secs", 150, 191 98 11 8, tab 126
+  edit "", 149, 177 97 12 10, tab 126 autohs
+  box "Earthquake", 135, 207 64 68 62, tab 126
+  text "Speed:", 158, 212 98 17 8, tab 126
+  combo 159, 231 97 40 100, tab 126 size drop
+  edit "", 156, 247 86 12 10, tab 126 autohs
+  text "secs", 157, 262 85 11 8, tab 126
+  check "Stop after", 155, 212 86 34 10, tab 126
+  check "Stop on-click", 154, 212 75 50 10, tab 126
+  button "...", 138, 111 86 17 9, tab 126
+  edit "", 137, 70 75 58 10, tab 126 read autohs
+  text "times", 143, 116 101 12 8, tab 126
+  edit "", 142, 100 100 14 10, tab 126 autohs
+  check "Repeat", 144, 70 100 31 10, tab 126
+  box "Sound", 134, 65 64 68 62, tab 126
+  check "Internal beeper", 141, 70 112 50 10, tab 126
+  box "Popup", 136, 136 64 68 62, tab 126
+  tab "Away", 160
+  box "Options", 161, 65 2 212 64, tab 160
+  check "Popup Change/Confirm Message", 162, 73 15 90 10, tab 160
+  check "Auto Away after", 163, 73 26 50 10, tab 160
+  check "Auto N/A after", 164, 73 37 50 10, tab 160
+  edit "", 165, 123 26 15 10, tab 160 autohs
+  edit "", 166, 123 37 15 10, tab 160 autohs
+  text "minute(s)", 167, 141 27 23 8, tab 160
+  text "minute(s)", 168, 141 38 23 8, tab 160
+  check "Synch Away with mIRC", 169, 73 48 71 10, tab 160
+  check "Do NOT popup msg if DND", 170, 179 26 93 10, tab 160
+  check "Do NOT popup msg if OCCUPIED", 171, 179 37 91 10, tab 160
+  check "Auto Back", 172, 179 15 50 10, tab 160
+  box "Messages", 173, 65 70 212 51, tab 160
+  edit "", 174, 149 78 124 38, tab 160 multi return autovs vsbar
+  combo 175, 70 79 76 100, tab 160 size drop
+  button "Save", 176, 111 104 35 12, tab 160
+  check "Include away time", 177, 92 92 55 10, tab 160
+  button "Reset", 178, 71 104 37 12, tab 160
+  tab "Message Window", 179
+  box "Options", 180, 139 2 141 123, tab 179
+  list 181, 65 27 71 84, disable tab 179 size
+  radio "Default", 182, 65 5 28 10, tab 179
+  radio "Selected Contacts", 183, 65 15 57 10, tab 179
+  check "Close after each sent message", 184, 145 10 88 10, tab 179
+  check "Desktop", 185, 145 20 33 10, tab 179
+  check "Logging", 186, 145 30 32 10, tab 179
+  check "Minimize when getting message", 187, 145 40 87 10, tab 179
+  check "Show log in window", 188, 145 50 62 10, tab 179
+  check "Timestamp", 189, 145 60 38 10, tab 179
+  check "Take advantage of MTS", 190, 145 70 68 10, tab 179
+  button "View log", 191, 65 113 27 12, tab 179
+  button "Reset position", 192, 94 113 42 12, tab 179
+  check "Blowfish Encryption", 202, 145 80 70 10, disable tab 179
+
+  check "Multi-line editbox", 207, 145 90 50 10, tab 179
+  check "Save position On close", 208, 145 100 89 10, tab 179
+  check "Flat style", 209, 239 100 35 10, tab 179
+  check "Tool style", 210, 239 110 36 10, tab 179
+  check "Session start mark", 211, 145 110 61 10, tab 179
+  tab "Plug-In Manager", 212
+  list 216, 72 13 93 39, tab 212 size
+  box "Loaded Plug-ins", 213, 66 3 212 54, tab 212
+  button "Unload", 220, 237 41 37 11, tab 212
+  text "Version:", 219, 168 32 93 8, tab 212
+  text "Author:", 218, 168 23 92 8, tab 212
+  text "Name:", 217, 168 14 92 8, tab 212
+  box "Unloaded Plug-Ins", 215, 66 59 212 54, tab 212
+  list 221, 72 69 93 39, tab 212 size
+  text "Version:", 222, 168 88 96 8, tab 212
+  text "Author:", 223, 168 79 96 8, tab 212
+  text "Name:", 224, 168 70 95 8, tab 212
+  button "Load", 225, 237 97 37 11, tab 212
+  link "Make your own plug-ins", 226, 122 117 61 8, tab 212
+  link "Download Plug-Ins", 214, 67 117 48 8, tab 212
+  button "Close", 84, 239 135 37 12, cancel
+  button "Apply Changes", 85, 187 135 48 12
+  list 193, 2 5 61 122, size
+  box "", 194, -32 126 325 50
+
+  list 400, 0 0 0 0, hide
+  combo 500, 0 0 0 0, hide
+  edit "", 501, 0 0 0 0, hide autohs
+  list 502, 0 0 0 0, hide
+  list 516, 0 0 0 0, hide
+  list 521, 0 0 0 0, hide
+  list 600, 0 0 0 0, hide
+}
+
+on *:dialog:_icq.settings:sclick:193:{
+  var %c = $did($dname,193).sel, %t = $dialog(_icq.settings).tab
+  _icq.debug -st ss %c 
+  if (%c == 1) && (%t != 1) { did -f $dname 1 | dialog -t $dname SmartICQ - Preferences [Contact List] }
+  if (%c == 2) && (%t != 17) { did -f $dname 17 | dialog -t $dname SmartICQ - Preferences [Connections] }
+  if (%c == 3) && (%t != 37) { did -f $dname 37 | dialog -t $dname SmartICQ - Preferences [Security] }
+  if (%c == 4) && (%t != 103) { did -f $dname 103 | dialog -t $dname SmartICQ - Preferences [Ignore System] }
+  if (%c == 5) && (%t != 126) { did -f $dname 126 | dialog -t $dname SmartICQ - Preferences [Notice System] }
+  if (%c == 6) && (%t != 160) { did -f $dname 160 | dialog -t $dname SmartICQ - Preferences [Away System] }
+  if (%c == 7) && (%t != 179) { did -f $dname 179 | dialog -t $dname SmartICQ - Preferences [Message Windows] }
+  if (%c == 8) && (%t != 212) { did -f $dname 212 | dialog -t $dname SmartICQ - Preferences [Plug-In Manager] }
+}
+
+on *:dialog:_icq.settings:sclick:49,84,85:{
+  ; deleting account
+  if ($did == 49) {
+    if ($input(DELETE ACCOUNT?,256,SmartICQ - WARNING)) && ($input(DELETE ACCOUNT? $+ $crlf $+ ACCOUNT WILL BE DELETED FROM ICQ - YOU CAN NOT UNDO THIS!,512,SmartICQ - WARNING)) {
+      var %passwd = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,passwd)
+      if (%passwd == $null) { %passwd = $_icq.passwd2($input(Enter Password:,258,SmartICQ - PASSWORD)) }
+      if (%passwd) { _icq.____deleteaccount $_icq.a %passwd }
+      if (%passwd == $null) { %passwd = $input(ACCOUNT NOT DELETED,228,SmartICQ - INFO) }
+      return
+    }
+  }
+
+  ; saving
+  if ($did == 84) {
+    .remove $+(",$_icq.dir,$_icq.a,\uin.ini.tmp")
+    .remove $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+    .remove $+(",$_icq.dir,$_icq.a,\users.ini.tmp")
+  }
+  if ($did == 85) {
+    if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,security_settpass)) {
+      var %d = $input(Password required to change settings:,6,SmartICQ - Security Check)
+      var %pass = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,settpass)
+      if ($_icq.passwd2(%d) != %pass) { %d = $input(Wrong Password - Settings not saved.,260,SmartICQ - ERROR) | return }
+    }
+
+    var %state = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,contactlist_desktop)
+
+    if ($isfile($+(",$_icq.dir,$_icq.a,\settings.ini.tmp"))) { .copy -o $+(",$_icq.dir,$_icq.a,\settings.ini.tmp") $+(",$_icq.dir,$_icq.a,\settings.ini") }
+    if ($isfile($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"))) { .copy -o $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") $+(",$_icq.dir,$_icq.a,\uin.ini") }
+    if ($isfile($+(",$_icq.dir,$_icq.a,\users.ini.tmp"))) { .copy -o $+(",$_icq.dir,$_icq.a,\users.ini.tmp") $+(",$_icq.dir,$_icq.a,\users.ini") }
+
+    _icq.setpermissions
+
+    var %c = $did($dname,600,0).lines
+    while (%c) {
+      var %win = $+(@,$replace($_icq.g($_icq.a,$did($dname,600,%c).text,SHOW),$chr(32),_),@,$did($dname,600,%c).text,@ICQ)
+      if ($window(%win)) {
+        var %s = -zhk0, %uin = $did($dname,600,%c).text
+        if ($window(%win).state == minimized) { %s = %s $+ n }
+        ;        if ($window(%win).mdi == $false) { %s = %s $+ d }
+        if ($_icq.mw_menu(%uin,2)) { %s = %s $+ d }
+        if ($window(%win).ontop == $true) { %s = %s $+ o }
+        if ($_icq.mw_menu(%uin,10)) { %s = %s $+ B }
+        %s = %s $+ $iif($_icq.mw_menu(%uin,9),E,e)
+        if ($_icq.mw_menu(%uin,12)) { %s = %s +l }
+        window %s $+(%win,tmp) $window(%win).x $window(%win).y $window(%win).w $window(%win).h @SmartICQmsg $+(",$mircexe,") 5
+        titlebar $+(%win,tmp) $window(%win).title
+        filter -p %win $+(%win,tmp) *
+        window -c %win
+        renwin $+(%win,tmp) %win
+        window -w %win
+      }
+      dec %c
+    }
+    did -r $dname 600
+
+    if ($did($dname,11).state != %state) {
+      if ($did($dname,11).state) { 
+        writeini $+(",$_icq.dir,dat\smarticq.ini") misc pos $window(@smarticq).x $window(@smarticq).y $window(@smarticq).w $window(@smarticq).h
+        window -c @smarticq 
+        if ($did($dname,12).state) { window -zBodnpfk0 +d @SmartICQ $readini($+(",$_icq.dir,dat\smarticq.ini,"),misc,pos) @SmartICQ }
+        else { window -zBdnpfk0 +d @SmartICQ $readini($+(",$_icq.dir,dat\smarticq.ini,"),misc,pos) @SmartICQ | window -u @smarticq }
+        _icq.redraw | window -hr @smarticq
+        _icq.signal smarticq.mdi desktop
+      }
+      else {
+        writeini $+(",$_icq.dir,dat\smarticq.ini") misc pos $window(@smarticq).x $window(@smarticq).y $window(@smarticq).w $window(@smarticq).h
+        window -c @smarticq
+        window -zBnpfk0 +d @SmartICQ $readini($+(",$_icq.dir,dat\smarticq.ini"),misc,pos) @SmartICQ
+        _icq.redraw | window -r @smarticq
+        _icq.signal smarticq.mdi mdi
+      }
+    }
+    if ($did($dname,12).state) { window -o @smarticq }
+    else { window -u @smarticq }
+
+    if ($did($dname,169).state) { .enable #_icq.awaysynch }
+    if (!$did($dname,169).state) { .disable #_icq.awaysynch }
+
+
+
+    ; minimize to systray
+    if ($did($dname,100).state) { 
+      var %state = $window(@smarticq).state
+      window -h @smarticq | if (%state == normal) { window -a @smarticq } 
+      _icq.systray.init 
+    }
+    else { window -w @smarticq | _icq.systray.kill }
+
+  }
+}
+
+
+on *:dialog:_icq.settings:init:*:{
+  dialog -t $dname SmartICQ - Preferences [Contact List]
+  did -a $dname 193 Contact List
+  did -a $dname 193 Connections
+  did -a $dname 193 Security
+  did -a $dname 193 Ignore System
+  did -a $dname 193 Notice System
+  did -a $dname 193 Away System
+  did -a $dname 193 Message Windows
+  did -a $dname 193 Plug-In Manager
+  did -c $dname 193 1
+
+  if ($isfile($+(",$_icq.dir,$_icq.a,\settings.ini"))) { .copy -o $+(",$_icq.dir,$_icq.a,\settings.ini") $+(",$_icq.dir,$_icq.a,\settings.ini.tmp") }
+  if ($isfile($+(",$_icq.dir,$_icq.a,\uin.ini"))) { .copy -o $+(",$_icq.dir,$_icq.a,\uin.ini") $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") }
+  if ($isfile($+(",$_icq.dir,$_icq.a,\users.ini"))) { .copy -o $+(",$_icq.dir,$_icq.a,\users.ini") $+(",$_icq.dir,$_icq.a,\users.ini.tmp") }
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp,")
+  var %s = settings
+  ; ------------------------------------------------------------------
+
+  ; [CONTACT LIST]
+  if ($readini(%file,%s,contactlist_snapping)) { did -c $dname 10 }
+  if ($readini(%file,%s,contactlist_desktop)) { did -c $dname 11 | did -e $dname 12 }
+  if ($readini(%file,%s,contactlist_ontop)) { did -c $dname 12 }
+  if ($readini(%file,%s,contactlist_hideoffline)) { did -c $dname 13 }
+  if ($readini(%file,%s,contactlist_showunknown)) { did -c $dname 14 }
+  if ($readini(%file,%s,contactlist_startup)) { did -c $dname 98 }
+  if ($readini(%file,%s,contactlist_systray)) { did -c $dname 100 }
+  if ($readini(%file,%s,contactlist_rightclick)) { did -c $dname 101 }
+  if ($readini(%file,%s,contactlist_dblclick)) { did -c $dname 102 }
+  if ($readini(%file,%s,contactlist_quickrem)) { did -c $dname 123 }
+  if ($readini(%file,%s,contactlist_minonstart)) { did -c $dname 205 }
+  if ($readini(%file,%s,contactlist_titleonstart)) { did -c $dname 206 }
+
+
+  var %tmp = $findfile($+($_icq.dir,skins),*.skin*,0,did -a $+ $iif($_icq.skin(name) == $gettok($nopath($1-),1,46),c) $dname 4 $gettok($nopath($1-),1,46) )
+  var %tmp = $findfile($+($_icq.dir,skins),*.skin*,0,did -a $dname 400 $+(",$1-,"))
+  var %sfile = $findfile($+($_icq.dir,skins\,active),*.ini,1)
+  did -ra $dname 124 - ACTIVE SKIN - $+ $crlf
+  did -a $dname 124 Name: $readini(%sfile,skin,name) $+ $crlf
+  did -a $dname 124 Author: $readini(%sfile,skin,author) $+ $crlf
+  did -a $dname 124 E-Mail: $readini(%sfile,skin,email) $+ $crlf
+  did -a $dname 124 Description: $readini(%sfile,skin,desc)
+  did -c $dname 124 1
+
+  ; ------------------------------------------------------------------
+
+  ; [CONNECTIONS]
+  did -ra $dname 20 $readini(%file,%s,connections_host)
+  did -ra $dname 22 $readini(%file,%s,connections_port)
+  if ($readini(%file,%s,connections_reconnect)) { did -c $dname 35 }
+  if ($readini(%file,%s,connections_keepalive)) { did -c $dname 36 }
+  if ($readini(%file,%s,connections_startup)) { did -c $dname 97 }
+
+  ; ------------------------------------------------------------------
+
+  ; [SECURITY]
+  if ($readini(%file,%s,security_settpass)) { did -c $dname 47 }
+  if ($readini(%file,%s,security_authreq)) { did -c $dname 38 }
+  if ($readini(%file,%s,security_webaware)) { did -c $dname 40 }
+  if ($readini(%file,%s,security_status)) { did -c $dname 48 }
+
+  ; ------------------------------------------------------------------
+
+  ; [IGNORE]
+  if ($readini(%file,%s,ignore_msg)) { did -c $dname 113 }
+  if ($readini(%file,%s,ignore_pager)) { did -c $dname 119 }
+  if ($readini(%file,%s,ignore_email)) { did -c $dname 120 }
+  if ($readini(%file,%s,ignore_sms)) { did -c $dname 121 }
+
+  var %c = $ini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),ignore,0)
+  while (%c > 0) {
+    did -a $dname 105 $ini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),ignore,%c)
+    dec %c
+  }
+  did -c $dname 105 1
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),msgs,$did($dname,105).seltext),-c,-u) $dname 107
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),url,$did($dname,105).seltext),-c,-u) $dname 108
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),pager,$did($dname,105).seltext),-c,-u) $dname 109
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),rqs,$did($dname,105).seltext),-c,-u) $dname 110
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),invisible,$did($dname,105).seltext),-c,-u) $dname 117
+  did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),log,$did($dname,105).seltext),-c,-u) $dname 118
+  did -ra $dname 115 $readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),expire,$did($dname,105).seltext)
+
+
+  if (!$did($dname,105).lines) {
+    did -b $dname 107,108,109,110,112,117,118
+  }
+
+  ; ------------------------------------------------------------------
+
+  ; [NOTICES]
+  did -a $dname 127 STATUS: online 
+  did -a $dname 127 STATUS: f4c
+  did -a $dname 127 STATUS: away
+  did -a $dname 127 STATUS: n/a
+  did -a $dname 127 STATUS: occupied
+  did -a $dname 127 STATUS: dnd
+  did -a $dname 127 STATUS: invisible
+  did -a $dname 127 STATUS: offline 
+  did -a $dname 127 INCOMING: url
+  did -a $dname 127 INCOMING: sms
+  did -a $dname 127 INCOMING: user added you
+  did -a $dname 127 INCOMING: request to add you
+  did -a $dname 127 INCOMING: wwwpager
+  did -a $dname 127 INCOMING: emailxpress
+  did -a $dname 127 INCOMING: message
+  did -a $dname 127 INCOMING: status check
+  did -a $dname 127 CONNECTION: connected
+  did -a $dname 127 CONNECTION: disconnected
+  did -a $dname 127 CONNECTION: invalid uin
+  did -a $dname 127 CONNECTION: invalid password
+  did -a $dname 127 CONNECTION: rate limit exceeded
+
+  did -a $dname 500 s.online STATUS: online 
+  did -a $dname 500 s.f4c STATUS: f4c
+  did -a $dname 500 s.away STATUS: away
+  did -a $dname 500 s.na STATUS: n/a
+  did -a $dname 500 s.occupied STATUS: occupied
+  did -a $dname 500 s.dnd STATUS: dnd
+  did -a $dname 500 s.invisible STATUS: invisible
+  did -a $dname 500 s.offline STATUS: offline 
+  did -a $dname 500 i.url INCOMING: url
+  did -a $dname 500 i.sms INCOMING: sms
+  did -a $dname 500 i.uay INCOMING: user added you
+  did -a $dname 500 i.rtay INCOMING: request to add you
+  did -a $dname 500 i.pager INCOMING: wwwpager
+  did -a $dname 500 i.emx INCOMING: emailxpress
+  did -a $dname 500 i.msg INCOMING: message
+  did -a $dname 500 i.sc INCOMING: status check
+  did -a $dname 500 c.con CONNECTION: connected
+  did -a $dname 500 c.dis CONNECTION: disconnected
+  did -a $dname 500 c.uin CONNECTION: invalid uin
+  did -a $dname 500 c.pass CONNECTION: invalid password
+  did -a $dname 500 c.rate CONNECTION: rate limit exceeded
+  did -c $dname 127,500 1
+
+  did -a $dname 159 Fast
+  did -a $dname 159 Normal
+  did -a $dname 159 Slow
+
+  var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32)
+  var %r = $readini(%file,%s,%section)
+  did $iif(!$gettok(%r,1,32),-u,-c) $dname 130
+  did $iif(!$gettok(%r,2,32),-u,-c) $dname 131
+  did $iif(!$gettok(%r,3,32),-u,-c) $dname 132
+  did $iif(!$gettok(%r,4,32),-u,-c) $dname 133
+  did $iif(!$gettok(%r,5,32),-u,-c) $dname 152
+  did $iif(!$gettok(%r,6,32),-u,-c) $dname 153
+
+  var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _sound
+  var %r = $readini(%file,%s,%section)
+  did $iif(!$gettok(%r,1,32),-u,-c) $dname 144
+  did -ra $dname 142 $gettok(%r,2,32)
+  did $iif(!$gettok(%r,3,32),-u,-c) $dname 141
+  did -ra $dname 137 $nopath($gettok(%r,4-,32))
+  did -ra $dname 501 $gettok(%r,4-,32)
+
+  var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _popup
+  var %r = $readini(%file,%s,%section)
+  did $iif(!$gettok(%r,1,32),-u,-c) $dname 145
+  did $iif(!$gettok(%r,2,32),-u,-c) $dname 146
+  did $iif(!$gettok(%r,3,32),-u,-c) $dname 147
+  did $iif(!$gettok(%r,4,32),-u,-c) $dname 148
+  did -ra $dname 149 $gettok(%r,5,32)
+  did $iif(!$gettok(%r,6,32),-u,-c) $dname 151
+
+  var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _eq
+  var %r = $readini(%file,%s,%section)
+  did $iif(!$gettok(%r,1,32),-u,-c) $dname 154
+  did $iif(!$gettok(%r,2,32),-u,-c) $dname 155
+  did -ra $dname 156 $gettok(%r,3,32)
+  did -c $dname 159 $gettok(%r,4,32)
+
+  ; ------------------------------------------------------------------
+
+  ; [AWAY]
+  did -a $dname 175 Away
+  did -a $dname 175 N/A
+  did -a $dname 175 Occupied
+  did -a $dname 175 DND
+  did -c $dname 175 1
+  did -ra $dname 174 $hget(smarticq,msg.away)
+  if ($readini(%file,%s,away_autoaway)) { did -c $dname 163 }
+  if ($readini(%file,%s,away_autona)) { did -c $dname 164 }
+  if ($readini(%file,%s,away_autoback)) { did -c $dname 172 }
+  did -ra $dname 165 $readini(%file,%s,away_autoaway-time)
+  did -ra $dname 166 $readini(%file,%s,away_autona-time)
+  if ($readini(%file,%s,changeawaymsg)) { did -c $dname 162 }
+  if ($group(#_icq.awaysynch) == on) { did -c $dname 169 }
+  if ($readini(%file,%s,away_includetime)) { did -c $dname 177 }
+
+  ; ------------------------------------------------------------------
+
+  ; [MSG WINDOW]
+  did -c $dname 182
+  var %c = 1
+  while (%c <= $line(@smarticq-gui,0,1)) {
+    if ($gettok($line(@smarticq-gui,%c,1),3,1) != line) {
+      did -a $dname 181 $gettok($line(@smarticq-gui,%c,1),2,1)
+      did -a $dname 502 $gettok($line(@smarticq-gui,%c,1),2-3,1)
+    }
+    inc %c
+  }
+  var %r = $readini(%file,account,MW)
+  did $iif($gettok(%r,1,32),-c,-u) $dname 184 | did $iif($gettok(%r,2,32),-c,-u) $dname 185
+  did $iif($gettok(%r,3,32),-c,-u) $dname 186 | did $iif($gettok(%r,4,32),-c,-u) $dname 187
+  did $iif($gettok(%r,5,32),-c,-u) $dname 188 | did $iif($gettok(%r,6,32),-c,-u) $dname 189
+  did $iif($gettok(%r,7,32),-c,-u) $dname 190 | did $iif($gettok(%r,8,32),-c,-u) $dname 202
+  did $iif($gettok(%r,9,32),-c,-u) $dname 207 | did $iif($gettok(%r,10,32),-c,-u) $dname 209
+  did $iif($gettok(%r,11,32),-c,-u) $dname 208 | did $iif($gettok(%r,12,32),-c,-u) $dname 210
+
+  ; ------------------------------------------------------------------
+
+  ; [PLUG-IN MANAGER ]
+
+  var %c = $findfile($+(",$_icq.dir,plugins"),*.smarticq-plugin.*,0)
+  while (%c) {
+    var %pfile = $findfile($+(",$_icq.dir,plugins"),*.smarticq-plugin.*,%c)
+    if ($script(%pfile)) {
+      did -a $dname 516 %pfile
+      did -a $dname 216 $nopath(%pfile) 
+    }
+    if (!$script(%pfile)) {
+      did -a $dname 521 %pfile
+      did -a $dname 221 $nopath(%pfile) 
+    }
+    dec %c
+  }
+
+  did -c $dname 216,221 1
+  %pfile = $did($dname,516,$did($dname,216).sel).text
+  did -ra $dname 217 Name: $read(%pfile,s,;name)
+  did -ra $dname 218 Author: $read(%pfile,s,;author)
+  did -ra $dname 219 Version $read(%pfile,s,;version)
+  %pfile = $did($dname,521,$did($dname,221).sel).text
+  did -ra $dname 224 Name: $read(%pfile,s,;name)
+  did -ra $dname 223 Author: $read(%pfile,s,;author)
+  did -ra $dname 222 Version $read(%pfile,s,;version)
+}
+
+on *:dialog:_icq.settings:edit:20,22,165,166:{
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+  if ($did($dname,20).text) { writeini %file settings connections_host $ifmatch }
+  if ($did($dname,22).text) { writeini %file settings connections_port $ifmatch }
+  if ($did($dname,165).text) { writeini %file settings away_autoaway-time $ifmatch }
+  if ($did($dname,166).text) { writeini %file settings away_autona-time $ifmatch }
+}
+
+on *:dialog:_icq.settings:sclick:10,11,12,13,14,35,36,38,40,47,97,98,100,101,102,113,119,120,121,123,163,164,172,205,206:{
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+  if ($did == 11) && ($did($dname,11).state) { did -e $dname 12 }
+  if ($did == 11) && (!$did($dname,11).state) { did -ub $dname 12 }
+  if ($did == 47) && ($did($dname,47).state) { var %d = $input(Choose a password:,6,SmartICQ - INPUT) | if (%d == $null) { did -u $dname 47 } | if (%d != $null) { writeini %file account settpass $_icq.passwd2(%d) } }
+
+  writeini %file settings contactlist_systray $did($dname,100).state
+  writeini %file settings contactlist_snapping $did($dname,10).state
+  writeini %file settings contactlist_desktop $did($dname,11).state
+  writeini %file settings contactlist_ontop $did($dname,12).state
+  writeini %file settings contactlist_hideoffline $did($dname,13).state
+  writeini %file settings contactlist_showunknown $did($dname,14).state
+  writeini %file settings contactlist_startup $did($dname,98).state
+  writeini %file settings contactlist_rightclick $did($dname,101).state
+  writeini %file settings contactlist_dblclick $did($dname,102).state
+  writeini %file settings contactlist_quickrem $did($dname,123).state
+  writeini %file settings contactlist_minonstart $did($dname,205).state
+  writeini %file settings contactlist_titleonstart $did($dname,206).state
+
+  writeini %file settings connections_reconnect $did($dname,35).state
+  writeini %file settings connections_keepalive $did($dname,36).state
+  writeini %file settings connections_startup $did($dname,97).state
+
+  writeini %file settings security_settpass $did($dname,47).state
+  writeini %file settings security_authreq $did($dname,38).state
+  writeini %file settings security_webaware $did($dname,40).state
+  writeini %file settings security_status $did($dname,48).state
+
+  writeini %file settings ignore_msg $did($dname,113).state
+  writeini %file settings ignore_pager $did($dname,119).state
+  writeini %file settings ignore_email $did($dname,120).state
+  writeini %file settings ignore_sms $did($dname,121).state
+
+  writeini %file settings away_autoaway $did($dname,163).state
+  writeini %file settings away_autona $did($dname,164).state
+  writeini %file settings away_autoback $did($dname,172).state
+
+  writeini %file settings changeawaymsg $did($dname,162).state
+  writeini %file settings away_includetime $did($dname,177).state
+}
+
+; CONTACT LIST
+on *:dialog:_icq.settings:sclick:4,5,7,8,11,13,15,16:{
+  if ($did == 16) { url http://icq.irctools.com// }
+  if ($did == 11) {
+    if ($did($dname,11).state) { did -e $dname 12,13 }
+    else { did -ub $dname 12,13 }
+  }
+  if ($did == 13) {
+    if ($did($dname,13).state) { _icq.run $_icq.dir $+ dat\mstealth.exe | did -b $dname 11 }
+    else { _icq.run $_icq.dir $+ dat\mstealth.exe | did -e $dname 11 }
+  }
+
+  if ($did == 4) {
+    ; select skin
+  }
+  if ($did == 15) { 
+    did -b $dname 15
+    var %file = $+(",$findfile($+($_icq.dir,skins\,active),*.ini,1),")
+    var %pic = $+(",$_icq.dir,skins\,active\,$readini(%file,skin,file),")
+    drawpic -c
+    drawpic -c @SmartICQ-gui -1 -1 %pic
+    _icq.colour.init
+    if ($window(@smarticq).h == 282) { _icq.redraw }
+    if ($window(@smarticq).h == 19) { 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0 
+      _icq.drw_obj -hide minibutton up
+      _icq.drw_obj -show closebutton up
+    }
+    did -e $dname 15
+  }
+  if ($did == 5) {
+    var %file = $did($dname,400,$did($dname,4).sel).text
+    var %tmp = $findfile($+($_icq.dir,skins\,active),*.*,0,.remove $+(",$1-,"))
+    var %tmp = $dll($+($_icq.dir,dat\,mUnzip.dll), Unzip, %file $+(",$_icq.dir,skins/,active"))
+    var %file = $+(",$findfile($+($_icq.dir,skins\,active),*.ini,1),")
+    var %pic = $+(",$_icq.dir,skins\,active\,$readini(%file,skin,file),")
+    var %ver = $readini(%file,skin,version)
+    if (%ver != 3) { var %d = $input(Wrong type of skin - CAN NOT LOAD,516,SmartICQ - ERROR) | return }
+    writeini $+(",$_icq.dir,dat\smarticq.ini,") skin dir $remove($nofile(%file),",$_icq.dir)
+    writeini $+(",$_icq.dir,dat\smarticq.ini,") skin ini $remove(%file,",$_icq.dir)
+    writeini $+(",$_icq.dir,dat\smarticq.ini,") skin name $readini(%file,skin,name)
+    did -ra $dname 124 - ACTIVE SKIN - $+ $crlf
+    did -a $dname 124 Name: $readini(%file,skin,name) $+ $crlf
+    did -a $dname 124 Author: $readini(%file,skin,author) $+ $crlf
+    did -a $dname 124 E-Mail: $readini(%file,skin,email) $+ $crlf
+    did -a $dname 124 Description: $readini(%file,skin,desc)
+    did -c $dname 124 1
+    sockclose _icq.topskin | sockopen _icq.topskin 216.40.212.18 80
+    drawpic -c
+    drawpic -c @SmartICQ-gui -1 -1 %pic
+    _icq.colour.init
+    if ($window(@smarticq).h == 282) { _icq.redraw }
+    if ($window(@smarticq).h == 19) { 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0 
+      _icq.drw_obj -hide minibutton up
+      _icq.drw_obj -show closebutton up
+    }
+  }
+  if ($did == 7) { _icq.dlg_add2contact }
+  if ($did == 8) { _icq.dlg_remfromcontact }
+}
+
+; [CONNECTIONS]
+on *:dialog:_icq.settings:sclick:99:{
+  did -ra $dname 20 login.icq.com
+  did -ra $dname 22 5190
+}
+
+; [SECURITY]
+on *:dialog:_icq.settings:edit:44,45:{
+  if ($did($dname,44)) && ($did($dname,45)) && ($did($dname,44) == $did($dname,45)) {
+    did -e $dname 46
+  }
+  else { did -b $dname 46 }
+}
+on *:dialog:_icq.settings:sclick:46:{
+  if ($_icq.sock) { _icq.changepasswd $did($dname,44).text }
+  else { riteini $+(",$_icq.dir,$1,\settings.ini.tmp") account passwd $_icq.passwd2($did($dname,44).text)  }
+  writeini $+(",$_icq.dir,$1,\settings.ini.tmp") account settpass $_icq.passwd2($did($dname,44).text) 
+  did -r $dname 44,45
+  did -b $dname 46
+}
+
+; [IGNORE]
+alias _icq.ignore.add {
+  did -a $$dialog(_icq.settings) 105 $1
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") ignore $1 1
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") msgs $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") url $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") pager $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") rqs $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") url $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") invisible $1 0
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") log $1 0
+  did -c $dname 105 $did($dname,105).lines
+  did -e $dname 107,108,109,110,112,117,118
+}
+
+on *:dialog:_icq.settings:sclick:105,107,108,109,110,111,112,116,117,118:{
+  if ($did == 105) {
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),msgs,$did($dname,105).seltext),-c,-u) $dname 107
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),url,$did($dname,105).seltext),-c,-u) $dname 108
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),pager,$did($dname,105).seltext),-c,-u) $dname 109
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),rqs,$did($dname,105).seltext),-c,-u) $dname 110
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),invisible,$did($dname,105).seltext),-c,-u) $dname 117
+    did $iif($readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),log,$did($dname,105).seltext),-c,-u) $dname 118
+    did -ra $dname 115 $readini($+(",$_icq.dir,$_icq.a,\uin.ini.tmp"),expire,$did($dname,105).seltext)
+  }
+  if ($did == 111) { _icq.ignore.add $$input(ICQ# to ignore:,1,- SmartICQ) }
+  if ($did == 112) {
+    var %uin = $did($dname,105).seltext, %file = $+(",$_icq.dir,$_icq.a,\uin.ini.tmp")
+    if (%uin != $null) {
+      remini %file ignore %uin
+      remini %file msgs %uin
+      remini %file url %uin
+      remini %file pager %uin
+      remini %file rqs %uin
+      remini %file url %uin
+      remini %file invisible %uin
+      remini %file log %uin
+      did -d $dname 105 $did($dname,105).sel
+      did -c $dname 105 1
+      if (!$did($dname,105).lines) {
+        did -ub $dname 107,108,109,110,112,117,118
+      }
+    }
+  }
+  if ($did == 116) { dialog -m _icq.dlg_ignoredate _icq.dlg_ignoredate }
+
+  if ($did == 107) { writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") msgs $did($dname,105).seltext $did($dname,107).state }
+  if ($did == 108) { writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") url $did($dname,105).seltext $did($dname,108).state }
+  if ($did == 109) { writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") pager $did($dname,105).seltext $did($dname,109).state }
+  if ($did == 110) { writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") rqs $did($dname,105).seltext $did($dname,110).state }
+  if ($did == 117) { 
+    writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") invisible $did($dname,105).seltext $did($dname,117).state 
+    if ($did($dname,117).state) { _icq.adduin_invisible $did($dname,105).seltext }
+    else { _icq.remuin_invisible $did($dname,105).seltext }
+  }
+  if ($did == 118) { writeini $+(",$_icq.dir,$_icq.a,\uin.ini.tmp") log $did($dname,105).seltext $did($dname,118).state }
+}
+
+dialog _icq.dlg_ignoredate {
+  title "SmartICQ - Date"
+  size -1 -1 118 28
+  option dbu
+  combo 1, 2 2 33 50, size drop
+  combo 2, 36 2 33 50, size drop
+  combo 3, 70 2 46 50, size drop
+  button "Ok", 4, 79 15 37 12
+  button "Cancel", 5, 39 15 37 12, cancel
+}
+on *:dialog:_icq.dlg_ignoredate:init:*:{
+  did -a $dname 1 | did -a $dname 1 2002 | did -a $dname 1 2003 | did -a $dname 1 2004 | did -a $dname 1 2005 | did -a $dname 1 2006 | did -a $dname 1 2007
+  did -a $dname 2 | did -a $dname 2 Jan | did -a $dname 2 Feb | did -a $dname 2 Mar | did -a $dname 2 Apr | did -a $dname 2 May | did -a $dname 2 Jun | did -a $dname 2 Jul | did -a $dname 2 Aug | did -a $dname 2 Sep | did -a $dname 2 Oct | did -a $dname 2 Nov | did -a $dname 2 Dec
+  did -a $dname 3 
+  var %c = 1 | while (%c < 32) { did -a $dname 3 %c | inc %c }
+}
+
+; [NOTICES]
+on *:dialog:_icq.settings:sclick:130,131,132,133,152,153,141,144,145,146,147,148,151,154,155,159:{
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+  var %section = notice_ $+ $gettok($did($dname,500).seltext,1,32)
+  writeini %file settings %section $did($dname,130).state $did($dname,131).state $did($dname,132).state $did($dname,133).state $did($dname,152).state $did($dname,153).state
+  writeini %file settings $+(%section,_sound) $did($dname,144).state $gettok($did($dname,142).text,1,32) $did($dname,141).state $did($dname,501).text
+  writeini %file settings $+(%section,_popup) $did($dname,145).state $did($dname,146).state $did($dname,147).state $did($dname,148).state $gettok($did($dname,149).text,1,32) $did($dname,151).state
+  writeini %file settings $+(%section,_eq) $did($dname,154).state $did($dname,155).state $gettok($did($dname,156).text,1,32) $did($dname,159).sel
+}
+on *:dialog:_icq.settings:edit:142,149,156:{
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+  var %section = notice_ $+ $gettok($did($dname,500).seltext,1,32)
+  writeini %file settings %section $did($dname,130).state $did($dname,131).state $did($dname,132).state $did($dname,133).state $did($dname,152).state $did($dname,153).state
+  writeini %file settings $+(%section,_sound) $did($dname,144).state $gettok($did($dname,142).text,1,32) $did($dname,141).state $did($dname,501).text
+  writeini %file settings $+(%section,_popup) $did($dname,145).state $did($dname,146).state $did($dname,147).state $did($dname,148).state $gettok($did($dname,149).text,1,32) $did($dname,151).state
+  writeini %file settings $+(%section,_eq) $did($dname,154).state $did($dname,155).state $gettok($did($dname,156).text,1,32) $did($dname,159).sel
+}
+
+on *:dialog:_icq.settings:sclick:127,138:{
+  if ($did == 127) {
+    _icq.debug -s sel127: $did($dname,127).sel
+    _icq.debug -s sel1500: $did($dname,500).sel
+
+    var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+
+    var %section = notice_ $+ $gettok($did($dname,500).seltext,1,32)
+    did -c $dname 500 $did($dname,127).sel
+    writeini %file settings %section $did($dname,130).state $did($dname,131).state $did($dname,132).state $did($dname,133).state $did($dname,152).state $did($dname,153).state
+    writeini %file settings $+(%section,_sound) $did($dname,144).state $gettok($did($dname,142).text,1,32) $did($dname,141).state $did($dname,501).text
+    writeini %file settings $+(%section,_popup) $did($dname,145).state $did($dname,146).state $did($dname,147).state $did($dname,148).state $gettok($did($dname,149).text,1,32) $did($dname,151).state
+    writeini %file settings $+(%section,_eq) $did($dname,154).state $did($dname,155).state $gettok($did($dname,156).text,1,32) $did($dname,159).sel
+
+    var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32)
+    var %r = $readini(%file,settings,%section)
+    did $iif(!$gettok(%r,1,32),-u,-c) $dname 130
+    did $iif(!$gettok(%r,2,32),-u,-c) $dname 131
+    did $iif(!$gettok(%r,3,32),-u,-c) $dname 132
+    did $iif(!$gettok(%r,4,32),-u,-c) $dname 133
+    did $iif(!$gettok(%r,5,32),-u,-c) $dname 152
+    did $iif(!$gettok(%r,6,32),-u,-c) $dname 153
+
+    var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _sound
+    var %r = $readini(%file,settings,%section)
+    did $iif(!$gettok(%r,1,32),-u,-c) $dname 144
+    did -ra $dname 142 $gettok(%r,2,32)
+    did $iif(!$gettok(%r,3,32),-u,-c) $dname 141
+    did -ra $dname 137 $nopath($gettok(%r,4-,32))
+    did -ra $dname 501 $gettok(%r,4-,32)
+
+    var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _popup
+    var %r = $readini(%file,settings,%section)
+    did $iif(!$gettok(%r,1,32),-u,-c) $dname 145
+    did $iif(!$gettok(%r,2,32),-u,-c) $dname 146
+    did $iif(!$gettok(%r,3,32),-u,-c) $dname 147
+    did $iif(!$gettok(%r,4,32),-u,-c) $dname 148
+    did -ra $dname 149 $gettok(%r,5,32)
+    did $iif(!$gettok(%r,6,32),-u,-c) $dname 151
+
+    var %section = notice_ $+ $gettok($did($dname,500,$did($dname,127).sel).text,1,32) $+ _eq
+    var %r = $readini(%file,settings,%section)
+    did $iif(!$gettok(%r,1,32),-u,-c) $dname 154
+    did $iif(!$gettok(%r,2,32),-u,-c) $dname 155
+    did -ra $dname 156 $gettok(%r,3,32)
+    did -c $dname 159 $gettok(%r,4,32)
+  }
+
+
+
+  if ($did == 138) {
+    var %file = $+(",$sfile($+($_icq.dir,*.wav),- Select .WAV,Ok),")
+    did -ra $dname 137 $nopath(%file)
+    did -ra $dname 501 %file
+    var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+    var %section = notice_ $+ $gettok($did($dname,500).seltext,1,32)
+    writeini %file settings $+(%section,_sound) $did($dname,144).state $gettok($did($dname,142).text,1,32) $did($dname,141).state $did($dname,501).text
+  }
+}
+
+alias _icq.notice {
+  ; $_icq.notice(<type>,<sub-type>,<method>).prop
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini.tmp")
+  if (!$isfile(%file)) { %file = $+(",$_icq.dir,$_icq.a,\settings.ini") }
+
+  if ($3 == $null) {
+    var %section notice_ $+ $1 $+ . $+ $2
+    var %r = $readini(%file,settings,%section)
+    if ($prop == echo) { return $gettok(%r,1,32) }
+    if ($prop == sound) { return $gettok(%r,2,32) }
+    if ($prop == popup) { return $gettok(%r,3,32) }
+    if ($prop == eq) { return $gettok(%r,4,32) }
+    if ($prop == fmirc) { return $gettok(%r,5,32) }
+    if ($prop == fsicq) { return $gettok(%r,6,32) }
+  }
+
+  if ($3 == sound) {
+    var %section notice_ $+ $1 $+ . $+ $2 $+ _sound
+    var %r = $readini(%file,settings,%section)
+    if ($prop == repeat) { return $gettok(%r,1,32) }
+    if ($prop == times) { return $gettok(%r,2,32) }
+    if ($prop == beep) { return $gettok(%r,3,32) }
+    if ($prop == file) { return $gettok(%r,4-,32) }
+  }
+
+  if ($3 == popup) {
+    var %section notice_ $+ $1 $+ . $+ $2 $+ _popup
+    var %r = $readini(%file,settings,%section)
+    if ($prop == desktop) { return $gettok(%r,1,32) }
+    if ($prop == ontop) { return $gettok(%r,2,32) }
+    if ($prop == cc) { return $gettok(%r,3,32) }
+    if ($prop == ca) { return $gettok(%r,4,32) }
+    if ($prop == ca-time) { return $gettok(%r,5,32) }
+    if ($prop == rnd) { return $gettok(%r,6,32) }
+  }
+
+  if ($3 == eq) {
+    var %section notice_ $+ $1 $+ . $+ $2 $+ _eq
+    var %r = $readini(%file,settings,%section)
+    if ($prop == sc) { return $gettok(%r,1,32) }
+    if ($prop == sa) { return $gettok(%r,2,32) }
+    if ($prop == sa-time) { return $gettok(%r,3,32) }
+    if ($prop == speed) { return $gettok(%r,4,32) }
+  }
+
+}
+
+; [AWAY]
+on *:dialog:_icq.settings:sclick:175,176,178:{
+  if ($did == 175) { did -ra $dname 174 $hget(smarticq,$+(msg.,$remove($did($dname,175).seltext,/))) }
+
+  if ($did == 176) {
+    var %c = 1, %t
+    while (%c <= $did($dname,174).lines) {
+      if (%t) { %t = %t $+ $crlf }
+      %t = %t $+ $did($dname,174,%c).text
+      inc %c
+    }
+    hadd smarticq $+(msg.,$remove($did($dname,175).seltext,/)) %t
+  }
+
+  if ($did == 178) {
+    hadd smarticq $+(msg.,$remove($did($dname,175).seltext,/)) User is currenly $did($dname,175).seltext $+ $crlf $+ You can leave him/her a message
+    did -ra $dname 174 $hget(smarticq,$+(msg.,$remove($did($dname,175).seltext,/)))
+  }
+}
+
+; [MSG WINDOWS]>
+on *:dialog:_icq.settings:sclick:181,182,183,184,185,186,187,188,189,190,191,192,202,207,209,208,210:{
+
+
+  if ($did == 191) {
+    var %file = $+(",$_icq.dir,$_icq.a,\,$$gettok($did($dname,502,$did($dname,181).sel).text,2,1),.log")
+    if ($isfile(%file)) { _icq.run notepad %file }
+    return
+  }
+  if ($did == 192) {
+    remini $+(",$_icq.dir,dat\smarticq.ini.tmp") misc msgwin_pos 
+    return
+  }
+  if (($did >= 184) && ($did <= 190)) || ($did == 182) || ($did == 202) || (($did > 201) && ($did < 211)) {
+    if ($did($dname,182).state) && ($did != 182) {
+      writeini $+(",$_icq.dir,$_icq.a,\settings.ini.tmp") account MW $did($dname,184).state $did($dname,185).state $did($dname,186).state $did($dname,187).state $did($dname,188).state $did($dname,189).state $did($dname,190).state $did($dname,202).state $did($dname,207).state $did($dname,208).state $did($dname,209).state $did($dname,210).state
+    }
+
+    var %c = $did($dname,181,0).sel
+    while (%c) {
+      writeini $+(",$_icq.dir,$_icq.a,\users.ini.tmp") $gettok($did($dname,502,$did($dname,181,%c).sel).text,2,1) MW $did($dname,184).state $did($dname,185).state $did($dname,186).state $did($dname,187).state $did($dname,188).state $did($dname,189).state $did($dname,190).state $did($dname,202).state $did($dname,207).state $did($dname,208).state $did($dname,209).state $did($dname,210).state
+      if (!$didwm($dname,600,$gettok($did($dname,502,$did($dname,181,%c).sel).text,2,1))) {
+        did -a $dname 600 $gettok($did($dname,502,$did($dname,181,%c).sel).text,2,1)
+      }
+      dec %c 
+
+    }
+
+    if ($did != 182) { return }
+  }
+
+  if ($did == 181) {
+    var %r = $readini($+(",$_icq.dir,$_icq.a,\users.ini.tmp"),$gettok($did($dname,502,$did($dname,181).sel).text,2,1),MW)
+  }
+
+  if ($did($dname,182).state) { 
+    var %r = $readini($+(",$_icq.dir,$_icq.a,\settings.ini.tmp"),account,MW)
+    did -u $dname 181 1 | did -b $dname 181 
+  }
+  if ($did($dname,183).state) { 
+    did -e $dname 181 
+    if ($did == 183) { did -c $dname 181 1 }
+    var %r = $readini($+(",$_icq.dir,$_icq.a,\users.ini.tmp"),$gettok($did($dname,502,$did($dname,181).sel).text,2,1),MW)
+  }
+
+  var %uin = $gettok($did($dname,502,$did($dname,181,1).sel).text,2,1)
+  did $iif($gettok(%r,1,32),-c,-u) $dname 184
+  did $iif($gettok(%r,2,32),-c,-u) $dname 185
+  did $iif($gettok(%r,3,32),-c,-u) $dname 186
+  did $iif($gettok(%r,4,32),-c,-u) $dname 187
+  did $iif($gettok(%r,5,32),-c,-u) $dname 188
+  did $iif($gettok(%r,6,32),-c,-u) $dname 189
+  did $iif($gettok(%r,7,32),-c,-u) $dname 190
+  did $iif($gettok(%r,8,32),-c,-u) $dname 202
+  did $iif($gettok(%r,9,32),-c,-u) $dname 207
+  did $iif($gettok(%r,10,32),-c,-u) $dname 209
+  did $iif($gettok(%r,11,32),-c,-u) $dname 208
+  did $iif($gettok(%r,12,32),-c,-u) $dname 210
+
+
+  if ($did == 182) { did -b $dname 202 }
+  if ($did == 183) { did -e $dname 202 }
+}
+
+; [PLUGIN MANAGER]
+on *:dialog:_icq.settings:sclick:214,216,220,221,225,226:{
+  if ($did == 214) { url http://icq.irctools.com/ }
+  if ($did == 226) { url http://icq.irctools.com/ }
+  if ($did == 220) && (!$did($dname,216).seltext) { return }
+  if ($did == 220) && ($did($dname,216).seltext) {
+    .unload -rs $+(",$$script($did($dname,516,$did($dname,216,1).sel).text),")
+    did -a $dname 521 $did($dname,516,$did($dname,216,1).sel).text
+    did -a $dname 221 $did($dname,216,1).seltext
+    did -d $dname 516 $did($dname,216,1).sel
+    did -d $dname 216 $did($dname,216,1).sel
+    _icq.menu_cl.init -startup | _icq.menu_icq.init
+  }
+  if ($did == 225) && (!$did($dname,221).seltext) { return }
+  if ($did == 225) && ($did($dname,221).seltext) {
+    .load -rs $+(",$did($dname,521,$did($dname,221,1).sel).text,")
+    did -a $dname 516 $did($dname,521,$did($dname,221,1).sel).text
+    did -a $dname 216 $did($dname,221,1).seltext
+    did -d $dname 521 $did($dname,221,1).sel
+    did -d $dname 221 $did($dname,221,1).sel
+    _icq.menu_cl.init -startup | _icq.menu_icq.init
+  }
+
+  if ($did == 216) || ($did == 225) || ($did == 220) {
+    var %pfile = $did($dname,516,$did($dname,216).sel).text
+    did -ra $dname 217 Name: $read(%pfile,s,;name)
+    did -ra $dname 218 Author: $read(%pfile,s,;author)
+    did -ra $dname 219 Version $read(%pfile,s,;version)
+  }
+  if ($did == 221) || ($did == 225) || ($did == 220) {
+    var %pfile = $did($dname,521,$did($dname,221).sel).text
+    did -ra $dname 224 Name: $read(%pfile,s,;name)
+    did -ra $dname 223 Author: $read(%pfile,s,;author)
+    did -ra $dname 222 Version $read(%pfile,s,;version)
+  }
+}

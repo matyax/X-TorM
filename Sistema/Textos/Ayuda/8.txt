@@ -1,0 +1,28 @@
+  La barra de útiles
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  La barra de útiles fue hecha para que puedas acceder rápidamente a
+  cualquier opción del script. Por medio de los botones se pueden abrir
+  las opciones más "útiles" del script, pero por falta de espacio, no pude
+  poner algunas otras cosas. Por eso, si haces click al lado del último 
+  botón de la barra (o click derecho en cualquier otra parte), se va a 
+  desplegar un menú dónde vas a poder abrir el fácilmente el resto de las
+  utilidades del script.
+€
+  Problemas: La barra no se abre
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  Esto se puede deber a dos problemas:
+€
+    1- Barra de útiles desactivada. La opción "mostrar barra de utilidades"
+       no está activada. Para solucionar esto, deber ir al panel de configuración
+       del script (tecla F3 o comando /configuracion), ir a la sección "General"
+       y activar la casilla que dice "mostrar barra..".
+€
+    2- Resolución de pantalla inferior a 800 * 600. La raíz de este problema es
+       que tu configuración de monitor es demasiado pequeña y no queda espacio
+       para mostrar la barra, pues si apareciese se vería cortada. Esto puede
+       solucionarse solo si tu placa de video soporta una resolución mayor. Para
+       ver esto deber ir al escritorio, hacer click derecho, ir a la opción
+       "propiedades"; una vez abierto, vas a la solapa "configuración" y buscas
+       la caja que dice "Resolución de pantalla"; ahí mueve la barra hacia la
+       derecha para setear una configuración más grande y presiona el botón
+       "aceptar".

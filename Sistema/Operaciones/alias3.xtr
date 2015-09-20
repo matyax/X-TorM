@@ -1,0 +1,293 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                     alias3.xtr - Protecciones del script - acciones en canales
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+bunker {
+  if ($server != $null) { 
+    if (%bunker.state == 0) {
+      sonido $%(alerta)
+      if ($query(1)) close -m
+      if ($chat(1)) close -c
+      ignore -pcntikdu60 *!*@* 
+      silence +*!*@*  
+      e.mon Activado el 12MODO BUNKER de proteción del script. 
+      %bunker.state = 1
+      .timerbunk 1 60 desactiva.bunker
+    }
+    elseif (%bunker.state == 1) {
+      ignore -r *!*@* | silence -*!*@* 
+      e.mon Desactivado el 12MODO BUNKER de proteción del script. 
+      %bunker.state = 0
+    }
+  }
+  else Avisar No estas conectado para usar el modo Bunker. Si no sabes lo que es el modo bunker, consulta la ayuda incluida en el script.
+}
+desactiva.bunker { if (%bunker.state == 1) bunker }
+shutup { silence + $+ $2 | .timer 1 $1 silence - $+ $2 }
+flod {
+  if (%abuso. [ $+ [ $1 ] ] [ $+ [ . ] ]  [ $+ [ $server ] ] == $null) { set %abuso. [ $+ [ $1 ] ] [ $+ [ . ] ]  [ $+ [ $server ] ] 0 }
+  inc %abuso. [ $+ [ $1 ] ] [ $+ [ . ] ]  [ $+ [ $server ] ] | var %t = a. [ $+ [ $1 ] ] [ $+ [ . ] ] [ $+ [ $server ] ]
+  .timer $+ %t 1 $2 unset %abuso. [ $+ [ $1 ] ] [ $+ [ . ] ]  [ $+ [ $server ] ]
+  if (%abuso. [ $+ [ $1 ] ] [ $+ [ . ] ]  [ $+ [ $server ] ] > $3) { return Flood }
+}
+antiflood {
+  if (%no. [ $+ [ $1 ] ] [ $+ [ .flood ] ] == no) return
+  var %tmp = flood. [ $+ [ $1 ] ] [ $+ [ . ] ] [ $+ [ $2 ] ] [ $+ [ . ] ] [ $+ [ $server ] ]
+  inc -u8 %flood. [ $+ [ $1 ] ]
+  inc -u8 % [ $+ [ %tmp ] ]
+  if (% [ $+ [ %tmp ] ] > %t. [ $+ [ $1 ] ] [ $+ [ .flood ] ]) {
+    sonido $%(alerta)
+    alerta Detectado flood $resalt $+  $+ $1 $+  desde $resalt $+ $2 $+  - Será ignorado por %flood.castigo segundos
+    .flash Flood!
+    .notice $$2 $logo Proteccion anti flood
+    ignore -pntikcu $+ %flood.castigo $2
+    if (%ref.silence == si) shutup %flood.castigo $wildsite
+  }
+  ;
+  if (%flood. [ $+ [ $1 ] ] > 15) {
+    alerta Detectados multiples mensajes tipo $+ $resalt $1  - Ignorando todo por 60 segundos.
+    .flash Flood detectado!
+    .ignore -pcntikdu60 $+ %flood.castigo *!*@*
+  }
+}
+antitext {
+  if (%no.text.flood == no) return
+  if (%antitext. [ $+ [ $1 ] ] == $null) { set %antitext. [ $+ [ $1 ] ] 0 }
+  .timerantif $+ $nick 1 8 unset %antitext. [ $+ [ $1 ] ]
+  inc %antitext. [ $+ [ $1 ] ]
+  if (%antitext. [ $+ [ $1 ] ] > %t.text.flood) {
+    sonido $%(alerta)
+    alerta Detectado flood de Texto desde $resalt $+ $1 - Será ignorado por %flood.castigo segundos
+    .Flash Flood!
+    .notice $$2 $logo Protección anti flood
+    .ignore -pcntu $+ %flood.castigo $1
+    if (%ref.silence == si) shutup %flood.castigo $wildsite
+  }
+}
+nospam {
+  if ($$1 == $me) halt
+  else {
+    .timernotice 1 1 .notice $$1 $fakeversion ÂntïSpãm System
+    antiflood NOTICE $$1
+    halt
+  }
+}
+anticon {
+  if (/con isin $2-) || (/aux isin $2-) || (/lpt isin $2-) || (/nul isin $2-) || (lpt isin $2-) || (/prn isin $2-) || (/com isin $2-) || (clock$ isin $2-) { goto inicio }
+  if (con isin $2-) || (aux isin $2-) || (lpt isin $2-) || (nul isin $2-) || (null isin $2-) || (ps isin $2-) || (prn isin $2-) || (com isin $2-) { goto inicio }
+  if (clock$ isin $2-) || (k$.mp3 isin $2-) { goto inicio }
+  return
+  :inicio
+  sonido $%(alerta)
+  alerta Ataque $resalt $+ CON/CON detectado desde $resalt $+ $1
+  .timer -m 1 100 .ignore -u60 $1 | close -mcf $nick
+  antiflood CTCP $1
+  .flash Ataque CON/CON detectado
+  .notice $$1 $logo Proteccion anti 4CON/CON
+  halt
+}
+spam.config {
+  if ($1 == +) {
+    var %tmp.spam = $$?="Qué palabra queres añadir? $crlf Sin *" 
+    if (%tmp.spam != $null) { 
+      if (%spam.words == $null) { set %spam.words %spam.words * $+ %tmp.spam $+ * | goto carga }
+      set %spam.words %spam.words $+ â* $+ %tmp.spam $+ * 
+      goto carga
+    }
+  }
+  if ($1 == -) {
+    if ($sline(@Antispam,1) != $null) { 
+      set %spam.words $remtok(%spam.words,$sline(@Antispam,1),1,226) | goto carga
+    }
+  }
+  if ($1 == carga) {
+    :carga
+    if ($window(@Antispamð) != $null) {
+      window -hl @Antispam | clear -l @Antispam
+      var %xcx = $numtok(%spam.words,226) 
+      while (%xcx > 0) { aline @antispam $gettok(%spam.words,%xcx,226) | dec %xcx }
+    }
+    setv tmp.@Antispamð @Antispamð 30 55 170 7 1 1 @Antispam not
+    lista @Antispamð 30 55 170 105
+    did-lista not @Antispamð tmp.@Antispamð
+  }
+}
+ve.script {
+  if (*f*infinita iswm $1) { return Frêcuêncîã Infînîtã }
+  if (*x*torm* iswm $1) { return X-TorM }
+  if (somer isin $1) { return ^SoMeR^ }
+  if (airc == $1) { return aIRC }
+  if (AnGeLNeGrO == $1) { return Angel Negro }
+  if (anonymous == $1) { return Anonymous }
+  if (IRcap isin $1) { return IRcap }
+  if (pantera == $1) { return Pantera }
+  if (backbeat == $1) { return Backbeat }
+  if (BaT == $1) { return BaT }
+  if (cetete isin $1) { return Cetete }
+  if (dtp == $1) { return DTP }
+  if (eirc == $1) { return eIRC }
+  if (kristoman isin $1) { return Kristoman }
+  if (resplandor isin $1) { return Resplandor }
+  if (Looksharp isin $1) { return Looksharp }
+  if (gra2 isin $1) { return Gra2 }
+  if (hennes isin $1) { return Hennes }
+  if (hackscript isin $1) { return Hackscript }
+  if (vamp isin $1) { return FilthIRC }
+  if (gravity isin $1) { return }
+  if (irc-planet isin $1) { return IRC-Planet }
+  if (Kenny isin $1) { return Kenny }
+  if (Krakatau isin $1) { return Krakatau }
+  if (Obsolete isin $1) { return Obsolete }
+  if (Orion isin $1) { return Orion }
+  if (oxirc isin $1) { return OxIRC }
+  if (Phanatic isin $1) { return Phanatic }
+  if (sirc isin $1) { return sIRC }
+  if (s*lido iswm $1) { return Sólido }
+  if (Tribal isin $1) { return Tribal }
+  if (Tribe isin $1) { return Tribe }
+  if (x-cript iswm $1) { return X-Cript }
+  if (zIRC isin $1) { return zIRC }
+  if (DirC1 isin $1) { return «(ÐÏGÏTå£ î®¢)» }  
+  if (zX-V* iswm $1) { return zØtaG}¤{X©®ïpt» }
+  if (WarNeT isin $1) { return WarNeT 3.0 }
+  if (orbital isin $1) { return Orbital }
+  return Desconocido
+}
+ve.spam {
+  if (ÂntïSpãm isin $strip($1-)) { halt }
+  if (*BLOQUEANDO* *publicidad* iswm $strip($1-)) { halt }
+  if (ÂntïSpåm isin $strip($1-)) { halt }
+  if (Frêcuêncîã isin $strip($1-)) { halt }
+  if (Infînîtã  isin $strip($1-)) { halt }
+  if (Antispam isin $strip($1-)) { halt }
+  if ($len(%spam.words) < 1) return
+  var %xcx = 1,%spam.texto = $strip($1-)
+  while ($gettok(%spam.words,%xcx,226)) {
+    if ($ifmatch iswm %spam.texto) return FUCK!
+    inc %xcx 1
+  }
+}
+dccvirus.config {
+  if ($1 == +) {
+    var %tmp.dccvirus = $$?="Que archivo - extension? $crlf $+ Ejemplo: virus.exe o *.exe" 
+    if (%tmp.dccvirus != $null) { 
+      if (%dccvirus.words == $null) { set %dccvirus.words %tmp.dccvirus | goto carga }
+      set %dccvirus.words %dccvirus.words $+ â $+ %tmp.dccvirus
+      goto carga
+    }
+  }
+  if ($1 == -) {
+    if ($sline(@Rechazavirus,1) != $null) { 
+      set %dccvirus.words $remtok(%dccvirus.words,$sline(@Rechazavirus,1),1,226) 
+      goto carga
+    }
+  }
+  if ($1 == carga) {
+    :Carga
+    setv tmp.@Setupð @Setupð 385 145 110 7 1 1 @Rechazavirus sel-vir
+    did-lista firstv dccvirus.words tmp.@Setupð
+  }
+}
+ve.dccvirus {
+  var %xcx = 1,%dccvirus.texto = $1-
+  var %tokv = $gettok(%dccvirus.words,%xcx,226)
+  while (%tokv) {
+    if ($left(%tokv,1) == *) { 
+      if (%tokv iswm %dccvirus.texto) return FUCK!
+    }
+    if (%tokv == %dccvirus.texto) return FUCK!
+    inc %xcx | %tokv = $gettok(%dccvirus.words,%xcx,226)
+  }
+}
+_kicklones {
+  var %canal.toclones = $1 
+  var %nick.toclones = $2
+  var %cant.toclones = $ialchan($gettok($address(%nick.toclones,2),2,33),%canal.toclones,0)
+  if (%cant.toclones == 1) { avisar $2 no tiene clones en $1 | goto fin }
+  else {
+    while (%cant.toclones > 0) {
+      if ($2 != $ialchan($gettok($address(%nick.toclones,2),2,33),%canal.toclones,%cant.toclones).nick ) {
+        mode %canal.toclones -o $ialchan($gettok($address(%nick.toclones,2),2,33),%canal.toclones,%cant.toclones).nick
+        kick %canal.toclones $ialchan($gettok($address(%nick.toclones,2),2,33),%canal.toclones,%cant.toclones).nick
+      }
+      dec %cant.toclones
+    }
+  }
+  :fin
+}
+massdeop {
+  var %nicks,%mose
+  var %ops = $nick(%canal,0,o)
+  while (%ops > 0) {
+    if ($nick($$1,%ops,o) != $me) { %nicks = %nicks $nick($1,%ops,o) | %mode = %mode $+ o }
+    dec %ops
+  }
+  mode $$1 - $+ %mode %nicks
+}
+masskick {
+  var %canal = $1
+  var %nicks = $nick(%canal,0)
+  var %timer = 200
+  while (%nicks > 0) {
+    if ($nick(%canal,%nicks) != $me) { 
+      .timer -m 1 %timer kick %canal $nick(%canal,%nicks) $logo $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) 
+      if ($%(kcontador.act) == si) incv cant.kicks 1
+      dec %nicks
+    }
+    else { dec %nicks }
+    inc %timer 150
+  }
+}
+massban {
+  var %nicks, %modeo, %modeb
+  var %nicks = $nick(%canal,0)
+  while (%nicks > 0) {
+    if ($nick($$1, %nicks) != $me) { 
+      %nicks = %nicks $nick($1,%nicks)
+      %modeo = %modeo $+ o
+      %modeb = %modeb $+ b
+    }
+    dec %nicks
+  }
+  mode $$1 - $+ %modeo %nicks
+  mode $$1 + $+ %modeb %nicks
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+noip { e.mon 4Search Engine: - No se encontro el nick de la ip buscada }
+buscar.ip {
+  if ($count($$1,$chr(46)) == 3) { 
+    e.mon 4Search Engine: buscando a12 $$1
+    %dns = busca.ip 
+    dns $$1 
+    .timerdisDNS 1 60 unset %dns
+  }
+  else { e.mon 4Search Engine: ip no válida 12( $$1 ) }
+}
+buscar.host {
+  e.mon 4Search Engine: Buscando desde12 $$1 ...
+  .enable #busca.host
+  who $$1
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+nick.log {
+  if (%chg.nick == no) return
+  if ($falseip($1) != $null) return
+  var %tmp.nick = $readini $mircdirSistema\Cfg\nicks.log LOG $1 
+  if (($2 != %tmp.nick) && (%tmp.nick != $null) && (%tmp.nick !ison $3)) return %tmp.nick
+}
+falseip {
+  if (( ** isin $$1) || (xx. isin $$1) || ($right($$1,2) == xx) || ($$1 == 0.0.0.0) || ($right($$1,2) == .x)) return falsa
+}
+cheka.log { 
+  if ($lof($mircdirSistema\Cfg\nicks.log) > 40000) { write -c $mircdirSistema\Cfg\nicks.log | info Borrando registro de nicks... }
+}
+escribe.nick {
+  if (%chg.nick == no) return
+  if ($falseip($1) != $null) return
+  if ($1 == $null) return
+  cheka.log
+  writeini $mircdirSistema\Cfg\nicks.log LOG $1 $2
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

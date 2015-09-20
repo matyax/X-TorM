@@ -1,0 +1,1170 @@
+; ______________________________________________________________________________________________________
+;
+;   SmartICQ v1.091
+;   copyright (c) 2001-02 tronicer
+;
+;   url, http://icq.irctools.com/
+;   e-mail, tronicer@freebox.com
+; _________________________________________________________________________________________________________
+;
+; icq gui engine
+
+on *:start:{
+  _icq.nedstat -on
+  .disable #_icq.button
+  if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_startup)) && (!$window(@smarticq)) { _icq }
+
+  if (!$script(socket.smarticq)) { .load -rs $+(",$scriptdir,socket.smarticq") }
+  if (!$script(core.smarticq)) { .load -rs $+(",$scriptdir,core.smarticq") }
+  if (!$script(dlg01.smarticq)) { .load -rs $+(",$scriptdir,dlg01.smarticq") }
+  if (!$script(dlg02.smarticq)) { .load -rs $+(",$scriptdir,dlg02.smarticq") }
+  if ($script(smarticq.mrc)) { .unload -rs smarticq.mrc }
+  ;  if (!$isdir($+($_icq.dir,addons))) { mkdir $+($_icq.dir,addons) }
+}
+
+alias _icq {
+  if ($version < 6.01) { echo -a [ICQ] YOU MUST HAVE AT LEAST mIRC v6.02 TO USE THIS ADDON! | return }
+  if ($1 == -restart) && ($window(@smarticq)) { .timer 1 1 _icq | _icq.shutdown }
+  if ($window(@smarticq)) { window -a @smarticq | return }
+  var %ini = $+(",$_icq.dir,dat\smarticq.ini")
+  ; checking smarticq.ini
+  if (!$isfile(%ini)) {
+    writeini %ini misc pos $calc( ($window(-1).dw /2) - (164 /2))  $calc( ($window(-1).dh /2) - (282/2)) 164 282
+    writeini %ini misc state normal
+  }
+  if ($readini(%ini,skin,ini) == $null) {
+    writeini %ini skin name default
+    writeini %ini skin skin skins\active\
+    writeini %ini skin ini skins\active\smarticq.ini
+  }
+
+  _icq.menu_icq.init
+  _icq.menu_cl.init -startup
+
+  if (!$hget(smarticq)) { hmake smarticq 10 }
+  hadd smarticq state normal
+  hadd smarticq status offline
+  hadd smarticq scroll 1
+  hadd smarticq sel 2
+  hadd smarticq seqnum 1
+  hadd smarticq click.dx -
+  hadd smarticq click.dy - 
+  hadd smarticq seqnum 0
+  hadd smarticq scroll.y 31
+
+
+  var %file = $+(",$_icq.dir,$_icq.a,\settings.ini"), %switches = -zBnpfk0
+  hadd smarticq msg.away $iif($readini(%file,settings,msg.away),$ifmatch,User is currenly Away $+ $crlf $+ You can leave him/her a message)
+  hadd smarticq msg.na $iif($readini(%file,settings,msg.na),$ifmatch,User is currenly N/A $+ $crlf $+ You can leave him/her a message)
+  hadd smarticq msg.occupied $iif($readini(%file,settings,msg.occupied),$ifmatch,User is currenly Occupied $+ $crlf $+ You can leave him/her a message)
+  hadd smarticq msg.dnd $iif($readini(%file,settings,msg.dnd),$ifmatch,User is currenly DND $+ $crlf $+ You can leave him/her a message)
+
+  if (!$_icq.a) { _icq.dlg_am | return }
+
+  window -zhpfk0l20S @SmartICQ-gui 0 0 600 298 @SmartICQ-gui
+  titlebar @SmartICQ-gui - What are you doing here? GO AWAY! =P
+  if ($readini(%file,settings,contactlist_desktop)) { %switches = %switches $+ d }
+  if ($readini(%file,settings,contactlist_ontop)) { %switches = %switches $+ o }
+
+  var %pos = $readini(%ini,misc,pos)
+  if ($gettok(%pos,3,32) != 164) { %pos = $gettok(%pos,1-2,32) 164 282 }
+  window %switches +d @SmartICQ %pos @SmartICQ
+
+  drawpic -c @SmartICQ-gui -1 -1 $_icq.skin(file)
+  _icq.colour.init
+  drawcopy -t @SmartICQ-gui $hget(smarticq,c-invisible) 1 3 164 282 @SmartICQ 0 0
+  _icq.drw_obj -hide minibutton up | _icq.drw_obj -hide closebutton up | _icq.drw_obj -hide scrollbg
+  _icq.drw_obj -hide upscroll up | _icq.drw_obj -hide downscroll up | _icq.drw_obj -hide scrollbar up
+  _icq.drw_obj -hide icqbutton up | _icq.drw_obj -hide statusbar | _icq.drw_obj -hide settbutton up
+  hadd smarticq systemnotice $hget(smarticq,C-SYSTEMNOTICE_TEXT) system notices
+
+  ;_icq.add_cl dd 12302 online arnie
+  ;_icq.add_cl dd 12302 occupied khaled
+  ;_icq.add_cl dd 12333 online tronicer
+  ;_icq.add_cl dd 12333 away goran person
+  ;_icq.add_cl uu 12333 unknown mr who
+  ;_icq.add_cl xx 13233 offline g0d
+
+  var %c = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,0), %read
+  while (%c > 0) {
+    %read = $ini($+(",$_icq.dir,$_icq.a,\uin.ini"),contacts,%c)
+    _icq.add_cl xx %read offline $_icq.g($_icq.a,%read,show,%read)
+    dec %c
+  }
+
+  _icq.drw_cl $hget(smarticq,scroll)
+  _icq.update_system_msg
+
+  _icq.signal smarticq.start 
+  _icq.signal smarticq.mdi $iif($window(@smarticq).mdi,mdi,desktop)
+
+  if ($readini(%file,settings,contactlist_titleonstart)) {
+    drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0
+    _icq.drw_obj -hide minibutton up
+    _icq.drw_obj -hide closebutton up
+    drawdot @SmartICQ
+    window @SmartICQ $window(@SmartICQ).x $window(@SmartICQ).y $window(@SmartICQ).w 19
+  }
+
+  if ($readini($+(",$_icq.dir,dat\smarticq.ini,"),misc,state) != normal) || ($readini(%file,settings,contactlist_minonstart) == 1) { window -n @SmartICQ }
+  else { if (!$readini(%file,settings,contactlist_systray)) { window -a @smarticq } }
+
+  if ($readini(%file,settings,connections_startup)) || ($1 == -connect) { 
+    hadd smarticq status online | _icq.drw_obj -show icqbutton up | _icq.login 
+  }
+  if ($readini(%file,settings,am_popup)) { _icq.dlg_am }
+
+  if ($readini(%file,settings,contactlist_systray)) { 
+    window -h @smarticq 
+    if ($readini($+(",$_icq.dir,dat\smarticq.ini,"),misc,pos) == normal) || (!$readini(%file,settings,contactlist_minonstart)) { window -a @SmartICQ }
+    _icq.systray.init
+  }
+
+}
+
+#_icq.FL on
+#_icq.FL end
+
+alias _icq.upd_uin {
+  ; /_icq.upd_uin <uin> -n <name>
+  ; /_icq.upd_uin <uin> -s <status>
+  ; -h = don't update
+  ;echo -s 12lag 1: $calc($ticks - %lag)
+  if ($1 !isnum) && (*@*.* !iswm $1) { return }
+  var %wildcard = * $+ $chr(1) $+ $1 $+ $chr(1) $+ *
+  var %line = $fline(@SmartICQ-gui,%wildcard,1,1)
+
+  if (%line) {
+    var %text = $line(@smarticq-gui,%line,1)
+    var %uin = $gettok(%text,3,1)
+    var %name = $gettok(%text,2,1)
+    var %status = $gettok(%text,4,1)
+    if (%status == unknown) { return }
+    if (-*n* iswm $2) && ($3) { %name = $3 }
+    if (-*s* iswm $2) && ($3) { %status = $3 }
+    if ($gettok(%text,4,1) == %status) { return }
+
+    var %window = @ $+ $replace($_icq.g($_icq.a,$1,show,$1),$chr(32),_) $+ @ $+ $1 $+ @ICQ
+    if ($window(%window)) { titlebar %window - $replace(%status,online,Online,f4c,Free 4 Chat,away,Away,na,N/A,dnd,DND,occupied,Occupied,invisible,Invisible,offline,Offline) $iif($_icq.mw_menu($1,8),[Blowfish Encryption]) }
+
+    if ($4 != -silent) { _icq.notice_do s %status $1 %status [ICQ] $_icq.g($_icq.a,$1,SHOW,$1) is $replace(%status,f4c,free 4 chat) }
+
+    ;drawdot -h @smarticq
+    _icq.signal smarticq.status %status $1 
+    _icq.debug -st status: L $+ %line %text %status
+    dline -l @SmartICQ-gui %line
+    if (%status == offline) { 
+      writeini $+(",$_icq.dir,$_icq.a,\users.ini") $1 LAST_ONLINE $ctime
+      _icq.add_cl xx %uin %status %name 
+    }
+    if (%status != offline) { 
+      writeini $+(",$_icq.dir,$_icq.a,\users.ini") $1 LAST_ONLINE now
+      _icq.add_cl dd %uin %status %name 
+    }
+    if (-*h* !iswm $2) { 
+      if ($group(#_icq.FL) == on) { .timer_icq.upd_uin off | .timer_icq.upd_uin -o 1 1 .disable #_icq.FL $chr(124) _icq.drw_cl $hget(smarticq,scroll) }
+      if ($group(#_icq.FL) == off) { _icq.drw_cl $hget(smarticq,scroll) }
+    }
+  }
+  ;echo -s 21lag 2: $calc($ticks - %lag)
+}
+
+
+alias _icq.cw { return $int($calc(( [ $window(-3).w /2) ] - ($1 / 2))) $int($calc(( [ $window(-3).h /2) ] - ($2 / 2))) $1 $2 }
+
+#_icq.notice off
+#_icq.notice end
+
+alias _icq.notice.popup {
+  ; /_icq.notice.popup <switches> <uin> <text> [time]
+  ; /_icq.notice.popup <type> <subtype> <uin> <text>
+  ;/_icq.notice.popup s online 1284770 online
+
+  var %desk = $_icq.notice($1,$2,popup).desktop, %ontop = $_icq.notice($1,$2,popup).ontop, %rnd = $_icq.notice($1,$2,popup).rnd, %ca = $_icq.notice($1,$2,popup).ca, %ca-time = $_icq.notice($1,$2,popup).ca-time, %cc = $_icq.notice($1,$2,popup).cc
+  var %window = @popup.cc. $+ $3 $+ $ctime, %switches = -phB, %text1 = [[ $+ $4- $+ ]] $3, %text2 = $_icq.g($_icq.a,$3,SHOW,$3) 
+  var %size.w1 = $calc($width(%text1,arial,10) +17), %size.w2 = $calc($width(%text2,arial,10) +17)
+
+  if ($window(%window)) || ($group(#_icq.notice) == off) { return }
+
+  if (%ca) { .timer_icq.notice.popups $+ %window -o 1 %ca-time window -c %window }
+  if (%desk) { %switches = -pdh }
+  if (%desk) && (%ontop) { %switches = -pdoh }
+  if (%size.w1 >= %size.w2) { var %size.w = %size.w1 }
+  if (%size.w1 < %size.w2) { var %size.w = %size.w2 }
+
+  window %switches +d %window $iif(%rnd,$rand(1,800) $rand(1,600) %size.w 40,$_icq.cw(%size.w,40)) $iif(%cc,@popup.cc,@popup)
+  window -a %window
+  drawrect -rf %window $rgb(face) 1 0 0 %size.w 40
+  drawrect -r %window $rgb(shadow) 1 1 1 $calc(%size.w -2) 38
+  drawtext -rc %window $rgb(hilight) arial 10 10 5 $calc(%size.w -15) 15 %text1
+  drawtext -rco %window $rgb(text) arial 15 10 18 $calc(%size.w -15) 20 %text2
+}
+
+on *:close:@popup*:{
+  .timer_icq.notice.popups. $+ $target off
+}
+
+menu @popup.cc {
+  sclick:{ .timer_icq.notice.popups. $+ $active off | window -c $active }
+}
+
+alias _icq.upd_icon {
+  ; /_icq.upd_icon <status> <colour> <y>
+  var %p
+  if ($1 == online) { %p = 260 116 15 15 }
+  if ($1 == offline) { %p = 277 116 15 15 }
+  if ($1 == away) { %p = 310 116 15 15 }
+  if ($1 == na) { %p = 378 116 16 15 }
+  if ($1 == f4c) { %p = 294 116 14 15 }
+  if ($1 == occupied) { %p = 327 116 15 15 }
+  if ($1 == dnd) { %p = 344 116 15 15 }
+  if ($1 == invisible) { %p = 361 116 15 15 }
+  if ($1 == unknown) { %p = 396 116 14 14 }
+  drawcopy -nt @SmartICQ-gui $2 %p @SmartICQ 7 $3
+}
+
+alias _icq.move_scrollbar.rev {
+  return $round($calc( - ((31 - $1) / (168 / ($line(@smarticq-gui,0,1) -12))) +1 ),0)
+}
+
+alias _icq.move_scrollbar {
+  var %y = $calc( 31 + ( (168 / ($line(@smarticq-gui,0,1) -12)) * ($hget(smarticq,scroll) -1) ) )
+  if (%y == $null) { var %y = 31 }
+  if (%y == 199) { inc %y }
+  if (%y > 200) { %y = 200 | hadd smarticq scroll $calc($hget(smarticq,scroll) -1) }
+  drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 69 9 188 @SmartICQ 149 31
+  if ($1 != -hide) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 36 9 19 @SmartICQ 149 $round(%y,0) }
+  if ($1 == -hide) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 36 9 19 @SmartICQ 149 $round(%y,0) }
+  hadd smarticq scroll.y $round(%y,0)
+}
+
+alias _icq.scroll_down {
+
+  if ($gettok($line(@smarticq-gui,$calc($hget(smarticq,scroll) +12),1),1,32)) {
+    hadd smarticq scroll $calc($hget(smarticq,scroll) +1)
+    _icq.move_scrollbar
+    _icq.drw_cl $hget(smarticq,scroll)
+    drawdot @SmartICQ
+  }
+}
+
+alias _icq.scroll_up {
+  if ($hget(smarticq,scroll) >= 0) {
+    hadd smarticq scroll $calc($hget(smarticq,scroll) -1)
+    if ($hget(smarticq,scroll) < 1) { hadd smarticq scroll 1 }
+    _icq.move_scrollbar
+    _icq.drw_cl $hget(smarticq,scroll)
+    drawdot @SmartICQ
+  }
+}
+
+alias _icq.drw_cl {
+  ; /_icq.drw_cl 
+  var %sel = $hget(smarticq,sel), %line, %q, %y, %scroll = $hget(smarticq,scroll), %status, %c = 0, %colour1 = $hget(smarticq,c-invisible), %colour2 = $hget(smarticq,c-hi_text), %colour3 = $hget(smarticq,c-text), %colour4 = $hget(smarticq,c-sel)
+  drawcopy -n @SmartICQ-gui 7 22 143 213 @SmartICQ 6 19
+  %q = $calc(%scroll + %c) | %line = $line(@smarticq-gui,%q,1)
+  while (%c <= 11) && (%line) { 
+    %y = $calc( ( 17 * ( %c + 1 ) ) + 6 ) 
+    %status = $gettok(%line,4,1) 
+    if ($gettok(%line,3,1) == line) {
+      if (%sel == %q) { inc %sel | hadd smarticq sel %sel }
+      drawline -rn @SmartICQ %colour3 1 15 $calc(%y +8) 45 $calc(%y +8)
+      drawtext $hget(smarticq,F.b-T) @SmartICQ %colour3 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 48 $calc(%y +1) 121 15 [[ $gettok(%line,2,1) ]] 
+    }
+    else {
+      if (%sel == %q) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 427 $calc(%y -16) 142 16 @SmartICQ 6 %y } 
+      _icq.upd_icon %status %colour1 %y 
+      if (%sel == %q) { drawtext $hget(smarticq,F.b-T) @SmartICQ %colour2 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%y +1) 121 15 $gettok(%line,2,1) } 
+      else { drawtext $hget(smarticq,F.b-T) @SmartICQ %colour3 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%y +1) 121 15 $gettok(%line,2,1) } 
+    }
+    inc %c | %q = $calc(%scroll + %c) | %line = $line(@smarticq-gui,%q,1) 
+  }
+  drawdot @SmartICQ
+}
+
+alias _icq.add_cl {
+  ; /_icq.add_cl <dd|xx|uu> <uin> <status> <name> 
+  ; dd = online, xx = offline, unknown = uu
+  if ($1 == uu) { _icq.reqfi $2 }
+  aline -l @SmartICQ-gui $+($1,$chr(1),$4-,$chr(1),$2,$chr(1),$3)
+  if (!$fline(@smarticq-gui,dd*,0,1)) && ($fline(@smarticq-gui,da*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,da*,1,1) }
+  if (!$fline(@smarticq-gui,uu*,0,1)) && ($fline(@smarticq-gui,ua*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,ua*,1,1) }
+  if ($fline(@smarticq-gui,xx*,0,1)) && (!$fline(@smarticq-gui,xa*,0,1)) { aline -l @smarticq-gui $+(xa,$chr(1),offline,$chr(1),line) }
+  if ($fline(@smarticq-gui,dd*,0,1)) && (!$fline(@smarticq-gui,da*,0,1)) { aline -l @smarticq-gui $+(da,$chr(1),online,$chr(1),line) }
+  if ($fline(@smarticq-gui,uu*,0,1)) && (!$fline(@smarticq-gui,ua*,0,1)) { aline -l @smarticq-gui $+(ua,$chr(1),unknown,$chr(1),line) }
+  while ($gettok($line(@smarticq-gui,$hget(smarticq,sel),1),3,1) == line) { hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+}
+
+
+alias _icq.event.dclick {
+  if ($window(@smarticq).state == maximized) && (!$_icq.i(contactlist)) { return }
+  hadd smarticq idle 0
+  if ($mouse.y < 18) || ($1 == -KEYBOARD) {
+    if ($window(@SmartICQ).h == 19) {
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 175 163 19 @SmartICQ 0 0
+      _icq.drw_obj -hide minibutton up
+      _icq.drw_obj -hide closebutton up
+      window @SmartICQ $window(@SmartICQ).x $window(@SmartICQ).y $window(@SmartICQ).w 282
+      drawcopy -n @SmartICQ-gui 7 22 143 213 @SmartICQ 6 19
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 1 3 164 282 @SmartICQ 0 0
+      _icq.drw_obj -hide minibutton up | _icq.drw_obj -hide closebutton up | _icq.drw_obj -hide scrollbg
+      _icq.drw_obj -hide upscroll up | _icq.drw_obj -hide downscroll up | _icq.drw_obj -hide icqbutton up
+      _icq.drw_obj -hide statusbar | _icq.drw_obj -hide settbutton up
+      _icq.move_scrollbar
+      drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 9 239 147 14 $gettok($hget(smarticq,systemnotice),2-,32)
+      _icq.drw_cl $hget(smarticq,scroll)
+      return
+    }
+    if ($window(@SmartICQ).h == 282) {
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0
+      _icq.drw_obj -hide minibutton up
+      _icq.drw_obj -hide closebutton up
+      drawdot @SmartICQ
+      window @SmartICQ $window(@SmartICQ).x $window(@SmartICQ).y $window(@SmartICQ).w 19
+    }
+  }
+  if ($_icq.i(contactlist)) { _icq.event.sclick dclick | return }
+}
+
+alias _icq.event.sclick {
+  hadd smarticq idle 0
+  if ($_icq.i(contactlist)) {
+
+    var %c = 1, %colour1 = $hget(smarticq,c-invisible), %colour2 = $hget(smarticq,c-hi_text), %colour3 = $hget(smarticq,c-text)
+    while (%c < 13) {
+      var %y = $calc((17 * %c) +6)
+      if ($inrect($mouse.x,$mouse.y,6,%y,141,17)) { 
+
+        var %sel = $calc((%c -1) + $hget(smarticq,scroll))
+        if ($gettok($line(@smarticq-gui,%sel,1),3,1) == line) { return }
+
+        ;dblclick
+        if ($1 == dclick) && ($gettok($line(@smarticq-gui,%sel,1),1,1)) && ($active == @smarticq) { 
+          if ($gettok($line(@smarticq-gui,%sel,1),3,1) !isnum) { return }
+          if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_dblclick)) {
+            _icq.open_msg $gettok($line(@smarticq-gui,%sel,1),3,1) -ACTIVATE | return
+          }
+        }
+
+        if ($hget(smarticq,sel) != $calc((%c -1) + $hget(smarticq,scroll))) && ($gettok($line(@smarticq-gui,%sel,1),1,1)) {
+
+          if ($hget(smarticq,sel) >= $hget(smarticq,scroll)) && ($calc($hget(smarticq,sel) - $hget(smarticq,scroll) +1) <= 12) {
+            var %icq.sel_y = $calc((17 * ($hget(smarticq,sel) - $hget(smarticq,scroll) +1)) +6)
+            drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 7 $calc(%icq.sel_y + 3) 142 16 @SmartICQ 6 %icq.sel_y
+            var %status = $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),4,1)
+
+            _icq.upd_icon %status %colour1 %icq.sel_y
+
+            drawtext $hget(smarticq,F.b-T) @SmartICQ %colour3 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%icq.sel_y +1) 121 15 $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),2,1) 
+            drawdot @SmartICQ
+          }
+
+          hadd smarticq sel $calc((%c -1) + $hget(smarticq,scroll))
+          drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 427 $calc(%y -16) 142 16 @SmartICQ 6 %y
+
+          var %status = $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),4,1)
+          _icq.upd_icon %status %colour1 %y
+
+          drawtext $hget(smarticq,F.b-T) @SmartICQ %colour2 $hget(smarticq,F-TEXT) $hget(smarticq,F.size-TEXT) 25 $calc(%y +1) 121 15 $gettok($line(@smarticq-gui,$hget(smarticq,sel),1),2,1) 
+          drawdot @SmartICQ
+        }
+        if ($1 == rclick) && ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_rightclick)) { 
+          if ($gettok($line(@smarticq-gui,%sel,1),3,1) !isnum) { return }
+          _icq.menu_cl.init
+          _icq.menu.popup icq.cl +Rcb $mouse.dx $calc($window(@smarticq).dy + %y)  
+        }
+        if ($1 != rclick) && (!$readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_rightclick)) { 
+          if ($gettok($line(@smarticq-gui,%sel,1),3,1) !isnum) { return }
+          _icq.menu_cl.init
+          _icq.menu.popup icq.cl +Rcb $mouse.dx $calc($window(@smarticq).dy + %y)  
+        }
+
+      }
+      inc %c
+    }
+    return | $_icq.asc2str(99 111 112 121 114 105 103 104 116 32 50 48 48 49 32 116 114 111 110 105 99 101 114)
+  }
+
+  if ($1 == rclick) { return }
+
+  hadd smarticq click.dx -
+  hadd smarticq click.dy -
+
+
+  if ($mouse.y < 18) {
+    hadd smarticq click.dx $mouse.dx
+    hadd smarticq click.dy $mouse.dy
+  }
+
+  if ($_icq.i(scrollbg)) && (!$_icq.i(scrollbar)) {
+    if ($_icq.move_scrollbar.rev($mouse.y) > 0) { 
+      hadd smarticq scroll $_icq.move_scrollbar.rev($mouse.y)
+      _icq.move_scrollbar
+      _icq.drw_cl $hget(smarticq,scroll)
+    }
+  }
+
+  if ($_icq.i(scrollbar)) { hadd smarticq state scrollbar | hadd smarticq scrollbar.my $mouse.dy | _icq.drw_obj -show scrollbar down }
+  if ($_icq.i(minibutton)) { hadd smarticq click.dx - | hadd smarticq state minibutton | _icq.drw_obj -show minibutton down }
+  if ($_icq.i(closebutton)) { hadd smarticq click.dx - | hadd smarticq state closebutton | _icq.drw_obj -show closebutton down }
+  if ($_icq.i(icqbutton)) { hadd smarticq state icqbutton | hadd smarticq state_ normal | _icq.event.mouse icqbutton }
+  if ($_icq.i(downscroll)) { 
+    hadd smarticq state downscroll | _icq.drw_obj -show downscroll down | 
+    _icq.scroll_down | .timer_icq.scrolldown -mo 0 50 _icq.scroll_down
+  }
+  if ($_icq.i(upscroll)) { 
+    hadd smarticq state upscroll | _icq.drw_obj -show upscroll down 
+    _icq.scroll_up
+    .timer_icq.scrollup -mo 0 50 _icq.scroll_up
+  }
+  if ($_icq.i(settbutton)) { hadd smarticq state settbutton | _icq.drw_obj -hide icqbutton up sett | _icq.drw_obj -show settbutton down }
+  if ($_icq.i(statusbar)) {
+    _icq.menu_sm.init
+    _icq.menu.popup icq.sm +Rcb $mouse.dx $mouse.dy 
+  }
+  _icq.debug -st x: $mouse.x y $mouse.y
+}
+
+alias _icq.event.uclick {
+  hadd smarticq idle 0
+  if ($hget(smarticq,state) == minibutton) && ($_icq.i(minibutton) == $false) { _icq.drw_obj -show minibutton up }
+  if ($hget(smarticq,state) == minibutton) && ($_icq.i(minibutton)) { 
+    _icq.drw_obj -show minibutton up | window -n @SmartICQ
+    if (!$window(@smarticq).mdi) && ($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,contactlist_systray)) { window -h @smarticq }
+    _icq.signal smarticq.minimized 
+  }
+  if ($hget(smarticq,state) == scrollbar) && ($_icq.i(scrollbar) == $false) { hadd smarticq state normal | _icq.drw_obj -show scrollbar up }
+  if ($hget(smarticq,state) == scrollbar) && ($_icq.i(scrollbar)) { hadd smarticq state normal | _icq.drw_obj -show scrollbar up }
+  if ($hget(smarticq,state) == closebutton) && ($_icq.i(closebutton) == $false) { _icq.drw_obj -show closebutton up }
+  if ($hget(smarticq,state) == closebutton) && ($_icq.i(closebutton)) { _icq.drw_obj -show closebutton up | _icq.shutdown | return }
+  if ($hget(smarticq,state) == icqbutton) && ($_icq.i(icqbutton2) == $false) { _icq.drw_obj -show icqbutton up }
+  ;  if ($hget(smarticq,state) == icqbutton) && ($_icq.i(icqbutton2)) { _icq.drw_obj -show icqbutton up }
+  if ($hget(smarticq,state) == downscroll) && ($_icq.i(downscroll) == $false) { _icq.drw_obj -show downscroll up | .timer_icq.scrolldown off }
+  if ($hget(smarticq,state) == downscroll) && ($_icq.i(downscroll)) { _icq.drw_obj -show downscroll up | .timer_icq.scrolldown off }
+  if ($hget(smarticq,state) == upscroll) && ($_icq.i(upscroll) == $false) { _icq.drw_obj -show upscroll up | .timer_icq.scrollup off }
+  if ($hget(smarticq,state) == upscroll) && ($_icq.i(upscroll)) { _icq.drw_obj -show upscroll up | .timer_icq.scrollup off }
+  if ($hget(smarticq,state) == settbutton) && ($_icq.i(settbutton) == $false) { _icq.drw_obj -hide icqbutton up sett | _icq.drw_obj -show settbutton up }
+  if ($hget(smarticq,state) == settbutton) && ($_icq.i(settbutton)) { _icq.drw_obj -hide icqbutton up sett | _icq.drw_obj -show settbutton up | _icq.menu.popup icq +cb $mouse.dx $calc($mouse.dy -10) }
+  if ($hget(smarticq,state) == statusbar) && (!$_icq.i(statusbar)) { hadd smarticq state normal | _icq.update_system_msg }
+
+  if ($hget(smarticq,state) == icqbutton) {
+    hadd smarticq state normal
+    _icq.update_system_msg
+    var %check = 1
+    if ($_icq.i(icqbutton_online)) { 
+      %check = 0
+      if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,security_status)) {
+        if ($hget(smarticq,status) == away) || ($hget(smarticq,status) == na) || ($hget(smarticq,status) == occupied) || ($hget(smarticq,status) == dnd) {
+          var %d = $input(Password required to change status:,6,SmartICQ - Security Check)
+          var %pass = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,settpass)
+          if ($_icq.passwd2(%d) != %pass) { 
+            %d = $input(Wrong Password - Status not changed.,260,SmartICQ - ERROR) 
+            _icq.drw_obj -show icqbutton up
+            return 
+          }
+        }
+      }
+      _icq.autoaway -on
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == online) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status online 
+      _icq.drw_obj -show icqbutton up
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 0 }
+      _icq.signal smarticq.mystatus online
+
+    }
+    if ($_icq.i(icqbutton_f4c)) { 
+      %check = 0
+      _icq.autoaway -on
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == f4c) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status f4c 
+      _icq.drw_obj -show icqbutton up
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 32 }
+      _icq.signal smarticq.mystatus f4c
+    }
+    if ($_icq.i(icqbutton_away)) { 
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == away) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status away
+      _icq.drw_obj -show icqbutton up
+      _icq.dlg_changeawaymsg Away $group(#_icq.shift)
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 1 }
+      _icq.signal smarticq.mystatus away
+    }
+    if ($_icq.i(icqbutton_na)) { 
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == na) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status na
+      _icq.drw_obj -show icqbutton up
+      _icq.dlg_changeawaymsg NA $group(#_icq.shift)
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 5 }
+      _icq.signal smarticq.mystatus na
+    }
+    if ($_icq.i(icqbutton_occupied)) { 
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == occupied) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status occupied 
+      _icq.drw_obj -show icqbutton up
+      _icq.dlg_changeawaymsg Occupied $group(#_icq.shift)
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 17 }
+      _icq.signal smarticq.mystatus occupied
+    }
+    if ($_icq.i(icqbutton_dnd)) { 
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == invisible) { _icq.adduin_visible }
+      if ($hget(smarticq,status) == dnd) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status dnd
+      _icq.drw_obj -show icqbutton up
+      _icq.dlg_changeawaymsg DND $group(#_icq.shift)
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.status 0 19 }
+      _icq.signal smarticq.mystatus dnd
+    }
+    if ($_icq.i(icqbutton_invisible)) {
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == invisible) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status invisible 
+      _icq.drw_obj -show icqbutton up
+      if ($sock($+(smarticq.login_,$_icq.a)) == $null) && ($sock($+(smarticq_,$_icq.a)) == $null) { _icq.login }
+      else { _icq.addlist_invisible | _icq.status 1 0 }
+      _icq.signal smarticq.mystatus invisible
+    }
+    if ($_icq.i(icqbutton_offline)) { 
+      %check = 0
+      _icq.autoaway -off
+      if ($hget(smarticq,status) == offline) { _icq.drw_obj -show icqbutton up | return }
+      hadd smarticq status offline 
+      _icq.drw_obj -show icqbutton up
+      sockclose $+(smarticq.login_,$_icq.a)
+      sockclose $+(smarticq_,$_icq.a)
+
+      while ($fline(@smarticq-gui,u*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,u*,1,1) }
+      while (1) {
+        if ($gettok($line(@smarticq-gui,2,1),3,1) == offline) || ($gettok($line(@smarticq-gui,2,1),4,1) == offline) { break }
+        _icq.upd_uin $gettok($line(@smarticq-gui,2,1),3,1) -sh offline -silent
+      }
+
+      _icq.drw_cl $hget(smarticq,scroll)
+      _icq.signal smarticq.mystatus offline
+    }
+    _icq.update_system_msg 
+    if (%check) { _icq.drw_obj -show icqbutton up }
+  }
+
+  hadd smarticq state normal
+}
+
+
+alias _icq.event.mouse {
+  if ($group(#_icq.earthquake) == on) { _icq.earthquake -off }
+
+  if ($hget(smarticq,state) == scrollbar)  { 
+    if ($line(@smarticq-gui,0,1) < 13) { return }
+    var %scroll = $calc($mouse.dy - $hget(smarticq,scrollbar.my))
+    if (%scroll < 0) && ($hget(smarticq,scroll.y) < 31) { return }
+    if (%scroll > 0) && ($hget(smarticq,scroll.y) == 200) { return }
+    if (%scroll) {
+      if ($_icq.move_scrollbar.rev($mouse.y) < 1) { var %y = 1 }
+      else { var %y = $_icq.move_scrollbar.rev($mouse.y) }
+      hadd smarticq scroll %y
+      _icq.move_scrollbar -hide
+      _icq.drw_cl $hget(smarticq,sel)
+      hadd smarticq scrollbar.my $mouse.dy
+    }
+    return
+  }
+
+  if ($hget(smarticq,state) == minibutton) && ($_icq.i(minibutton) == $false) { hadd smarticq state minibutton | _icq.drw_obj -show minibutton up }
+  if ($hget(smarticq,state) == minibutton) && ($_icq.i(minibutton)) { hadd smarticq state minibutton | _icq.drw_obj -show minibutton down }
+  if ($hget(smarticq,state) == closebutton) && ($_icq.i(closebutton) == $false) { hadd smarticq state closebutton | _icq.drw_obj -show closebutton up }
+  if ($hget(smarticq,state) == closebutton) && ($_icq.i(closebutton)) { hadd smarticq state closebutton | _icq.drw_obj -show closebutton down }
+  if ($hget(smarticq,state) == icqbutton) && ($_icq.i(icqbutton2) == $false) { hadd smarticq state_ out | hadd smarticq state normal_ | _icq.drw_obj -show icqbutton up | _icq.update_system_msg }
+  if ($hget(smarticq,state) == icqbutton) && ($_icq.i(icqbutton2)) && ($hget(smarticq,state_) == out) { hadd smarticq state icqbutton | _icq.drw_obj -show icqbutton down }
+  if ($hget(smarticq,state) == downscroll) && ($_icq.i(downscroll) == $false) { hadd smarticq state downscroll | _icq.drw_obj -show downscroll up | .timer_icq.scrolldown off }
+  if ($hget(smarticq,state) == downscroll) && ($_icq.i(downscroll)) { hadd smarticq state downscroll | _icq.drw_obj -show downscroll down | _icq.scroll_down | .timer_icq.scrolldown -m 0 50 _icq.scroll_down }
+  if ($hget(smarticq,state) == upscroll) && ($_icq.i(upscroll) == $false) { hadd smarticq state upscroll | _icq.drw_obj -show upscroll up | .timer_icq.scrollup off }
+  if ($hget(smarticq,state) == upscroll) && ($_icq.i(upscroll)) { hadd smarticq state upscroll | _icq.drw_obj -show upscroll down | _icq.scroll_up | .timer_icq.scrollup -mo 0 50 _icq.scroll_up }
+  if ($hget(smarticq,state) == settbutton) && ($_icq.i(settbutton) == $false) { hadd smarticq state settbutton |  _icq.drw_obj -hide icqbutton up sett | _icq.drw_obj -show settbutton up }
+  if ($hget(smarticq,state) == settbutton) && ($_icq.i(settbutton)) { hadd smarticq state settbutton | _icq.drw_obj -hide icqbutton up sett | _icq.drw_obj -show settbutton down }
+  if ($hget(smarticq,state) != statusbar) && ($_icq.i(statusbar)) { hadd smarticq state statusbar }
+  if ($hget(smarticq,state) == statusbar) && (!$_icq.i(statusbar)) { hadd smarticq state normal }
+
+  if ($hget(smarticq,state) == icqbutton) {
+    if ($1 == icqbutton) { _icq.drw_obj -hide icqbutton down }
+    if ($_icq.i(icqbutton_online)) && ($hget(smarticq,state_) != icqbutton_online) { _icq.print_system_msg online | hadd smarticq state_ icqbutton_online | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton online }
+    if (!$_icq.i(icqbutton_online)) && ($hget(smarticq,state_) == icqbutton_online) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_f4c)) && ($hget(smarticq,state_) != icqbutton_f4c) { _icq.print_system_msg free for chat | hadd smarticq state_ icqbutton_f4c | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton f4c }
+    if (!$_icq.i(icqbutton_f4c)) && ($hget(smarticq,state_) == icqbutton_f4c) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_away)) && ($hget(smarticq,state_) != icqbutton_away) { _icq.print_system_msg away | hadd smarticq state_ icqbutton_away | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton away }
+    if (!$_icq.i(icqbutton_away)) && ($hget(smarticq,state_) == icqbutton_away) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_na)) && ($hget(smarticq,state_) != icqbutton_na) { _icq.print_system_msg not available | hadd smarticq state_ icqbutton_na | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton na }
+    if (!$_icq.i(icqbutton_na)) && ($hget(smarticq,state_) == icqbutton_na) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_occupied)) && ($hget(smarticq,state_) != icqbutton_occupied) { _icq.print_system_msg occupied | hadd smarticq state_ icqbutton_occupied | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton occupied }
+    if (!$_icq.i(icqbutton_occupied)) && ($hget(smarticq,state_) == icqbutton_occupied) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_dnd)) && ($hget(smarticq,state_) != icqbutton_dnd) { _icq.print_system_msg do not disturb | hadd smarticq state_ icqbutton_dnd | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton dnd }
+    if (!$_icq.i(icqbutton_dnd)) && ($hget(smarticq,state_) == icqbutton_dnd) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_invisible)) && ($hget(smarticq,state_) != icqbutton_invisible) { _icq.print_system_msg invisible | hadd smarticq state_ icqbutton_invisible | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton invisible }
+    if (!$_icq.i(icqbutton_invisible)) && ($hget(smarticq,state_) == icqbutton_invisible) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+    if ($_icq.i(icqbutton_offline)) && ($hget(smarticq,state_) != icqbutton_offline) { _icq.print_system_msg offline | hadd smarticq state_ icqbutton_offline | _icq.drw_obj -hide icqbutton down | _icq.drw_obj -show icqbutton offline }
+    if (!$_icq.i(icqbutton_offline)) && ($hget(smarticq,state_) == icqbutton_offline) { _icq.update_system_msg | hadd smarticq state_ normal | _icq.drw_obj -show icqbutton down }
+  }
+
+  if ($mouse.key !& 1) && ($hget(smarticq,click.dx) isnum) { hadd smarticq click.dx - }
+
+  if (($hget(smarticq,state) == normal) || ($hget(smarticq,state) == moving)) {
+    if ($window(@smarticq).state == maximized) { return }
+    if ($mouse.key & 1) && ($hget(smarticq,click.dx) isnum) { 
+
+      var %y = $calc($mouse.dy - $hget(smarticq,click.dy)), %x = $calc($mouse.dx - $hget(smarticq,click.dx))
+      %x = $calc($window(@SmartICQ).x + %x)
+      %y = $calc($window(@SmartICQ).y + %y)
+
+      var %dest.y = $calc($mouse.dy - $hget(smarticq,click.dy)), %dest.x = $calc($mouse.dx - $hget(smarticq,click.dx))
+      if (%dest.y == 0) && (%dest.x == 0) { return }
+
+      if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_snapping)) {
+        var %dock_x = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).dw - ($window(@smarticq).x + $window(@smarticq).w)  )
+        var %dock_y = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).dh - ($window(@smarticq).y + $window(@smarticq).h)  )
+        if ($window(@SmartICQ).y < 8) && ($window(@SmartICQ).y > -1) && ($window(@SmartICQ).y != 0) && (%dest.y < 0) { %y = 0 | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap top }
+        if ($window(@SmartICQ).x < 8) && ($window(@SmartICQ).x > -1) && ($window(@SmartICQ).x != 0) && (%dest.x < 0) { %x = 0 | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap left }
+        if (%dock_x < 11) && (%dock_x > -1) && (%dock_x != 0) && (%dest.x > 0) { %x = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).dw - $window(@smarticq).w ) | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap right }
+        if (%dock_y < 11) && (%dock_y > -1) && (%dock_y != 0) && (%dest.y > 0) { %y = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).dh - $window(@smarticq).h ) | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap bottom }
+      }
+
+      window @SmartICQ %x %y 164 $window(@SmartICQ).h
+      _icq.signal smarticq.winmove %x %y 164 $window(@SmartICQ).h
+      if ($hget(smarticq,click.dx) isnum) {
+        hadd smarticq click.dx $mouse.dx
+        hadd smarticq click.dy $mouse.dy
+      }
+    }
+  }
+}
+
+alias _icq.event.leave {
+  _icq.event.uclick
+  hadd smarticq idle 0
+  _icq.debug -st LEAVE $mouse.key $hget(smarticq,click.dx)
+  if ($mouse.key & 1) && ($hget(smarticq,click.dx) isnum) { 
+    var %y = $calc($mouse.dy - $hget(smarticq,click.dy)), %x = $calc($mouse.dx - $hget(smarticq,click.dx))
+    %x = $calc($window(@SmartICQ).x + %x)
+    %y = $calc($window(@SmartICQ).y + %y)
+
+    var %dest.y = $calc($mouse.dy - $hget(smarticq,click.dy)), %dest.x = $calc($mouse.dx - $hget(smarticq,click.dx))
+    if (%dest.y == 0) && (%dest.x == 0) { return }
+
+    if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini,"),settings,contactlist_snapping)) {
+      var %dock_x = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).w - ($window(@smarticq).x + $window(@smarticq).w) )
+      var %dock_y = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).h - ($window(@smarticq).y + $window(@smarticq).h) )
+      if ($window(@SmartICQ).y < 8) && ($window(@SmartICQ).y > -1) && ($window(@SmartICQ).y != 0) && (%dest.y < 0) { %y = 0 | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap top }
+      if ($window(@SmartICQ).x < 8) && ($window(@SmartICQ).x > -1) && ($window(@SmartICQ).x != 0) && (%dest.x < 0) { %x = 0 | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap left }
+      if (%dock_x < 8) && (%dock_x > -1) && (%dock_x != 0) && (%dest.x > 0) { %x = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).w - $window(@smarticq).w) | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap right }
+      if (%dock_y < 8) && (%dock_y > -1) && (%dock_y != 0) && (%dest.y > 0) { %y = $calc( $window($iif($window(@smarticq).mdi,-3,-1)).h - $window(@smarticq).h) | hadd smarticq state docked | hadd smarticq click.dx - | _icq.signal smarticq.snap bottom }
+    }
+
+    window @SmartICQ %x %y 164 $window(@SmartICQ).h
+    _icq.signal smarticq.winmove %x %y 164 $window(@SmartICQ).h
+    if ($hget(smarticq,click.dx) isnum) {
+      hadd smarticq click.dx $mouse.dx
+      hadd smarticq click.dy $mouse.dy
+
+    }
+  }
+}
+
+
+on *:input:@*@*@ICQ:{
+  if (/* !iswm $1) {
+    if (!$_icq.sock) { echo -a [icq] not connected to server - this message will be sent later. }
+    var %uin = $gettok($active,-2,64)
+
+    if ($hget(smarticq)) { hadd smarticq idle 0 }
+    if ($len($1-) > 800) { aline -p $active * not sent. line to long! ( $+ $len($1-) chars - max 800) | return }
+    _icq.signal smarticq.mymsg %uin $1-
+
+    if ($_icq.mw_menu(%uin,13)) && ($calc($ctime - $_icq.g($_icq.a,%uin,MSG_CTIME,0)) > 3559) {
+      if ($line($active,$calc($line($active,0) -1)) == ) && ($gettok($line($active,$line($active,0)),1-2,32) == [ Session started ] ) { return }
+      aline $active 
+      aline $active Session started $fulldate
+      if ($_icq.mw_menu(%uin,3)) { write $+(",$_icq.dir,$_icq.a,\,%uin,.log")  | write $+(",$_icq.dir,$_icq.a,\,%uin,.log") Session started $fulldate }
+    }
+    _icq.adduserinfo $_icq.a %uin MSG_CTIME $ctime
+
+    if ($theme.setting(MTSversion)) && ($_icq.mw_menu(%uin,7)) {
+      var %font = $gettok($theme.setting(FontQuery),2,44) $gettok($theme.setting(FontQuery),1,44), %font2 = $window($active).fontsize $window($active).font
+      if (%font2 != %font) { font $active %font }
+      set -u0 %:echo echo $active $iif($_icq.mw_menu(%uin,6),$timestamp) $iif($_icq.mw_menu(%uin,8),*)
+      set -u0 %::nick $_icq.myname
+      set -u0 %::text $1-
+      theme.text textquery
+    }
+    else { aline -p $colour(own) $active $iif($_icq.mw_menu(%uin,6),$timestamp) $iif($_icq.mw_menu(%uin,8),*) < $+ $_icq.myname $+ > $1- }
+    if ($_icq.mw_menu(%uin,8)) { 
+      _icq.qs _icq.msg %uin $str($chr(254),5) $+ $_icq.encryptmsg(%uin,$1-)
+    }
+    else { _icq.qs _icq.msg %uin $1- }
+    if ($_icq.mw_menu(%uin,3)) { write $+(",$_icq.dir,$_icq.a,\,%uin,.log") $timestamp $iif($_icq.mw_menu(%uin,8),*) < $+ $_icq.myname $+ > $1- }
+    if ($_icq.mw_menu(%uin,1)) { window -c $active }
+  }
+}
+
+
+menu @SmartICQ {
+  sclick:_icq.event.sclick
+  mouse:_icq.event.mouse
+  uclick:_icq.event.uclick
+  dclick:_icq.event.dclick
+  leave:_icq.event.leave
+  rclick:_icq.event.sclick rclick
+}
+
+alias _icq.inrect { return $_icq.i($1) }
+
+alias _icq.i {
+  ; $_icq.i(type) 
+  var %x = $mouse.x, %y = $mouse.y
+  if ($1 == contactlist) { return $inrect(%x,%y,6,19,141,211) }
+  if ($1 == minibutton) { return $inrect(%x,%y,139,5,9,8) }
+  if ($1 == closebutton) { return $inrect(%x,%y,150,5,9,8) }
+  if ($1 == icqbutton) { return $inrect(%x,%y,4,258,67,19) }
+  if ($1 == icqbutton2) { return $inrect(%x,%y,4,258,155,19) }
+  if ($1 == icqbutton_online) { return $inrect(%x,%y,8,258,15,17) }
+  if ($1 == icqbutton_f4c) { return $inrect(%x,%y,29,258,15,17) }
+  if ($1 == icqbutton_away) { return $inrect(%x,%y,45,258,15,17) }
+  if ($1 == icqbutton_na) { return $inrect(%x,%y,63,258,17,17) }
+  if ($1 == icqbutton_occupied) { return $inrect(%x,%y,81,258,17,17) }
+  if ($1 == icqbutton_dnd) { return $inrect(%x,%y,100,258,17,17) }
+  if ($1 == icqbutton_invisible) { return $inrect(%x,%y,119,258,17,17) }
+  if ($1 == icqbutton_offline) { return $inrect(%x,%y,138,258,17,17) }
+  if ($1 == scrollbg) { return $inrect(%x,%y,149,31,8,188) }
+
+  if ($1 == downscroll) { return $inrect(%x,%y,149,218,8,11) }
+  if ($1 == upscroll) { return $inrect(%x,%y,149,19,8,11) }
+  if ($1 == settbutton) { return $inrect(%x,%y,76,258,65,19) }
+  if ($1 == statusbar) { return $inrect(%x,%y,4,235,155,20) }
+  if ($1 == scrollbar) { return $inrect(%x,%y,149,$hget(smarticq,scroll.y),8,18) }
+}
+
+
+alias _icq.drw_obj {
+  ;/icq.drw_obj <-hide|-show> <type> <subtype>
+
+  if ($2 == minibutton) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 3 10 9 @SmartICQ 139 5 }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 3 10 9 @SmartICQ 139 5 }
+  }
+  if ($2 == closebutton) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 13 10 9 @SmartICQ 150 5 }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 13 10 9 @SmartICQ 150 5 }
+  }
+  if ($2 == scrollbg) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 69 9 189 @SmartICQ 149 31 }
+  if ($2 == upscroll) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 23 9 12 @SmartICQ 149 19 }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 23 9 12 @SmartICQ 149 19 }
+  }
+  if ($2 == downscroll) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 56 9 12 @SmartICQ 149 219 }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 56 9 12 @SmartICQ 149 219 }
+  }
+  if ($2 == scrollbar) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 167 36 9 19 @SmartICQ 149 $iif($hget(smarticq,scroll.y),$ifmatch,31) }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 178 36 9 19 @SmartICQ 149 $iif($hget(smarticq,scroll.y),$ifmatch,31) }
+  }
+  if ($2 == statusbar) {
+    drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 92 156 21 @SmartICQ 4 235 
+  }
+  if ($2 == icqbutton) {
+    if ($3 == up) { 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 3 156 20 @SmartICQ 4 258 
+      if ($hget(smarticq,status) == online) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 45 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == f4c) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 66 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == away) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 87 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == na) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 108 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == occupied) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 129 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == dnd) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 150 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == invisible) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 171 68 20 @SmartICQ 4 258 }
+      if ($hget(smarticq,status) == offline) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 192 68 20 @SmartICQ 4 258 }
+      if ($4 != sett) {
+        drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 3 66 20 @SmartICQ 76 258 
+      }
+    }
+    if ($3 == down) { 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 24 156 20 @SmartICQ 4 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 342 46 18 20 @SmartICQ 8 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 362 46 18 20 @SmartICQ 26 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 382 46 18 20 @SmartICQ 44 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 402 46 19 20 @SmartICQ 62 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 344 69 19 20 @SmartICQ 81 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 365 69 19 20 @SmartICQ 100 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 386 69 19 20 @SmartICQ 119 258 
+      drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 407 69 18 20 @SmartICQ 138 258 
+    }
+    if ($3 == online) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 46 18 20 @SmartICQ 8 258 }
+    if ($3 == f4c) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 279 46 18 20 @SmartICQ 26 258 }
+    if ($3 == away) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 299 46 18 20 @SmartICQ 44 258 }
+    if ($3 == na) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 319 46 19 20 @SmartICQ 62 258 }
+    if ($3 == occupied) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 69 19 20 @SmartICQ 81 258 }
+    if ($3 == dnd) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 280 69 19 20 @SmartICQ 100 258 }
+    if ($3 == invisible) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 301 69 19 20 @SmartICQ 119 258 }
+    if ($3 == offline) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 322 69 18 20 @SmartICQ 138 258 }
+  }
+  if ($2 == settbutton) {
+    if ($3 == up) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 3 66 20 @SmartICQ 76 258 }
+    if ($3 == down) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 189 24 66 20 @SmartICQ 76 258 }
+  }
+
+  if ($1 == -show) { drawdot @smarticq }
+} 
+
+
+#_icq.button off
+#_icq.button end
+
+on *:active:*:{
+  if ($group(#_icq.button) == on) { _icq.drw_obj -show icqbutton up | .disable #_icq.button }
+  if ($window(@SmartICQ-gui)) {
+    if ($window(@smarticq).state == normal) && ($window(@SmartICQ).h != 282) && ($window(@SmartICQ).h != 19) { window @smarticq $window(@smarticq).x $window(@smarticq).y 164 282 | _icq.redraw }
+    if ($window(@SmartICQ).h == 282) {
+      if ($active == @SmartICQ) { 
+        drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 175 163 19 @SmartICQ 0 0 
+        _icq.drw_obj -hide minibutton up
+        _icq.drw_obj -hide closebutton up
+        _icq.signal smarticq.active
+        if ($window(@smarticq).state != minimized) { window -a @smarticq }
+      }
+      if ($active != @SmartICQ) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 195 163 19 @SmartICQ 0 0 }
+    }
+    if ($window(@SmartICQ).h == 19) {
+      if ($active == @SmartICQ) { 
+        drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0 
+        _icq.drw_obj -hide minibutton up
+        _icq.drw_obj -hide closebutton up
+        _icq.signal smarticq.active
+        if ($window(@smarticq).state != minimized) { window -a @smarticq }
+      }
+      if ($active != @SmartICQ) { drawcopy -tn @SmartICQ-gui $hget(smarticq,c-invisible) 259 155 163 19 @SmartICQ 0 0 }
+    }
+    drawdot @SmartICQ
+  }
+}
+
+on *:APPACTIVE:{ 
+  if ($group(#_icq.button) == on) { _icq.drw_obj -show icqbutton up | .disable #_icq.button }
+  if ($window(@SmartICQ-gui)) {
+    if ($window(@smarticq).state == normal) && ($window(@SmartICQ).h != 282) && ($window(@SmartICQ).h != 19) { window @smarticq $window(@smarticq).x $window(@smarticq).y 164 282 | _icq.redraw }
+    if ($appactive) {
+      if ($window(@SmartICQ).h == 282) {
+        if ($active == @SmartICQ) { 
+          drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 175 163 19 @SmartICQ 0 0 
+          _icq.drw_obj -hide minibutton up
+          _icq.drw_obj -hide closebutton up
+        }
+        if ($active != @SmartICQ) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 195 163 19 @SmartICQ 0 0 }
+      }
+      if ($window(@SmartICQ).h == 19) {
+        if ($active == @SmartICQ) { 
+          drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 135 163 19 @SmartICQ 0 0 
+          _icq.drw_obj -hide minibutton up
+          _icq.drw_obj -hide closebutton up
+        }
+        if ($active != @SmartICQ) { drawcopy -nt @SmartICQ-gui $hget(smarticq,c-invisible) 259 155 163 19 @SmartICQ 0 0 }
+      }
+    }
+    if (!$appactive) {
+      if ($window(@SmartICQ).h == 282) { drawcopy -tn @SmartICQ-gui $hget(smarticq,c-invisible) 259 195 163 19 @SmartICQ 0 0 }
+      if ($window(@SmartICQ).h == 19) { drawcopy -tn @SmartICQ-gui $hget(smarticq,c-invisible) 259 155 163 19 @SmartICQ 0 0 }
+    }
+    drawdot @SmartICQ
+  }
+}
+
+on *:close:@smarticq:{ _icq.shutdown }
+on *:exit:{ _icq.shutdown }
+
+on *:close:@smarticq-gui:{
+  window -zhpfk0l20S @SmartICQ-gui2 0 0 600 298 @SmartICQ-gui
+  titlebar @SmartICQ-gui2 - What are you doing here? GO AWAY! =P
+  drawpic -c @SmartICQ-gui2 -1 -1 $_icq.skin(file)
+  var %c = $line(@smarticq-gui,0,1)
+  while (%c) {
+    aline -l @smarticq-gui2 $line(@smarticq-gui,%c,1)
+    dec %c
+  }
+  .timer 1 0 renwin @smarticq-gui2 @SmartICQ-gui
+}
+
+; _________________________________________________________________________________________________________
+;
+; menu
+;
+
+alias _icq.mw_menu {
+  ; - $_icq.mw(uin,N)
+  var %r = $readini($+(",$_icq.dir,$_icq.a,\users.ini"),$1,MW)
+  if (%r == $null) { %r = $readini($+(",$_icq.dir,$_icq.a,\settings.ini"),account,MW) }
+  if ($gettok(%r,0,32) == 7) { %r = %r 0 }
+  if ($gettok(%r,0,32) == 8) { %r = %r 0 }
+  if ($gettok(%r,0,32) == 9) { %r = %r 1 }
+  if ($gettok(%r,0,32) == 10) { %r = %r 0 }
+  if ($gettok(%r,0,32) == 11) { %r = %r 0 }
+  if ($gettok(%r,0,32) == 12) { %r = %r 1 }
+  if ($isid) { return $gettok(%r,$2,32) }
+  writeini $+(",$_icq.dir,$_icq.a,\users.ini") $1 MW $puttok(%r,$xor($gettok(%r,$2,32),1),$2,32) 
+
+  if ($2 == 8) && ($xor($gettok(%r,$2,32),1)) {
+    echo -a blowfish encryption enabled.
+    echo -a remember that this encryption will only work with other contacts using smarticq.
+    var %window = @ $+ $replace($_icq.g($_icq.a,$1,show,$1),$chr(32),_) $+ @ $+ $1 $+ @ICQ
+    titlebar %window $window(%window).title [Blowfish Encryption]
+  }
+  if ($2 == 8) && ($gettok(%r,$2,32)) {
+    echo -a blowfish encryption disabled.
+    echo -b 
+    var %window = @ $+ $replace($_icq.g($_icq.a,$1,show,$1),$chr(32),_) $+ @ $+ $1 $+ @ICQ
+    titlebar %window $remove($window(%window).title,[blowfish encryption])
+  }
+}
+
+alias _icq.window {
+  if ($window($1).mdi) {
+    if ($prop == dsize) { return $window($1).dx $window($1).dy $window($1).w $window($1).h }
+    if ($prop == size) { return $window($1).x $window($1).y $window($1).w $window($1).h }
+  }
+  if (!$window($1).mdi) {
+    if ($prop == dsize) { return $window($1).x $window($1).y $window($1).w $window($1).h }
+    if ($prop == size) { return $window($1).dx $window($1).dy $window($1).w $window($1).h }
+  }
+}
+
+menu @SmartICQmsg {
+  $_icq.menu_add2contact($gettok($active,-2,64)):_icq.dlg_add2contact $gettok($active,-2,64)
+  -
+  Web Page Address (URL):_icq.dlg_sendurl
+  SMS Message:_icq.dlg_sendsms
+  $_icq.menu_dccfile($gettok($active,-2,64)):dcc send $_icq.g($_icq.a,$gettok($active,-2,64),ip) $+ : $+ $_icq.g($_icq.a,$gettok($active,-2,64),port)
+  -
+  $gettok($_icq.menu_read-away-msg,1,9):_icq.get_away-msg $gettok($active,-2,64)
+  -
+  User Details:_icq.dlg_userdetails $gettok($active,-2,64)
+  -
+  Window Settings
+  .$style($_icq.mw_menu($gettok($active,-2,64),1)) Close After each sent message:_icq.mw_menu $gettok($active,-2,64) 1
+  .$style($_icq.mw_menu($gettok($active,-2,64),2)) Desktop:_icq.mw_menu $gettok($active,-2,64) 2 | var %uin = $gettok($active,-2,64),2), %pos = $_icq.window($active).dsize | window -c $active | _icq.open_msg %uin %pos
+  .$style($_icq.mw_menu($gettok($active,-2,64),3)) Logging:_icq.mw_menu $gettok($active,-2,64) 3
+  .$style($_icq.mw_menu($gettok($active,-2,64),4)) Minimize when getting message:_icq.mw_menu $gettok($active,-2,64) 4
+  .$style($_icq.mw_menu($gettok($active,-2,64),5)) Show log in window:_icq.mw_menu $gettok($active,-2,64) 5
+  .$style($_icq.mw_menu($gettok($active,-2,64),6)) Timestamp:_icq.mw_menu $gettok($active,-2,64) 6
+  .$style($_icq.mw_menu($gettok($active,-2,64),7)) Take advantage of MTS:_icq.mw_menu $gettok($active,-2,64) 7
+  .$style($_icq.mw_menu($gettok($active,-2,64),8)) Blowfish Encryption:_icq.mw_menu $gettok($active,-2,64) 8
+  .$style($_icq.mw_menu($gettok($active,-2,64),9)) Multi-line editbox:_icq.mw_menu $gettok($active,-2,64) 9 | var %uin = $gettok($active,-2,64),2), %pos = $_icq.window($active).size | window -c $active | _icq.open_msg %uin %pos
+  .$style($_icq.mw_menu($gettok($active,-2,64),10)) Flat style:_icq.mw_menu $gettok($active,-2,64) 10 | var %uin = $gettok($active,-2,64),2), %pos = $_icq.window($active).size  | window -c $active | _icq.open_msg %uin %pos 
+  .$style($_icq.mw_menu($gettok($active,-2,64),12)) Tool style:_icq.mw_menu $gettok($active,-2,64) 12 | var %uin = $gettok($active,-2,64),2), %pos = $_icq.window($active).size | window -c $active | _icq.open_msg %uin %pos
+  .$style($_icq.mw_menu($gettok($active,-2,64),11)) Save position On Close:_icq.mw_menu $gettok($active,-2,64) 11
+  .$style($_icq.mw_menu($gettok($active,-2,64),13)) Session start mark:_icq.mw_menu $gettok($active,-2,64) 13
+  .-
+  .Save Settings As Default:{
+    writeini $+(",$_icq.dir,settings.ini") account mw $readini($+(",$_icq.dir,\,$_icq.a,\,users.ini,"),$gettok($active,-2,64),mw)
+  }
+  .-
+  .Position
+  ..Save Default Position:{
+    writeini $+(",$_icq.dir,dat\smarticq.ini") misc msgwin_pos $window($active).x $window($active).y $window($active).w $window($active).h
+  }
+  ..Reset Default Position:{
+    remini $+(",$_icq.dir,dat\smarticq.ini") misc msgwin_pos 
+  }
+  .-
+  .View Log:_icq.run notepad $+(",$_icq.dir,$_icq.a,\,$gettok($active,-2,64),.log")
+  -
+  Rename:_icq.dlg_rename $gettok($active,-2,64)
+  Remove:_icq.dlg_remfromcontact $gettok($active,-2,64)
+}
+
+alias _icq.menu_add2contact {
+  var %wc = $+(*,$chr(1),$1,$chr(1),*)
+  if ($gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1) == unknown) {
+    return Add to contact list
+  }
+}
+
+alias _icq.menu_read-away-msg {
+  var %wc = $+(*,$chr(1),$_icq.seluin,$chr(1),*)
+  if ($gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1) == away) { return Read AWAY Message	Shift+R }
+  if ($gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1) == na) { return Read N/A Message	Shift+R }
+  if ($gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1) == occupied) { return Read OCCUPIED Message	Shift+R }
+  if ($gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),-1,1) == dnd) { return Read DND Message	Shift+R }
+}
+
+alias -l _icq.smarticq-search_menu {
+  if ($1 == 1) && ($2 !isnum) { return $style(2) you must selected an contact. }
+  if ($1 == 1) && ($2 isnum) { return Add To Contact List }
+  if ($1 == 2) && ($2 isnum) { return User Details }
+}
+
+menu @smarticq-search {
+  dclick:{
+    if ($gettok($sline(@smarticq-search,1),1,32) isnum) { _icq.dlg_add2contact $gettok($sline(@smarticq-search,1),1,32)
+    }
+  }
+  New Search:_icq.dlg_searchwp
+  -
+  $_icq.smarticq-search_menu(1,$gettok($sline(@smarticq-search,1),1,32)):_icq.dlg_add2contact $gettok($sline(@smarticq-search,1),1,32)
+  $_icq.smarticq-search_menu(2,$gettok($sline(@smarticq-search,1),1,32)):_icq.dlg_userdetails $gettok($sline(@smarticq-search,1),1,32)
+  -
+  Close:window -c @smarticq-search
+}
+
+menu @SmartICQ-gui {
+  sclick:_icq.debug -st x: $mouse.x y $mouse.y $getdot(@smarticq-gui,$mouse.x,$mouse.y)
+}
+
+alias _icq.menu.popup {
+  var %click = $menu(Popup,$1-)
+  if ( %click != $null ) $gettok(%click,3-,32)
+  return
+}
+
+alias _icq.menu_cl.init {
+  menu New icq.cl 0 0
+  if ($1 == -startup) { menu New icq.cl_plugins 0 0 }
+  menu New icq.cl_ignore 16 16
+
+  if ($_icq.menu_add2contact($_icq.seluin)) { item icq.cl $_icq.menu_add2contact($_icq.seluin) $cr _icq.dlg_add2contact $_icq.seluin | item icq.cl }
+  item icq.cl &Message	Enter $cr _icq.open_msg $_icq.seluin -activate
+  item icq.cl &URL	U $cr _icq.dlg_sendurl
+  item icq.cl &SMS	S $cr _icq.dlg_sendsms
+  if ($_icq.menu_read-away-msg) { item icq.cl | item icq.cl $_icq.menu_read-away-msg $cr _icq.get_away-msg $_icq.seluin }
+  item icq.cl
+  item icq.cl &User Details	D $cr _icq.dlg_userdetails $_icq.seluin
+  item icq.cl +> Plug-Ins $cr icq.cl_plugins
+  item icq.cl
+  item icq.cl +> &Ignore $cr icq.cl_ignore
+  item icq.cl &Rename	R $cr _icq.dlg_rename $_icq.seluin
+  item icq.cl R&emove	Del $cr _icq.dlg_remfromcontact $_icq.seluin
+
+  if ($1 == -startup) { _icq.signal smarticq.menu contactlist icq.cl_plugins }
+
+  var %file = $+(",$_icq.dir,$_icq.a,\uin.ini")
+  item icq.cl_ignore $iif($readini(%file,msgs,$_icq.seluin),+x) Ignore &Messages $cr _icq.ignore $_icq.seluin msgs 
+  item icq.cl_ignore $iif($readini(%file,url,$_icq.seluin),+x) Ignore &URLs $cr _icq.ignore $_icq.seluin url
+  item icq.cl_ignore $iif($readini(%file,pager,$_icq.seluin),+x) Ignore &Pager $cr _icq.ignore $_icq.seluin pager 
+  item icq.cl_ignore $iif($readini(%file,rqs,$_icq.seluin),+x) Ignore &Requests $cr _icq.ignore $_icq.seluin rqs 
+  item icq.cl_ignore
+  item icq.cl_ignore $iif($readini(%file,invisible,$_icq.seluin),+x) I'm &Invisible $cr _icq.ignore $_icq.seluin invisible
+}
+
+
+alias _icq.ignore {
+  ; /_icq.ignore <uin> <type>
+  var %file = $+(",$_icq.dir,$_icq.a,\uin.ini")
+  var %state = $readini(%file,$2,$1)
+  if (%state) { remini %file $2 $1 }
+  else { writeini %file $2 $1 1 | writeini %file ignore $1 1 }
+  if (!$readini(%file,msgs,$1)) && (!$readini(%file,url,$1)) && (!$readini(%file,pager,$1)) && (!$readini(%file,rqs,$1)) && (!$readini(%file,invisible,$1)) {
+    remini %file ignore $1 
+  }
+}
+
+alias _icq.menu_icq.init {
+  menu New icq 0 0
+  menu New icq_sub1 0 0
+  menu New icq_sub2 0 0
+  menu New icq_plugins 0 0
+  item icq +> Add / &Search $cr icq_sub1
+  item icq Account &Manager	Tab $cr _icq.dlg_am
+  item icq &My Details	< $cr _icq.dlg_mydetails
+  item icq &Preferences	§ $cr _icq.dlg_settings
+  item icq
+  item icq SmartICQ Chat $cr _icq.chan
+  item icq
+  item icq +> Plug-Ins $cr icq_plugins
+  item icq +> &Help $cr icq_sub2
+  item icq
+  item icq &Exit $cr _icq.shutdown
+
+  item icq_sub1 &Add Contact	Ins $cr _icq.dlg_add2contact
+  item icq_sub1 &Search Whitepages	Shift+Enter $cr _icq.dlg_searchwp
+
+  item icq_sub2 &About	A $cr _icq.dlg_about
+  item icq_sub2 Homepage	Shift+A $cr url http://icq.irctools.com/
+  item icq_sub2
+  item icq_sub2 View Readme.txt $cr _icq.run $+(",$_icq.dir,readme.txt")
+  item icq_sub2 View Version.txt $cr _icq.run $+(",$_icq.dir,version.txt")
+  item icq_sub2 View FAQ.txt $cr _icq.run $+(",$_icq.dir,faq.txt")
+  item icq_sub2 
+  item icq_sub2 Unload SmartICQ $cr _icq.unload
+
+  _icq.signal smarticq.menu main icq_plugins
+  ;  item icq_plugins $null $cr haha
+}
+
+alias _icq.menu_additem { menu AddItem $1 end $2- }
+alias _icq.menu { menu $1- }
+alias -l icon { menu LoadImg $1 icon small $scriptdir $+ $2- }
+alias -l item { menu AddItem $1 end $2- }
+alias -l menu {
+  var %result
+  if ($2 == $null) { %result = $dll($udll,$1,.) }
+  else { %result = $dll($udll,$1,$2-) }
+  if ($gettok(%result,1,32) == OK) { return $gettok(%result,2-,32) }
+}
+alias -l udll { return $+(",$_icq.dir,dat\popups.dll") }
+
+alias _icq.menu_sm.init {
+  _icq.drw_obj -hide statusbar
+  drawtext $hget(smarticq,F.b-SN) @SmartICQ $hget(smarticq,C-SYSTEMNOTICE_TEXT) $hget(smarticq,F-SN) $hget(smarticq,F.size-SN) 9 239 147 14 system notices
+  hadd smarticq systemnotice $hget(smarticq,C-SYSTEMNOTICE_TEXT) system notices
+  _icq.menu New icq.sm 0 0
+  var %file = $+(",$_icq.dir,$_icq.a,\system.ini"), %c = $ini(%file,url,0), %t
+  while (%c) {
+    var %ini = $gettok($ini(%file,url,%c),1,254)
+    _icq.menu_additem icq.sm $gettok($gettok($readini(%file,url,$ini(%file,url,%c)),2,254),1,32) from $_icq.g($_icq.a,%ini,SHOW,$ini(%file,url,%c)) 	[ $+ %ini $+ ]] $cr _icq.dlg_recvurl $ini(%file,url,%c)
+    dec %c | %t = 1
+  }
+
+  var %c = $ini(%file,rqst,0)
+  while (%c) {
+    var %ini = $ini(%file,rqst,%c)
+    _icq.menu_additem icq.sm Requests Authorization  	[ $+ %ini $+ ]] $cr _icq.dlg_reqauth %ini
+    dec %c | %t = 1
+  }
+
+  var %c = $ini(%file,addedyou,0)
+  while (%c) {
+    var %ini = $ini(%file,addedyou,%c)
+    var %nick = $gettok($readini(%file,addedyou,%ini),1,254)
+    _icq.menu_additem icq.sm $iif(%nick != -,%nick,%ini) added you 	[ $+ %ini $+ ]] $cr _icq.dlg_useraddyou %ini
+    dec %c | %t = 1
+  }
+
+  var %c = $ini(%file,pager,0)
+  while (%c) {
+    var %ini = $ini(%file,pager,%c)
+    _icq.menu_additem icq.sm Pager Message 	[ $+ $gettok(%ini,1,254) $+ ]] $cr _icq.dlg_wwwpager %ini
+    dec %c | %t = 1
+  }
+
+  var %c = $ini(%file,sms,0)
+  while (%c) {
+    var %ini = $ini(%file,sms,%c)
+    _icq.menu_additem icq.sm SMS 	[ $+ $gettok(%ini,1,254) $+ ]] $cr _icq.dlg_rsms %ini
+    dec %c | %t = 1
+  }
+
+  if (%t) { _icq.menu_additem icq.sm }
+  _icq.menu_additem icq.sm History $cr _icq.dlg_history
+}

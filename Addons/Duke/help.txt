@@ -1,0 +1,27 @@
+Os controles:
+Ctrl = usa espada
+Ctrl+Cima = usa magia (soh fiz ele mexer)
+Shift = Pula
+Cima(no ar) = agarra nas plataformas
+(agarrado) Cima+Pulo = sobe na plataforma
+
+Vc ainda pode atacar no ar, na plataforma e agachado, A magia funciona no ar e na plataforma tbm. Dah pra andar agachado.
+Se vc quiser usar o editor de niveis e brincar mais com o cenario: /ninja-ed
+
+As teclas sao:
+1/2/3 = Ativa/Desativa os layers (as camadas do cenario, BG (fundo), MG (meio), FG (frente))
+Q/W/E = Muda qual layer vc tah editando (BG/MG/FG)
+
+Paredes, plataformas, espinhos, vao no MG
+Agua e fumaca no FG
+O resto vai no BG, q nao tem efeito em nada, soh serve pra enfeitar
+
+Ainda tem o popup pra ajudar a preencher
+
+As escadas NAO FUNCIONAM
+
+-----
+
+Divirtam-se :P
+
+e nao critiquem q tem mt bug, eu fiz soh pra testar

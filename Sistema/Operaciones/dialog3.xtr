@@ -1,0 +1,482 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                          dialog3.xtr - Dialogos
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias dialogaway {
+  if ($window(@Awayð)) { window -a @Awayð | return }
+  ventana @Awayð 350 380 | titulo @Awayð Sistema de away - /dialogaway | unsetv tmp.msgaway tmp.sline
+  texto cent @Awayð 40 Sistema de Away (Ausente) 
+  caja @Awayð 10 65 328 95 Razones del away | combo draw @Awayð 22 80 285 %away.msg
+  texto @Awayð 22 105 Agregar razón: | edita @Awayð 100 104 225 1
+  ;
+  caja @Awayð 10 170 328 165 Configuracion | texto @Awayð 22 185 Anunciar cada: | edita @Awayð 120 183 30 2 $calc(%away.tiempo / 60) | texto @Awayð 160 185 minutos.
+  edita @Awayð 120 205 90 3 %away.nick-m
+  edita @Awayð 120 227 205 4 %away.contestador-m
+  edita @Awayð 120 249 205 5 %away.vuelta-m
+  setv check.@awayð away.nick 22 208 Cambiar nick a:â away.contestador 22 230 Usar contestador:â away.vuelta 22 252 Msg. de vuelta:â  away.cmensionan 22 273 Mostrar mensaje de away cuando te mencionen.â away.page 22 294 Activar sistema de llamado de atención mediante pagesâ away.silencioso 22 314 Away silenciosoâ
+  setv but.@awayð 22 125 130 20 Agregar _away.sel 1/â 177 125 150 20 Borrar seleccionado_away.sel 2/â13 345 190 20 $iif($away == $true,Volver,Ir Away) _ir-away/â210 345 125 20 Cerrar_ok/â
+  do_but @awayð but.@awayð | do_check @awayð check.@awayð
+  window -wa @Awayð
+}
+alias away.sel {
+  if ($1 == 1) {
+    if ($%(tmp.msgaway)) { write sistema/cfg/away.cfg $%(tmp.msgaway) | %away.msg = $%(tmp.msgaway) | combo draw @Awayð 22 80 285 %away.msg }
+    else { avisar No escribiste el mensaje a agregar! }
+  }
+  if ($1 == 2) {
+    if ($lines(sistema/cfg/away.cfg) == 0) return
+    if ($%(tmp.sline)) { write -dl $+ $%(tmp.sline) sistema/cfg/away.cfg | unset %away.msg | combo draw @Awayð 22 80 285 }
+    else { avisar No seleccionaste el mensaje a borrar! }
+  }
+}
+menu @Awayð {
+  mouse {
+    if ($mouse.x > 120 && $mouse.x < 150 && $mouse.y > 183 && $mouse.y < 200) { cursor edit }
+    elseif ($mouse.x > 120 && $mouse.x < 211 && $mouse.y > 206 && $mouse.y < 221) { cursor edit }
+    elseif ($mouse.x > 120 && $mouse.x < 326 && $mouse.y > 227 && $mouse.y < 243) { cursor edit }
+    elseif ($mouse.x > 120 && $mouse.x < 326 && $mouse.y > 250 && $mouse.y < 265) { cursor edit }
+    elseif ($mouse.x > 100 && $mouse.x < 325 && $mouse.y > 105 && $mouse.y < 120) { cursor edit }
+    else { cursor normal } 
+  }
+  sclick {
+    if ($mouse.x > 22 && $mouse.x < 325 && $mouse.y > 80 && $mouse.y < 100) { combo push @Awayð 22 80 285 90 file sistema/cfg/away.cfg set.away-msg-sline }
+    if ($mouse.x > 100 && $mouse.x < 325 && $mouse.y > 105 && $mouse.y < 120) { editar @Awayð 100 104 225 1 $ tmp.msgaway }
+    if ($mouse.x > 120 && $mouse.x < 150 && $mouse.y > 183 && $mouse.y < 200) { editar @Awayð 120 183 30 2 - $calc(%away.tiempo / 60) set.away-time }
+    if ($mouse.x > 120 && $mouse.x < 211 && $mouse.y > 206 && $mouse.y < 221) { editar @Awayð 120 205 90 3 % away.nick-m }
+    if ($mouse.x > 120 && $mouse.x < 326 && $mouse.y > 227 && $mouse.y < 243) { editar @Awayð 120 227 205 4 % away.contestador-m }
+    if ($mouse.x > 120 && $mouse.x < 326 && $mouse.y > 250 && $mouse.y < 265) { editar @Awayð 120 249 205 5 % away.vuelta-m }
+  }
+}
+alias set.away-msg-sline { %away.msg = $2- | setv tmp.sline $1 }
+alias set.away-time { %away.tiempo = $calc($1 * 60) }
+alias ir-away {
+  drawline @Awayð
+  if ($server == $null) {
+    .timerAWAY $+ $cid off | .timercAWAY $+ $cid off | unset %away.tiempo-t | sonido $%(info)
+    avisar No estas conectado para usar el sistema AWAY! | return
+  }
+  if ($away != $true) {
+    if (%away.msg) {
+      if (%away.nick == si) { set %away.vnick $me | nick %away.nick-m }
+      .away %away.msg
+      if (%away.silencioso == no) {
+        .timerAWAY $+ $cid 0 %away.tiempo scid $cid ame $!_away(go)
+        %away.tiempo-t = 0
+        .timercAWAY $+ $cid 0 1 inc %away.tiempo-t
+        ame $_away(go)
+      }
+      sonido $%(info) | e.mon Modo away 12activado
+      if ((%away.contestador == si) || (%away.page == si)) { window -ols @Mensajes $+ $cid 10 10 500 200 | titlebar @Mensajes $+ $cid y Pages - $server }
+    }
+    else { error | avisar No seleccionaste ningún mensaje de away! }
+  }
+  else { 
+    if ((%away.nick == si) && (%away.vnick)) { .nick %away.vnick | unset %away.vnick }
+    away | .timerAWAY $+ $cid off | .timercAWAY $+ $cid off
+    if ((%away.vuelta == si) && (%away.silencioso == no)) ame $_away(back) 
+    unset %away.tiempo-t | sonido $%(info) | e.mon Modo away 12desactivado
+  }
+  if ($window(@Awayð)) { $boton(@Awayð,13,345,190,20, $iif($away == $true,Volver,Ir Away) ).norm | drawline @Awayð }
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias avisar {
+  var %alt = $$entra-text(@Avisoð,20,55,265,75,$1-).h
+  ventana @Avisoð 320 $calc(%alt + 65) | titulo @Avisoð X-TorM informa
+  entra-text @Avisoð 20 55 265 75 $1-
+  caja @Avisoð 10 40 300 $calc(%alt - 15) Atención!
+  setv but.@Avisoð 110 $calc(%alt + 33)  100 20 OKz_ok/â | do_but @Avisoð but.@Avisoð
+  window -wa @Avisoð
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias sonidos {
+  if ($window(@Sonidosð)) { window -a @Sonidosð | return }
+  ventana @Sonidosð 325 430 | titulo @Sonidosð Sonidos del script - /Sonidos
+  texto cent @Sonidosð 43 Sonidos que ejecuta el script para cada evento
+  caja @Sonidosð 10 70 300 320 Ubicación de los archivos (*.wav)
+  texedit.sonidos
+  setv but.@Sonidosð 261 83 20 19 !_.splay $%(Inicio) /â 283 83 20 19 ..._select.sonido inicio /â261 103 20 19 !_.splay $%(Clones) /â 283 103 20 19 ..._select.sonido clones /â261 123 20 19 !_.splay $%(Conecta) /â 283 123 20 19 ..._select.sonido conecta /â261 143 20 19 !_.splay $%(desconecta) /â 283 143 20 19 ..._select.sonido desconecta /â
+  setv but1.@Sonidosð 261 163 20 19 !_.splay $%(CTCP) /â 283 163 20 19 ..._select.sonido ctcp /â261 183 20 19 !_.splay $%(skick) /â 283 183 20 19 ..._select.sonido skick /â261 203 20 19 !_.splay $%(notice) /â 283 203 20 19 ..._select.sonido notice /â261 223 20 19 !_.splay $%(page) /â 283 223 20 19 ..._select.sonido page /â
+  setv but2.@Sonidosð 261 243 20 19 !_.splay $%(privado) /â 283 243 20 19 ..._select.sonido privado /â261 263 20 19 !_.splay $%(ssplit) /â 283 263 20 19 ..._select.sonido ssplit /â261 283 20 19 !_.splay $%(info) /â 283 283 20 19 ..._select.sonido info /â261 303 20 19 !_.splay $%(alerta) /â 283 303 20 19 ..._select.sonido alerta /â
+  setv but3.@Sonidosð 261 323 20 19 !_.splay $%(join) /â 283 323 20 19 ..._select.sonido join /â261 343 20 19 !_.splay $%(error) /â 283 343 20 19 ..._select.sonido error /â261 363 20 19 !_.splay $%(closer) /â 283 363 20 19 ..._select.sonido closer /â
+  setv check.@Sonidosð son.act 10 400 Sonidos activadosâ
+  do_but @Sonidosð but.@Sonidosð 
+  do_check @Sonidosð check.@Sonidosð
+  window -wa @Sonidosð
+}
+alias select.sonido {
+  if (!$%(tmp.sounddir)) setv tmp.sounddir $mircdir\*.wav
+  setv $1 $$sfile($%(tmp.sounddir),Selecciona un archivo de sonido para el evento " $+ $$1 $+ ")
+  setv tmp.sounddir $nofile($%($1)) $+ *.wav
+  texedit.sonidos
+}
+alias texedit.sonidos {
+  texto @Sonidosð 18 85 - Inicio: | edita @Sonidosð 85 84 170 1 $%(inicio)
+  texto @Sonidosð 18 105 - Clones: | edita @Sonidosð 85 104 170 2 $%(clones)
+  texto @Sonidosð 18 125 - Conectar: | edita @Sonidosð 85 124 170 2 $%(conecta)
+  texto @Sonidosð 18 145 - Desconectar: | edita @Sonidosð 85 144 170 2 $%(desconecta)
+  texto @Sonidosð 18 165 - CTCP: | edita @Sonidosð 85 164 170 2 $%(ctcp)
+  texto @Sonidosð 18 185 - Te patean: | edita @Sonidosð 85 184 170 2 $%(skick)
+  texto @Sonidosð 18 205 - Notice: | edita @Sonidosð 85 204 170 2 $%(notice)
+  texto @Sonidosð 18 225 - Page: | edita @Sonidosð 85 224 170 2 $%(page)
+  texto @Sonidosð 18 245 - Privado: | edita @Sonidosð 85 244 170 2 $%(privado)
+  texto @Sonidosð 18 265 - Split: | edita @Sonidosð 85 264 170 2 $%(ssplit)
+  texto @Sonidosð 18 285 - Información: | edita @Sonidosð 85 284 170 2 $%(info)
+  texto @Sonidosð 18 305 - Alerta: | edita @Sonidosð 85 304 170 2 $%(alerta)
+  texto @Sonidosð 18 325 - Join: | edita @Sonidosð 85 324 170 2 $%(join)
+  texto @Sonidosð 18 345 - Error: | edita @Sonidosð 85 344 170 2 $%(error)
+  texto @Sonidosð 18 365 - Cierrar: | edita @Sonidosð 85 364 170 2 $%(closer)
+  drawline @Sonidosð
+}
+
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias canales {
+  if ($window(@Canalesð)) { window -a @Canalesð | return }
+  ventana @Canalesð 330 230 | titulo @Canalesð Canales preferidos - /Canales
+  caja @Canalesð 10 40 160 155 Canales | lista @Canalesð 20 50 140 117
+  edita @Canalesð 180 40 135 1 $chr(35)
+  setv but.@Canalesð 20 172 60 20 Entrar_prefer.j 1/â100 172 60 20 Todos_prefer.j all/â180 65 135 20 Agregar_prefer.j add/â180 95 135 20 Borrar seleccionado_prefer.j rem/â180 125 135 20 Ver lista de canales_list/â180 155 135 20 Cerrar_Ok/â
+  setv check.@Canalesð canales.al.conectar 10 202 Ejecutar esta ventana al conectarâ
+  do_but @Canalesð but.@Canalesð | do_check @Canalesð check.@Canalesð
+  prefer.lista
+  window -wa @Canalesð
+}
+menu @Canalesð {
+  mouse {
+    if ($mouse.key == 1) { refresco-lista firstf $mircdirsistema\canales.txt tmp.@Canalesð }
+    elseif ($mouse.x isnum 180-315 && $mouse.y isnum 40-57) { cursor edit }
+    else { cursor normal }
+  }
+  sclick { 
+    refresco-lista firstf $mircdirsistema\canales.txt tmp.@Canalesð
+    if ($mouse.x isnum 180-315 && $mouse.y isnum 40-57) {
+      editar @Canalesð 180 40 135 1 id edid(@Canales,1)
+    }
+  }
+}
+alias prefer.lista { setv tmp.@Canalesð @Canalesð 20 50 140 8 1 1 @Canalez prefer.sel | did-lista firstf $mircdirsistema\canales.txt tmp.@Canalesð }
+alias prefer.j {
+  if ($1 == 1) { join $$sline(@Canalez,1) }
+  if ($1 == all) {
+    var %canales = $line(@Canalez,0),%timer = 500
+    while (%canales > 0) {
+      .timer -m 1 %timer j $line(@Canalez,%canales)
+      dec %canales | inc %timer 500
+    }
+  }
+  if ($1 == rem) { write -dl $+ $sline(@Canalez,1).ln $mircdirsistema\canales.txt | prefer.lista }
+  if ($1 == add) { write $mircdirsistema\canales.txt $$edid(@Canales,1) | prefer.lista }
+}
+alias prefer.sel { return }
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias cpanel {
+  ventana @Panelð 540 388 no
+  titulo @Panelð Panel de control (F4 - /Cpanel)
+  drawpic @Panelð 140 31 $skindir(panelup.png)
+  drawpic @Panelð 2 31 $skindir(paneleft.png), 0, noborder
+  cuadro @Panelð $.rsk(cpanel,list) 142 119 393 262
+  cuadro @Panelð $.rsk(cpanel,muestra) 10 150 100 95
+  entra-text @Panelð 15 155 90 85 Pasa el mouse sobre un ícono para obtener información...
+  setv panel.@Panelð 157 135 320 280 fversion.bmp_f-version_Versions Falsos ânickcol.bmp_completion_Nick Completion âaway.bmp_dialogaway_Sistema de ausencia âthemes.bmp_temas_Temas de texto âsound.bmp_sonidos_Sonidos âcanales.bmp_canales_Canales ârueda.bmp_configuracion_Configuracion general âfirextorm.bmp_firextorm_FireXtorM âfondos.bmp_fondos_Fondos âantivirus.bmp_antivirus_Antivirus â
+  setv panel1.@Panelð antispam.bmp_antispam_Anti Propaganda (Spam) âprotchan.bmp_cprotect_Protección de canales âbot.bmp_nick-_Nicks en IRC-Hispano âbot.bmp_nick2_Nick2 en IRC-Hispano âencriptador.bmp_encripta_Encriptado de texto âescritura.bmp_escrituras_Central de escritura âgconfiguracion.bmp_gconfiguracion_Guadar/Cargar configuración â
+  do_panel @Panelð panel.@Panelð
+
+  window -wa @Panelð
+}
+alias escribe.panel {
+  cuadro @Panelð $.rsk(cpanel,muestra) 10 150 100 95
+  entra-text @Panelð 15 155 90 85 $readini($mircdirsistema\panel.xtr,Informacion, $1 )
+  drawline @Panelð
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias fondos {
+  ventana @Fondosð 260 400 | titulo @Fondosð X-TorM Fondos - /Fondos
+  caja @Fondosð 14 45 230 320 Modificar los fondos del X-TorM
+  lista @Fondosð 24 55 210 89
+  caja @Fondosð 24 250 210 45 Estilos
+  caja @Fondosð 24 310 210 45 Aplicar a
+
+  setv radio.@Fondosð ºf.estilos 34 257 Centradoâ ºf.estilos 110 257 Normalâ ºf.estilos 175 257 Azulejoâºf.estilos 34 277 Enteroâ ºf.estilos 110 277 Estiradoâ ºf.estilos 175 277 Pequeñoâ
+  setv radio1.@Fondosð ºf.estilos1 34 317 Estadoâ ºf.estilos1 110 317 Fondoâ ºf.estilos1 175 317 Privadosâ ºf.estilos1 75 337 Barra de herramientasâ
+  setv but.@Fondosð 24 150 60 20 Agregar_fondos.op 1/â175 150 60 20 Quitar_fondos.op 2/â40 175 180 20 Poner fondo seleccionado_fondos.op 4/â40 200 180 20 Quitar fondo_fondos.op 3 /â100 370 60 20 OKz_ok/â
+  do_but @Fondosð but.@Fondosð 
+  do_radio @Fondosð radio.@Fondosð | do_radio @Fondosð radio1.@Fondosð
+  if ($exists(Sistema\Cfg\fondos.lst) != $true) write -c Sistema\Cfg\fondos.lst
+  carga.fondos
+  edita @Fondosð 24 225 210 1 $findfile($mircdir,$sline(@Fondos,1),1)
+  window -wa @Fondosð
+}
+alias sel-fondo { edita @Fondosð 24 225 210 1 $findfile($mircdir,$sline(@Fondos,1),1) | drawline @Fondosð }
+alias carga.fondos {
+  window -hl @Fondos
+  clear -l @Fondos
+  var %tmp.f = 1
+  while (%tmp.f <= $lines(Sistema\Cfg\fondos.lst)) {
+    aline @Fondos $nopath($read -l $+ %tmp.f Sistema\Cfg\fondos.lst)
+    inc %tmp.f
+  }
+  setv tmp.@Fondosð @Fondosð 24 55 210 6 1 1 @Fondos sel-fondo
+  did-lista tok @Fondosð tmp.@Fondosð 
+}
+alias fondos.op {
+  if ($1 == 1) { write Sistema\Cfg\fondos.lst $$file="Selecciona el fondo" c:\*.* | carga.fondos }
+  elseif ($1 == 2) { if ($sline(@Fondos,1)) { write -dl $+ $sline(@Fondos,1).ln Sistema\Cfg\fondos.lst | carga.fondos } }
+  elseif ($1 == 3) {
+    if (%f.estilos1 == 1) { var %tipo s }
+    if (%f.estilos1 == 2) { var %tipo m }
+    if (%f.estilos1 == 3) { var %tipo d }
+    if (%f.estilos1 == 4) { var %tipo l }
+    if (%tipo != $null) background -x $+ %tipo
+  }
+  elseif ($1 == 4) { 
+    if ($sline(@Fondos,1).ln) {
+      if (%f.estilos == 1) { var %tipo- -c }
+      if (%f.estilos == 2) { var %tipo- -n }
+      if (%f.estilos == 3) { var %tipo- -t }
+      if (%f.estilos == 4) { var %tipo- -f }
+      if (%f.estilos == 5) { var %tipo- -r }
+      if (%f.estilos == 6) { var %tipo- -p }
+      if (%f.estilos1 == 1) { var %tipo s }
+      if (%f.estilos1 == 2) { var %tipo m }
+      if (%f.estilos1 == 3) { var %tipo d }
+      if (%f.estilos1 == 4) { var %tipo l }
+      if ((%tipo != $null) && (%tipo- != $null)) { background %tipo- $+ %tipo $read -l $+ $sline(@Fondos,1).ln Sistema\Cfg\fondos.lst }
+    }
+  }
+}
+menu @Fondosð {
+  mouse { if ($mouse.key == 1) { refresco-lista tok add tmp.@Fondosð } }
+  sclick { refresco-lista tok add tmp.@Fondosð }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias antivirus {
+  if ($window(@Antivirusð)) { window -a @Antivirusð | return }
+  ventana @Antivirusð 250 325 | titulo @Antivirusð Prot. antivirus - /antivirus | unset %sel.antivir
+  texto cent @Antivirusð 35 Configura tu antivirus para ser ejecutado cuando
+  texto cent @Antivirusð 47 recibas archivos sospechosos
+  caja @Antivirusð 20 70 210 150 Buscar antivirus
+  texto cent @Antivirusð 225 [-Antivirus actual-]
+  show.antivir
+  setv radio.@Antivirusð ºsel.antivir 30 85 Norton System Works âºsel.antivir 30 100 Norton Antivirus âºsel.antivir 30 115 McAfee âºsel.antivir 30 130 AVG âºsel.antivir 30 145 The Cleaner âºsel.antivir 30 160 AVP âºsel.antivir 30 175 Otro... â
+  setv check.@Antivirusð autoscan 20 270 Autoescanear al recibir archivos sospechososâ
+  setv but.@Antivirusð 30 195 190 15 Buscar_busca.antivir/â95 290 60 20 Okz_ok/â
+  do_but @Antivirusð but.@Antivirusð | do_check @Antivirusð check.@Antivirusð | do_radio @Antivirusð radio.@Antivirusð
+  window -wa @Antivirusð
+}
+alias show.antivir {
+  edita @Antivirusð 20 245 210 1 ...\ $+ $gettok(%antivirus,$calc($numtok(%antivirus,92) - 1),92) $+ \ $+ $gettok(%antivirus,$numtok(%antivirus,92),92)
+}
+alias busca.antivir {
+  if (%sel.antivir == $null) { avisar No seleccionaste el antivirus a buscar! }
+  if (%sel.antivir == 1) var %tmp.a = navw32.exe
+  if (%sel.antivir == 2) var %tmp.a = navw32.exe
+  if (%sel.antivir == 3) var %tmp.a = scan32.exe
+  if (%sel.antivir == 4) var %tmp.a = avgse.exe
+  if (%sel.antivir == 5) var %tmp.a = cleaner.exe
+  if (%sel.antivir == 6) var %tmp.a = avp32.exe
+  if (%sel.antivir == 7) { %antivirus = $$file="Selecciona el ejecutable del antivirus" c:/*.exe | show.antivir | return }
+  var %tmp.av = $findfile(c:,%tmp.a,1)
+  if ($isfile(%tmp.av) == $true) { avisar Antivirus encontrado en %antivirus | %antivirus =  %tmp.av | show.antivir }
+  else { avisar No se encontro el antivirus seleccionado }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias antispam {
+  ventana @Antispamð 230 290 | titulo @Antispamð Antipropaganda
+  caja @Antispamð 20 45 190 140 Palabras a bloquear
+  caja @Antispamð 20 200 190 45 Bloquear propaganda en:
+  spam.config carga
+  setv check.@Antispamð antispam.quit 40 210 Quitsâ antispam.canal 120 210 Privadosâ antispam.privado 40 225 Canalesâantispam.notice 120 225 Noticesâ
+  setv but.@Antispamð 70 163 30 15 +_spam.config +/â130 163 30 15 -_spam.config -/â88 255 60 20 OKz_ok/â
+  do_but @Antispamð but.@Antispamð | do_check @Antispamð check.@Antispamð
+  window -wa @Antispamð
+}
+menu @Antispamð {
+  mouse { if ($mouse.key == 1) { refresco-lista not @Antispamð tmp.@Antispamð } }
+  sclick { refresco-lista not @Antispamð tmp.@Antispamð }
+}
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias revenge {
+  ventana @Revengeð 250 395 | titulo @Revengeð Kick/Ban venganza
+  texto cent @Revengeð 35 Respuesta ante Kicks y Bans en tu contra
+  texto cent @Revengeð 50 Nota: Todas estas acciones son posibles solo si tenés 
+  texto cent @Revengeð 62 @P en el canal donde sucedan
+  caja @Revengeð 10 85 229 115 Cuando te pateen...
+  texto cent @Revengeð 120 Responder con:
+  setv radio.@Revengeð ºkres 30 135 Kickâ ºkres 95 135 Ban â ºkres 155 135 Ban + Kickâ
+  texto cent @Revengeð 155 Con el mensaje:
+
+  caja @Revengeð 10 215 229 115 Cuando te baneen...
+  texto cent @Revengeð 250 Responder con:
+  setv radio1.@Revengeð ºbres 20 265 Kickâ ºbres 70 265 Banâ ºbres 115 265 Ban + Kickâ ºbres 190 265 Nadaâ
+  texto cent @Revengeð 285 Con el mensaje:
+
+  setv check.@Revengeð kick.revenge 20 100 Kick revenge activadoâ desbanear 20 230 Sacarte el ban si es posibleâ unban.bot 10 340 Utilizar los bots del servidorâ
+  setv edit.@Revengeð kres.texto 20 170 210â bres.texto 20 300 210â | setv but.@Revengeð 100 360 60 20 OKz_ok/â
+  do_radio @Revengeð radio.@Revengeð | do_radio @Revengeð radio1.@Revengeð | do_check @Revengeð check.@Revengeð
+  do_but @Revengeð but.@Revengeð | do_edit @Revengeð edit.@Revengeð
+  window -wa @Revengeð
+}
+menu @Revengeð {
+  mouse { 
+    if ($mouse.key != 1) {
+      if ($mouse.x isnum 20-230 && $mouse.y isnum 170-190) cursor edit
+      elseif ($mouse.x isnum 20-230 && $mouse.y isnum 300-320) cursor edit
+      else cursor normal
+    }
+  }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias nick- {
+  if ($window(@Nickð)) { window -a @Nickð | return }
+  ventana @Nickð 200 265 | titulo @Nickð Iden. Nicks
+  texto cent @Nickð 40 Autoidentificación en IRC-Hispano
+  caja @Nickð 20 65 160 135 Lista de nicks
+  setv but.@Nickð 40 182 40 15 +_identifica.addnick/â120 182 40 15 -_identifica.delnick/â70 230 60 20 OKz_ok/â
+  setv check.@Nickð iden.nick 40 210 Identificación automáticaâ
+  do_but @Nickð but.@Nickð |  do_check @Nickð check.@Nickð
+  identifica.loadlist
+  window -wa @Nickð
+}
+menu @Nickð {
+  mouse { if ($mouse.key == 1) { refresco-lista not @Nickð tmp.@Nickð } }
+  sclick { refresco-lista @Nickð tmp.@Nickð }
+}
+alias identifica.delnick {
+  if ($sline(@Identifica,1).ln) { write -dl $+ $sline(@Identifica,1).ln sistema\cfg\registrados.lst | identifica.loadlist }
+}
+alias identifica.loadlist {
+  if ($exists(sistema\cfg\registrados.lst) != $true) write -c sistema\cfg\registrados.lst
+  window -hl @Identifica | clear -l @Identifica 
+  var %i = 1,%tmp.var = $read -l %i sistema\cfg\registrados.lst
+  while (%tmp.var != $null) { 
+    aline @Identifica $gettok(%tmp.var,1,5) 
+    inc %i | %tmp.var = $read -l %i sistema\cfg\registrados.lst 
+  }
+  lista @Nickð 30 75 140 105 Lista de nicks
+  setv tmp.@Nickð @Nickð 30 75 140 7 1 1 @Identifica not
+  did-lista not @Nickð tmp.@Nickð
+}
+alias identifica.addnick { write sistema\cfg\registrados.lst $$?="Nick?" $+ $chr(5) $+ $$?*="Contraseña?" | identifica.loadlist }
+alias nick.pass { 
+  var %i = 1 
+  :inicio 
+  var %tmp.var = $read -l %i sistema\cfg\registrados.lst
+  if (%tmp.var) { 
+    if ($gettok(%tmp.var,1,5) == $1) return $gettok(%tmp.var,2,5) 
+    else { inc %i | goto inicio } 
+  }
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias nick2 {
+  if ($window(@Nick2ð)) { window -a @Nick2ð | return }
+  ventana @Nick2ð 200 265 | titulo @Nick2ð Iden. Nicks
+  texto cent @Nick2ð 40 Autoidentificación NiCK2 IRC-Hispano
+  caja @Nick2ð 20 65 160 135 Lista de nicks
+  setv but.@Nick2ð 40 182 40 15 +_identifica.addnick2/â120 182 40 15 -_identifica.delnick2/â70 230 60 20 OKz_ok/â
+  setv check.@Nick2ð iden.nick 40 210 Identificación automáticaâ
+  do_but @Nick2ð but.@Nick2ð |  do_check @Nick2ð check.@Nick2ð
+  identifica.loadlist2
+  window -wa @Nick2ð
+}
+menu @Nick2ð {
+  mouse { if ($mouse.key == 1) { refresco-lista not @Nick2ð tmp.@Nick2ð } }
+  sclick { refresco-lista @Nick2ð tmp.@Nick2ð }
+}
+alias identifica.delnick2 {
+  if ($sline(@Identifica2,1).ln) { write -dl $+ $sline(@Identifica2,1).ln sistema\cfg\registrados2.lst | identifica.loadlist2 }
+}
+alias identifica.loadlist2 {
+  if ($exists(sistema\cfg\registrados2.lst) != $true) write -c sistema\cfg\registrados2.lst
+  window -hl @Identifica2 | clear -l @Identifica2 
+  var %i = 1,%tmp.var = $read -l %i sistema\cfg\registrados2.lst
+  while (%tmp.var != $null) { 
+    aline @Identifica2 $gettok(%tmp.var,1,5) 
+    inc %i | %tmp.var = $read -l %i sistema\cfg\registrados2.lst 
+  }
+  lista @Nick2ð 30 75 140 105 Lista de nicks
+  setv tmp.@Nick2ð @Nick2ð 30 75 140 7 1 1 @Identifica2 not
+  did-lista not @Nick2ð tmp.@Nick2ð
+}
+alias identifica.addnick2 { write sistema\cfg\registrados2.lst $$?="Nick?" $+ $chr(5) $+ $$?*="Contraseña?" | identifica.loadlist2 }
+alias nick2.pass { 
+  var %i = 1 
+  :inicio 
+  var %tmp.var = $read -l %i sistema\cfg\registrados2.lst
+  if (%tmp.var) { 
+    if ($gettok(%tmp.var,1,5) == $1) return $gettok(%tmp.var,2,5) 
+    else { inc %i | goto inicio } 
+  }
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias gconfiguracion {
+  if ($window(@GConfiguracionð)) { window -a @GConfiguracionð | return }
+  ventana @GConfiguracionð 330 245
+  titulo @GConfiguracionð Guardar/Cargar configuración
+  texto @GConfiguracionð 15 35 Desde acá vas a poder guardar la configuración total del script, lo
+  texto @GConfiguracionð 40 48 que incluye a todos los elementos del panel de control.
+  caja @GConfiguracionð 15 75 300 35 Guardar configuración
+  texto @GConfiguracionð 25 85 Nombre del archivo: | edita @GConfiguracionð 120 84 110 1
+  texto @GConfiguracionð 15 120 Si por alguna razón necesitas recuperar la configuracion total del
+  texto @GConfiguracionð 85 133 script, podes hacerlo desde aca:
+  caja @GConfiguracionð 15 160 300 35 Cargar configuración
+  setv but.@GConfiguracionð 240 83 65 19 Guardar_gconf.opt 1/â135 170 65 20 Cargar_gconf.opt 2/â110 205 115 20 Cerrar_ok/â
+  do_but  @GConfiguracionð but.@GConfiguracionð
+  unsetv tmp.saveconf
+  window -wa @GConfiguracionð 
+}
+alias gconf.opt {
+  if ($1 == 1) { pre.g.config $%(tmp.saveconf) }
+  elseif ($1 == 2) { carga.configuracion $$file="Selecciona el archivo de configuración" Sistema\Cfg\*.conf }
+}
+menu @GConfiguracionð {
+  mouse: {
+    if ($mouse.x > 120 && $mouse.x < 230 && $mouse.y > 85 && $mouse.y < 100) { cursor edit }
+    else { cursor normal }
+  }
+  sclick {
+    if ($mouse.x > 120 && $mouse.x < 230 && $mouse.y > 85 && $mouse.y < 100) { editar @GConfiguracionð 120 84 110 1 $ tmp.saveconf }
+  }
+}
+
+alias pre.g.config { 
+  if (!$1) { avisar No escribiste el nombre del archivo donde se guardará la configuracion | return }
+  guarda.configuracion Sistema\Cfg\ $+ $1 $+ .conf
+}
+
+alias guarda.configuracion {
+  if ($1 = -b) { var %conf.archivo Sistema\Cfg\backup.conf | linesep -s | echo -s $marc Guardando automáticamente la configuración del $resalt $+ X-TorM... }
+  else { var %conf.archivo = $1 | linesep -s | info Guardando la configuración... }
+  write -c %conf.archivo | var %tmp.inicial = $ticks 
+  var %conf.linea = 1
+  var %conf.txt- = n $+ %conf.linea
+  while ($readini($script(remote2.ini),-n,variables,%conf.txt-)) {
+    var %conf.txt = $ifmatch
+    if (%conf == $chr(59) $+ !!) goto fin
+    if ($left(%conf.txt,1) == $chr(37)) { write %conf.archivo /set %conf.txt }
+    inc %conf.linea
+    var %conf.txt- = n $+ %conf.linea
+  }
+  :fin
+  echo -s $marc Configuración guardada exitósamente en $resalt $+ %conf.archivo (tiempo: $round($calc($calc($ticks - %tmp.inicial) / 1000),2) segs)
+  linesep -s
+}
+alias carga.configuracion {
+  if ($1 = -b) { var %conf.archivo Sistema\Cfg\backup.conf }
+  else { var %conf.archivo = $1 }
+  if (%conf.archivo == $null) { return } 
+  var %conf.linea = 1
+  var %conf.total = 0
+  var %conf.lines = $lines(%conf.archivo)
+  linesep -s
+  echo -s $marc Cargando configuración...
+  while (%conf.linea <= %conf.lines) {
+    var %conf.txt = $read(%conf.archivo,n,%conf.linea)
+    if ($gettok(%conf.txt,1,32) == /set) { inc %conf.total | $gettok(%conf.txt,1-,32) }
+    inc %conf.linea
+  }
+  echo -s $marc Configuración exitósamente cargada. Variables cargadas: $+ $resalt %conf.total
+  linesep -s
+}

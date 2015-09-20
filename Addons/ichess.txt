@@ -1,0 +1,249 @@
+(actual version 2.077's notes will be found after scrolling down a bit)
+old: 
+iChess v2.0       (for mIRC 6.03 and higher, 5.91 will work as well.. i think)
+---------------
+
+aye, this is supposed to be a little help file, listing the main functions
+of the script... and stuff one better knows to run it..
+i unfortunately didnt keep track of version updates, so the current version
+is rather a guess and only defined to make it easier to see whether an update
+is available. I shall try to list news and fixes for new versions from now on
+though.
+
+oh ya... my name is Oliver.. bugreports and suggestions are welcome, if not
+on IRC, an email to x_or@gmx.net will do =D
+
+Installation: 
+-----------------
+              quite trivial, actually (or should be)
+              firstly: unzip the file (ichess.zip) into a folder called "ichess"
+              in your mIRC folder (of course you can pick another foldername
+              but i will suppose you picked "ichess" while explaining)
+              secondly: you only need to load the file "ichess.mrc", thats
+              done by typing 
+                               /load -rs1 ichess/ichess.mrc
+              
+              it tries to load it into the first position of the process order
+              i suggest this, because experience showed that some silly scripts
+              try to handle socket connections they have nothing to do with, so
+              this will catch the events first. if you know what you are doing, 
+              of course you can load it into any position, if need be
+
+              err yeah.. if that doesnt work.. check again whether the program
+              you are using is called "mIRC" and not "Pirch" or "Internet
+              Explorer"...
+
+Starting:
+--------------
+
+yeah well after loading.. /ichess [nick] will request a connection to the specified
+nickname.. after that connection is established, both users should see a window
+with a chessboard among other things
+
+Note: if you are behind a firewall and cant get incoming connections on port 221
+      (the one ichess standardwise uses) you can specify a port in the call, example:
+      "/ichess ChessNinja 736" to host it on port 736
+
+Menus:
+-------------
+
+the right-click menu and submenus in that window should be pretty self-explaining
+requesting a Game is done under "Game" (i really put lots of thought into the
+menu-names) such a request (as well as all other requests) are simply answered
+by typing "ok" or "no" (without the ") in the entry-field of the window. 
+
+Under Rules, you will find "Allow Undo".. trying to "Undo" will still only be a
+request and the opponent has to accept it, but if it is disabled all Undo-requests
+will be auto-declined.
+
+if you want to set a Time-limit, a dialog will ask for the length, number of seconds or
+a format like "hours:mins:seconds" will work, the opponent has to accept it.
+
+Settings:
+-----------
+
+ Allow Single-Click-Moves: normally you need to drag and drop a piece to move, if
+                           this option is enabled you also can singleclick on a piece
+                           and then singleclick on the field to go
+
+ Show valid moves: humm if this is disabled the script wont color the fields you can
+                   move to, after clicking a piece, if enabled.. *gasps*... it will!
+
+ Show chess-clocks: yeah.. guess.
+
+ show clock as countdown: if a timelimit is enabled this will show the remaining time 
+                           each player has, if not it will show  the time it normally
+
+ Update: will download the newest update and install it (only the ichess.mrc, though
+         if the DLL changes, i will either try to let it send the dll as well or make 
+         an update available)
+
+ Piecesets: lets ye pick a pieceset.. if you want to paint your own, just look at 
+            the bitmaps, name it in the same way "ichess_pieces_[setname].bmp"
+
+ Fieldsets: lets ye pick a fieldset.. if you want to paint your own, just look at 
+            the bitmaps, name it in the same way "ichess_fields_[setname].bmp"
+
+ Boardbitmap: lets ye pick.. etc. "ichess_boards_[name].bmp" will be the filename
+              this will render a bitmap transparently into the background of the board
+
+ Boardbitmap-dominance: sets the percentage at which the background will be seen,
+                        trying out different settings here depending on the background
+                        and the fieldset can produce nice results.               
+
+
+Other stuff:
+------------
+
+theeeeen there is a lil item called "Forfeit" so if the ship is sinking.. *nods*
+
+right below that.. you have the option to open the content of the chat-window in
+the notepad.. either keeping the control-/colorcodes or stripping them.. to save
+it as log or copy it or something
+(before anyone asks: no i cannot make it let you mark/copy/paste the content, as
+it is completely graphics... and writing this manually would be way too huge and 
+slow as well ;P)
+
+ECO:
+------
+
+ECO means "Encyclopedia of Chess Openings" a click on this item will show all openings
+of the database matching the currently played opening, this wont find many matches
+in most played openings and middle-games, however.. it can be used to analyze an opening
+or get a good move-suggestion, i dont feel the need for making it possible to disable
+this feature.. for it will rarely be used and mainly something *I* wanted to add
+(was hard enough to build the database) and a single move suggestion in the opening
+wont win a game :))
+
+Undo-ing:
+-----------
+
+it is possible to re-store any state in the game for both sides by rightclicking on
+a move in the history in the nicklist of the window and choosing the menuitem, or
+double-clicking on the move that the board should be restored AFTER.
+white will always undo to a state after a black move, black will always undo to a state
+after a black move... i hope this does make sense after a few tries or so.
+
+Moving: (or.. how to move my mouse.)
+---------------------------------------
+
+single-click on a piece shows the validmoves it can do (or not, if the option is
+turned off), double-click on a field shows all possible attacker-fields.. careful
+with that one though, if you enabled single-click-moves this might cause an accidental
+move. to actually move a piece, drag and drop is used.
+
+Did i apologize for the structure of this file, or the fact that said structure
+is lacking? however.. i hope that most options are explained and there are no 
+questions left, if there are.. the email address is at the top of the file
+
+/updateichess is the command used to update it, it *should* work automatically 
+
+you can also change the font and fontsize in the ichess.ini, i didnt make that an
+option in the script, so.. change it manually :D, ill add the option to change
+the colors.. maybe.. someday.
+
+the current rating and game-statistics are not yet available as option in the script
+or something, but you can type //say $showchessstats.. if you must :P (yes, 3 's's)
+
+thats all, i think..
+
+the script does have a computer-opponent.. however.. its not released here and would
+need the second dll containing the "AI".. the problem was that it froze mIRC for about
+2 minutes while thinking 4 moves deep, fancy optimizing using hashtables for chess-
+situations and whatnot seem to be quite a bit of work to work with a dll and tries to
+let the dll run a second "thinking" thread in the background while the user can chat
+were successful, however: resulted in an odd exception after 10 minutes or so of idling.
+this probably due to the lack of my coding abilities. if anyone wants the dll to play
+against Chob (his name :D) i can send it.
+
+============================================================================
+
+Update to v2.077
+---------------------
+
+In short, the new options are: stripping the colors from the chat-lines (for
+those who have problems with em), turning on/off the beeping, make it open
+all windows as desktop windows, turn on/off the sorting of captured pieces
+(if turned off they will appear in the order they got captured) 
+
+New features:
+-----------------
+
+is is now possible to run a server that watchers or potential players can
+connect to, also the host of the board can kick users and ban IP-masks, or
+set the whole board to "mute" (+m, if you will, you IRC fanatics, you.), so
+only the owner of the thing can talk (supposed to keep the board quiet if
+a serious game is happening).. users still connected, but matching a banned
+IP-masks will not be able to chat or send requests/events of any sort (hence
+await the kick or get the message.)
+
+the update system is finally quite decent.. it now checks for the version
+before updating.. giving my box a bit of time to do things for ME.. instead of
+sending everybody the version they already have 24/7 :\
+
+a little stats-thing is built in now, so a huge list of played games can be
+populated.. its turn off-able if someone doesnt want this.. but i would
+suggest to keep it in, since it is interesting and makes for good statistics :)
+
+to view those go to http://xor.ma.cx/ichess same address for adding "public"
+servers and comments, etc. (will also have new version news)
+
+a CPU-player is now added and works.. (still beta, please report bugs or
+suggestions) it doesnt state "thinking" yet.. ill add that soonish...
+just consider it thinking if its time runs... in RARE cases there might have 
+been a timeout or so.. (maybe 10 mins.. shouldnt happen) in that case just
+undo the last move (really the last line, so it wont actually undo anything)
+then itll hopefully wake up again :P
+
+im not completely happy with this chess-service, but it works and is quite fast
+and quite a tough opponent, for more info: http://www.danmarinescu.com/
+thanks m0rph^/m0rpheus, who pointed that service out to me and also wrote the
+main php to retrieve the stuff.
+if i get to finish Chob and make it faster, ill compile it as cgi and do a similar
+trick to get the next move.. until then have fun with RCPU.
+
+
+Small command-list:
+--------------------------
+just in short, some commands in compressed form:
+
+  /ichess [nick] [port]  - request starting a session with <nick> on port [port]
+                           both are optional, standard port is 222
+                           if no <nick> is given, you will be the only one on 
+                           the board and can play against yourself or RCPU
+                           Note: in this mode you can NOT invite other people or
+                           run a server
+
+  /ichessjoin <host> <port>  - connect to an iChess-server, both parameters
+                               are needed
+
+ inside the session/board:
+
+  /me                    - /me slaps you for even wondering
+
+  /clear                 - clears the chat-stuff
+  
+  /who                   - lists all users currently on the board (with ratings)
+
+  /invite <nick> [port]  - invite <nick> to the board, must be host of it
+                           port is again optional, standard is 222
+                           Note: same as inviting through the Host-menu
+
+  aliases:
+
+   $showchessstats     - shows your complete record, if no parameters are given
+                         if you specify nick names or parts of nicknames, itll
+                         only spit out the stats for all games against those
+                         matching nicks (can specify more than one, speparated
+                         by spaces)    
+
+  (still no real alias or so for this, maybe later.. but at least the streak
+   bugs and the like should be fixed now)
+
+
+That's All. (i think.. yet again.)
+
+Ah. one addition: if you want to change your nick inside the game, change it in
+"ichess.ini", where it is stored.. this is only done to keep a "static" nick
+in all those record.stats, and assures you always are the same in there, network
+and IRC-nick independent.

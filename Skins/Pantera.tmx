@@ -1,0 +1,86 @@
+;Info
+13:6:: 6 Entra 7ElOp14 ( op@xxx.xxx.xx2 )7 al canal
+13:6:: 5 Sale 7QuTi14 ( xtorm@xxx.xxx.xx3 ) 7 del canal
+13•15 Holas!
+13•15ElOp13•15 como va?
+13:6:: 4Se desconecta15 Nijikon 4(15 xtorm@xxx.xxx.666 4)
+13:6:: 6Tu nick es ahora 7 NuevoNick
+13• 6 $+ $2 7cambia el topic a:15 No see que poner!
+;Fin info
+;TEMA PaNTeRa PARA X-TORM script y base para PaNTeRa script
+on 1:load: {
+  fuentes 11 tahoma
+  set.colores pone 15265000,0,8388608,37888,255,5263520,11043920,9474192,13172735,64512,9475072,4194304,16711680,7890000,8421504, 12105912
+  clear -s 
+  colour editbox text 15 | colour editbox 13 | colour listbox 11 | colour background 1 | colour action 8 | colour ctcp text 8
+  colour highlight text 5 | colour info text 14 | colour info2 text 15 | colour invite text 15 | colour join text 15 | colour kick text 13
+  colour mode text 15 | colour nick text 15 | colour normal text 15 | colour notice text 5 | colour notify text 7 | colour other text 6
+  colour own text 0 | colour part text 9 | colour quit text 5 | colour topic text 7 | colour wallops text 5 | colour whois text 13
+  colour listbox text 15
+  credit
+  background -sx
+}
+alias nresalt return 15
+alias resalt return 5
+alias logo return 0,0|14,14|0,1 X-TorM 14,14|0,0| 1Script
+alias alerta { echo -es 4•Alerta• $1- }
+alias info { echo -es 6•Info• $1- }
+alias marc return 13:6::
+alias _m return 13•
+alias _ctcp { echo -es 5•CTCP•  $+ $1 $+ : $2- }
+alias _notice { echo -es 6•Notice• $1 $+ : $2- }
+alias bnotice { echo -es 13• $+ $1 $+ • $2- }
+alias _join { echo $1 $marc 6 Entra 7 $+ $2 14( $3  )7 al canal $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc 6 Entra 7 $+ $2 $+ 14( $3  )7 al canal - Clones: 13 $4- }
+
+alias _part { echo $1 $marc 5 Sale 7 $+ $2 $+ 14( $3 ) 7 del canal }
+alias _quit { 
+  if ($1 == -split) { return $marc 4Se desconecta $2 4(15 $3 4) [14 $4- 4] - Servidor en Split }
+  if ($3 == $null) { return $marc 4Se desconecta $1 4(15 $2 4) }
+  else { return $marc  4Se desconecta $1 4(15 $2 4) [14 $3- 4] }
+}
+alias _nick { return $marc 6Nick:15 $1 6es ahora15 $2 }
+alias _mNick { return $marc 6Tu nick es ahora 7 $1 }
+alias _text { echo $1 13•15 $+ $2 $+ 13• $3- }
+alias _mtext { echo $1 6• $2- | .msg $1 $2- }
+alias _discon { echo -es $_m |- No estás conectado -| }
+alias _mode { echo $1 $marc 13[6 Modo - $1 13] (6 $2 $4- 13) por6 $3 }
+alias _kick { echo $1 $marc 5[15 Kick - $1 5] 5(7 $2 0patea a7 $3 5) $4- }
+alias _topic { echo $1 $_m 6Topic: $2- }
+alias _ptopic { echo $1 $_m Puesto por6 $2 el7 $3 a las7 $4- horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 6 $+ $2 7cambia el topic a: $3- }
+
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 6,15[9 $replace($duration(%away.tiempo-t),sec,seg) 6]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 6,15[9 $replace($duration(%away.tiempo-t),sec,seg) 6]
+  }
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $marc 4Modos: $chan($1).mode 4 Usuarios: $nick($1,0) 4 Ops: $nick($1,0,o) 4 Voz: $nick($1,0,v)
+}
+
+alias credit {
+  echo -s     13:6::15 X-Torm Script :6:13: 15- by MaTyAs666   
+  eblanco -s
+  echo -s    7http://www.xtorm-script.cjb.net - 7http://www.x-torm.com.ar
+  eblanco -s
+  echo -s Version: $xversion
+  echo -s     mIRC: $version
+  echo -s     Theme: %tema.actual
+
+  eblanco -s
+  eblanco -s 
+}
+
+[info]
+autor=^MaNSoN^
+comentarios=Tema base del PaNTeRa Script. 
+fuente=Tahoma 10
+back=1
+colores=pone 15265000,0,8388608,37888,255,5263520,11043920,9474192,13172735,64512,9475072,4194304,16711680,7890000,8421504, 12105912

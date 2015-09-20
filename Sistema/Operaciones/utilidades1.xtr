@@ -1,0 +1,454 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                        utilidades1.xtr - Utilidades
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+;telnet server
+alias t-server {
+  set %s-telnet.pt $$?="Puerto?"
+  if ($window(@s-Telnet) == $null)  { window -aek @s-Telnet 120 120 420 200 | background -t @s-Telnet img\relleno.bmp | font @s-Telnet 12 Terminal }
+  sockclose stelnet | sockclose atelnet
+  socklisten stelnet %s-telnet.pt
+  echo @s-Telnet 4ù0í4ù 0Servidor de TelNet activo en el puerto %s-telnet.pt ( $rv_pt(%s-telnet.pt) )
+  echo @s-Telnet 4ù0í4ù 0IP local: $ip ( $host )
+  titlebar @s-Telnet :  $+ 0 %s-telnet.pt ( $rv_pt(%s-telnet.pt) )
+}
+on 1:socklisten:stelnet: {
+  sockaccept atelnet
+  sockclose stelnet
+  if ($window(@s-Telnet) == $null)  { window -aek @s-Telnet 120 120 420 200 | background -t @s-Telnet img\relleno.bmp | font @s-Telnet 12 Terminal }
+  echo @s-Telnet 4ù0í4ù $+ 0 $sock(atelnet).ip conectando...
+}
+on 1:sockread:atelnet: {
+  sockread 1000 &tmp 
+  var %t-net = $bvar(&tmp,1-1000).text
+  if ($window(@s-Telnet) == $null)  { window -aek @s-Telnet 120 120 420 200 | background -t @s-Telnet img\relleno.bmp | font @s-Telnet 12 Terminal }
+  echo @s-Telnet 15>0 %t-net
+}
+on 1:input:@s-Telnet: {
+  if ($sock(atelnet).status != active) { 
+    echo @s-Telnet 4ù0í4ù 0La conexion esta cerrada... | error | halt 
+  }
+  sockwrite -tn atelnet $1- | echo @s-telnet 15>0 $1- | halt
+}
+on 1:sockclose:atelnet: {
+  if ($window(@s-Telnet) == $null) { window -aek @s-Telnet 120 120 420 200 | background -t @s-Telnet img\relleno.bmp | font @s-Telnet 12 Terminal }
+  echo @s-Telnet 4ù0í4ù 0Conexión cerrada por $sock($sockname).ip 
+  t-server %s-telnet.pt
+}
+on 1:close:@s-Telnet: { sockclose stelnet | sockclose atelnet | unset %s-telnet.* | info Servidor Telnet - Conexión cerrada }
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias downloads {
+  if ($window(@Downloadð)) { window -a @Downloadð | return }
+  ventana @Downloadð 420 310 | titulo @Downloadð Visor de archivos recibidos - /downloads
+  texto cent @Downloadð 40 Doble click en el archivo para abrir | caja @Downloadð 120 40 177 15
+  caja @Downloadð 20 54 380 170
+  setv but.@Downloadð 35 235 80 20 Abrir_fdown2 dclick/â 125 235 80 20 Abrir carpeta_run $mircdirdownload/â 215 235 80 20 Actualizar_fdown 3/â 305 235 80 20 Borrar_fdown 2/â 170 265 80 20 Cerrar_ok/â
+  do_but @Downloadð but.@Downloadð | fdown 3
+  window -wa @Downloadð
+}
+alias fdown {
+  if ($1 == 2) { if ($ask(!,¿Estas seguro de querer borrar este archivo?) == $true) { .remove $mircdirdownload\ $+ $$gettok($$sline(@Downloads,1),1,9) | fdown 3 } }
+  elseif ($1 == 3) { 
+    var %crfi = $findfile($mircdirDownload,*.*,0),%crft = 1 | window -hl @Downloads | clear -l @Downloads
+    while (%crft <= %crfi) {
+      var %vfdd = $nopath($findfile($mircdirDownload,*.*,%crft)))
+      if (%vfdd == $null) return
+      if ($right(%vfdd,3) == txt) || ($right(%vfdd,3) == doc) || ($right(%vfdd,3) == wri) || ($right(%vfdd,3) == ini) {
+        var %tipo-file Texto  | inc %crft
+      }
+      elseif ($right(%vfdd,3) == bmp) || ($right(%vfdd,3) == png) || ($right(%vfdd,3) == jpg) || ($right(%vfdd,3) == gif) {
+        var %tipo-file Imagen | inc %crft
+      }
+      elseif ($right(%vfdd,3) == htm) || ($right(%vfdd,4) == html) || ($right(%vfdd,3) == php) || ($right(%vfdd,3) == asa) || ($right(%vfdd,3) == asp) {
+        var %tipo-file Documento Internet | inc %crft
+      }
+      elseif ($right(%vfdd,3) == mp3) || ($right(%vfdd,3) == midi) || ($right(%vfdd,3) == wav) || ($right(%vfdd,3) == mid) {
+        var %tipo-file Música | inc %crft
+      }
+      elseif ($right(%vfdd,3) == mrc) || ($right(%vfdd,4) == frc) {
+        var %tipo-file Script de mIRC | inc %crft
+      }
+      elseif ($right(%vfdd,3) == avi) || ($right(%vfdd,4) == mpeg) {
+        var %tipo-file Vídeo | inc %crft
+      }
+      elseif ($right(%vfdd,3) == exe) || ($right(%vfdd,4) == com) {
+        var %tipo-file Ejecutable | inc %crft
+      }
+      elseif ($right(%vfdd,3) == zip) || ($right(%vfdd,4) == rar) {
+        var %tipo-file Archivo comprimido | inc %crft
+      }
+      else { var %tipo-file = Desconocido | inc %crft }
+      var %tmp-size = $mircdirDownload\ $+ %vfdd
+      aline @Downloads %vfdd $+ $chr(9) $+ $round($calc($file(%tmp-size).size / 1024),2) Kb $+ $chr(9) $+ %tipo-file
+    }
+    lista @Downloadð 30 65 360 146
+    setv tmp.@Downloadð @Downloadð 30 65 360 10 1 1 @Downloads fdown2 0,120,190
+    did-lista not @Downloadð tmp.@Downloadð
+  }
+}
+alias fdown2 { if ($1 == dclick) { run $mircdirdownload\ $+ $$gettok($$sline(@Downloads,1),1,9) } }
+menu @Downloadð {
+  mouse { if ($mouse.key == 1) refresco-lista not @Downloadð tmp.@Downloadð }
+  sclick { refresco-lista not @Downloadð tmp.@Downloadð }
+  dclick { refresco-lista not @Downloadð tmp.@Downloadð dclick }
+}
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias buscador {
+  ventana @Buscadorð 290 290 | titulo @Buscadorð Busqueda usuarios - /buscador
+  caja @Buscadorð 15 45 260 220 Opciones | texto cent @Buscadorð 55 Introduce los patrones de búsqueda
+  texto @Buscadorð 25 80 Buscar IP: 
+  texto @Buscadorð 25 105 Buscar Host:
+  $cuad(@Buscadorð,25,130,240,2).list
+  texto @Buscadorð 25 145 Por países: | combo draw @Buscadorð 90 143 135
+  texto @Buscadorð 25 170 Por script: | combo draw @Buscadorð 90 168 135
+  texto @Buscadorð 25 195 Por ISP: | combo draw @Buscadorð 90 193 135
+  $cuad(@Buscadorð,25,220,240,2).list
+  texto @Buscadorð 25 235 Otros:
+  setv edit.@Buscadorð edid 90 78 150âedid 90 103 150âedid 90 233 150â
+  setv but.@Buscadorð 248 78 20 16 Go_go.bus 1/â 248 103 20 16 Go_go.bus 2/â 248 143 20 16 Go_go.bus 3/â 248 168 20 16 Go_go.bus 4/â 248 193 20 16 Go_go.bus 5/â 248 233 20 16 Go_go.bus 6/â
+  do_edit @Buscadorð edit.@Buscadorð | do_but @Buscadorð but.@Buscadorð
+  %busc-.pais = España ItaliaFrancia ChilePeruBrasilArgentinaMexicoUSAInglaterraColombia
+  %busc-.script = X-TorMFrêcuêncîã InfînîtãIRcapKiller ZombieKristomanPhanaticAngel NegroX-criptGra2OrbitalBeginnerGravedad ZeroKennySaTaniK
+  %busc-.isp = InfoviaArnetArrakisServicomIddeoTeleLineMicrosysCTVJet InternetNetspain
+  window -wa @Buscadorð
+}
+menu @Buscadorð {
+  mouse {
+    if ($mouse.x isnum 90-240 && $mouse.y isnum 78-95) cursor edit
+    elseif ($mouse.x isnum 90-240 && $mouse.y isnum 103-120) cursor edit
+    elseif ($mouse.x isnum 90-240 && $mouse.y isnum 233-250) cursor edit
+    else cursor normal
+  }
+  sclick {
+    if ($mouse.x isnum 90-243 && $mouse.y isnum 143-161) { combo push @Buscadorð 90 143 135 60 var busc-.pais busc-sline }
+    elseif ($mouse.x isnum 90-243 && $mouse.y isnum  168-186) { combo push @Buscadorð 90 168 135 60 var busc-.script busc2-sline }
+    elseif ($mouse.x isnum 90-243 && $mouse.y isnum  193-211) { combo push @Buscadorð 90 193 135 60 var busc-.isp busc3-sline }
+  }
+}
+alias busc-sline { %busc-.psel = $2- }
+alias busc2-sline { %busc-.ssel = $2- }
+alias busc3-sline { %busc-.isel = $2- }
+alias go.bus {
+  if ($1 == 1) {
+    if ($edid(@Buscador,1)) buscar.ip $ifmatch
+    else avisar No especificaste el número de IP a buscar. $crlf Ejemplo: 202.13.69.162
+  }
+  if ($1 == 2) {
+    if ($edid(@Buscador,2)) buscar.host $ifmatch
+    else avisar No especificaste el Host a buscar. $crlf Ejemplo: host6535.arnet.com.ar
+  }
+  if ($1 == 3) {
+    if (%busc-.psel) {
+      init.srch
+      if (%busc-.psel == españa) { who *.es }
+      elseif (%busc-.psel == italia) { who *.it }
+      elseif (%busc-.psel == francia) { who *.fr }
+      elseif (%busc-.psel == chile) { who *.com.cl }
+      elseif (%busc-.psel == peru) { who *.pe }
+      elseif (%busc-.psel == brasil) { who *.br }
+      elseif (%busc-.psel == argentina) { who *.com.ar }
+      elseif (%busc-.psel == mexico) { who *.net.mx }
+      elseif (%busc-.psel == usa) { who *.com }
+      elseif (%busc-.psel == Inglaterra) { who *.co.uk }
+      elseif (%busc-.psel == colombia) { who *.com.co }
+    }
+    else avisar No seleccionaste el país a buscar buscar. $crlf Ejemplo: Argentina
+  }
+  if ($1 == 4) {
+    if (%busc-.ssel) {
+      init.srch
+      if (%busc-.ssel == Frêcuêncîã Infînîtã) { who *infinita* }
+      elseif (%busc-.ssel == IRcap) { who *ircap* }
+      elseif (%busc-.ssel == Killer Zombie) { who *k-zombie* }
+      elseif (%busc-.ssel == Phanatic) { who *phanatic* }
+      elseif (%busc-.ssel == Angel Negro) { who *angelnegro* }
+      elseif (%busc-.ssel == X-cript) { who *x-cript* }
+      elseif (%busc-.ssel == Orbital) { who *orbital* }
+      elseif (%busc-.ssel == Beginner) { who *Beginner* }
+      elseif (%busc-.ssel == Gravedad Zero) { who *gravity* }
+      elseif (%busc-.ssel == Kenny) { who *kenny* }
+      elseif (%busc-.ssel == Gra2) { who *gra2* }
+      elseif (%busc-.ssel == Kristoman) { who *Kristoman* }
+      elseif (%busc-.ssel == X-TorM) { who *xtorm* }
+      elseif (%busc-.ssel == SaTaniK) { who *SaTaniK* }
+    }
+    else avisar No seleccionaste el script a buscar. $crlf Ejemplo: X-TorM
+  }
+  if ($1 == 5) {
+    if (%busc-.isel) {
+      init.srch
+      if (%busc-.isel == Infovia) { who *.infovia.com.ar }
+      elseif (%busc-.isel == Arnet) { who *.arnet.com.ar }
+      elseif (%busc-.isel == Arrakis) { who *.arrakis.es }
+      elseif (%busc-.isel == Servicom) { who *.servicom.es }
+      elseif (%busc-.isel == Iddeo) { who *.retevision.es }
+      elseif (%busc-.isel == TeleLine) { who *.teleline.es }
+      elseif (%busc-.isel == Microsys) { who *.falcon-es.com }
+      elseif (%busc-.isel == CTV) { who *.ctv.es }
+      elseif (%busc-.isel == Jet Internet) { who who *.jet.es }
+    }
+    else avisar No seleccionaste el ISP a buscar. $crlf Ejemplo: Arnet
+  }
+  if ($1 == 6) {
+    if ($edid(@Buscador,3)) { init.srch | who $edid(@Buscador,3) }
+    else avisar No especificaste el patrón de búsqueda. $crlf Ejemplo: *algo*
+  }
+}
+alias init.srch { .disable #who | .enable #buscador | set %resultados 0 | buscador.vent }
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias tips {
+  if ($window(@Tipsð)) { window -a @Tipsð | return }
+  ventana @Tipsð 275 145 | titulo @Tipsð Consejo del día - /tips
+  drawpic -nt @Tipsð 65280 10 40 $icono(Tips.bmp)
+  tip
+  setv check.@Tipsð startips 10 120 Mostrar tips al inicio del scriptâ
+  setv but.@Tipsð 175 115 20 20 X_ok/â 205 115 40 20 >>>_tip/â
+  do_check @Tipsð check.@Tipsð | do_but @Tipsð but.@Tipsð
+  window -wa @Tipsð
+}
+alias tip { drawcopy @Tipsð 43 40 2 72 @Tipsð 44 40 210 72 | entra-text @Tipsð 50 40 185 72 $read sistema\textos\tips.txt | drawline @Tipsð }
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias Encripta {
+  ventana @Encriptað 330 215 | Titulo @Encriptað Encriptador de texto - /Encripta
+  caja @Encriptað 12 45 305 40 Canales o nicks
+  ;
+  caja @Encriptað 12 95 305 50 Clave de encriptación
+  texto @Encriptað 90 102 La clave debe se una sola palabra | edita @Encriptað 100 117 125 1 | cargar-encripts
+  ;
+  setv check.@Encriptað auto.desencripta 12 155 Auto desencriptar texto
+  setv but.@Encriptað 195 55 50 20 Agregar_encripta.opt 1/â255 55 50 20 Borrar_encripta.opt 2/â12 180 120 20 $iif(%encript.act == si,Desactivar,Activar) _encripta.opt 3/â 197 180 120 20 Cerrar_ok/â
+  do_but @Encriptað but.@Encriptað | do_check @Encriptað check.@Encriptað
+  ;
+  window -wa @Encriptað
+}
+alias encripta.opt {
+  if ($1 == 1) {
+    var %tmp.chan-nick = $$?="¿#Canal o nick?" 
+    write -c Sistema\Cfg\Encripta\ $+ %tmp.chan-nick $+ .ini | cargar-encripts selecciona %tmp.chan-nick
+  }
+  elseif ($1 == 2) {
+    .remove Sistema\Cfg\Encripta\ $+ %select-enc $+ .ini | cargar-encripts
+  }
+  elseif ($1 == 3) {
+    %encript.act = $iif(%encript.act == si,no,si) | sonido $%(info)
+    e.mon Sistema de encriptado de texto 12 $+ $iif(%encript.act == si,ACTIVADO,DESACTIVADO)
+    $boton(@Encriptað,12,180,120,20,$iif(%encript.act == si,Desactivar,Activar)).norm
+    drawline @Encriptað
+  }
+}
+menu @Encriptað {
+  mouse {
+    if ($mouse.x > 101 && $mouse.x < 225 && $mouse.y > 119 && $mouse.y < 133) { cursor edit }
+    else { cursor normal }
+  }
+  sclick {
+    if ($mouse.x > 25 && $mouse.x < 183 && $mouse.y > 58 && $mouse.y < 75) { combo push @Encriptað 25 57 140 70 var tmp.encripters cargar-pass }
+
+    if ($mouse.x > 101 && $mouse.x < 225 && $mouse.y > 119 && $mouse.y < 133) { editar @Encriptað 100 117 125 1 % tmp.pass escribe-pass }
+    if ($mouse.x > 13 && $mouse.x < 130 && $mouse.y > 183 && $mouse.y < 201) { 
+    }
+  }
+}
+;
+alias escribe-pass { if (%select-enc) { var %arch = Sistema\Cfg\Encripta\ $+ %select-enc $+ .ini | writeini %arch canal clave $$1 } }
+alias cargar-pass {
+  %select-enc = $$1
+  var %tmp.das = Sistema\Cfg\Encripta\ $+ $$1 $+ .ini
+  %tmp.pass = $readini(%tmp.das,canal,clave)
+  esc-edit @Encriptað 100 117 125 %tmp.pass
+}
+alias cargar-encripts {
+  var %tmp.enc = $findfile(Sistema\Cfg\Encripta,*.ini,0) 
+  unset %tmp.encripters %tmp.pass %select-enc
+  while (%tmp.enc > 0) {
+    %tmp.encripters = %tmp.encripters $+ $remove($nopath($findfile(Sistema\Cfg\Encripta,*.ini,%tmp.enc)),.ini) $+ 
+    dec %tmp.enc
+  }
+  if ($2 == selecciona) { combo draw @Encriptað 25 57 140 $3 | edita @Encriptað 100 117 125 1 | halt }
+
+  if (%tmp.encripters) { combo draw @Encriptað 25 57 140 $gettok(%tmp.encripters,1,16) | cargar-pass $gettok(%tmp.encripters,1,16) }
+  else { combo draw @Encriptað 25 57 140 }
+}
+;Sistema de encriptación implementado por GSi - www.ircap.net
+
+alias CRIP {
+  unset %cript | set %cr.p 1 | set %cr.f 1 | set %cr.m $asc($mid($1,$calc($len($1) / 2),1)) | set %cr.u $asc($right($1,1))
+  set %cr.no ç256ç258ç259ç266ç269ç271ç278ç287ç288ç
+  set %cr.t $replace($2-,$chr(32),$chr(130))
+  :L1
+  set %cr.n $calc($asc($mid($1,%cr.p,1)) - %cr.u)
+  set %cr.l $asc($mid(%cr.t,%cr.f,1))
+
+  set %ascc $calc(%cr.l + %cr.n)
+  if (ç $+ %ascc $+ ç isin %cr.no) || (%ascc == %cr.m) { set %cript %cript $+ $chr(%cr.m) $+ $chr(%cr.l) }
+  else { set %cript %cript $+ $chr(%ascc) }
+
+  inc %cr.p 1 | if (%cr.p > $len($1)) { set %cr.p 1 }
+  inc %cr.f 1 | if (%cr.f <= $len(%cr.t)) goto L1
+
+  unset %ascc %cr.p %cr.f %cr.n %cr.l %cr.t %cr.m %cr.u %cr.no
+  return %cript
+}
+
+alias DCRIP {
+  unset %cript | set %cr.p 1 | set %cr.f 1 | set %cr.m $asc($mid($1,$calc($len($1) / 2),1)) | set %cr.u $asc($right($1,1))
+  :L1
+  set %cr.n $asc($mid($1,%cr.p,1))
+  set %cr.n $calc($asc($mid($1,%cr.p,1)) - %cr.u)
+  set %cr.l $asc($mid($2-,%cr.f,1))
+
+  set %ascc $calc(%cr.l - %cr.n)
+
+  ;  echo -s %cr.l - %cr.n = %ascc ( $calc(%ascc - 256) ) 1,15 $+ $chr(%ascc)
+
+  if (%cr.l == %cr.m) { inc %cr.f 1 | set %cript %cript $+ $mid($2-,%cr.f,1) }
+  else { set %cript %cript $+ $chr(%ascc) }
+
+  inc %cr.p 1 | if (%cr.p > $len($1)) { set %cr.p 1 }
+  inc %cr.f 1 | if (%cr.f <= $len($2-)) goto L1
+
+  unset %ascc %cr.p %cr.f %cr.n %cr.l %cr.m %cr.u
+  return $replace(%cript,$chr(130),$chr(32))
+}
+
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias escrituras {
+  ventana @Escriturað 300 370
+  titulo @Escriturað Central de escritura - /escrituras
+  caja @Escriturað 15 40 270 160 Corrector ortográfico
+  $cuad(@Escriturað,25,52,116,15,Reemplazar).norm | $cuad(@Escriturað,140,52,117,15,Por).norm
+  lista @Escriturað 25 65 250 62
+
+  caja @Escriturað 15 210 270 115 Estilos de escritura
+  rc.escritura 1
+  combo draw @Escriturað 120 221 135 %escritura
+  texto @Escriturað 120 249 Texto: | cuadro @Escriturað %esc.color 170 250 40 10
+  texto @Escriturað 120 269 Fondo: | cuadro @Escriturað %esc.fondo 170 270 40 10
+  rc.escritura 2
+  chek $iif(%corr_escribe == si,a,d) @Escriturað 25 155 Corregir mientras se escribe
+  setv but.@Escriturað 120 335 60 20 OKz_Ok/â150 130 60 20 Agregar_corrector + /â215 130 60 20 Borrar_corrector -/â
+  setv check.@Escriturað corrector 25 135 Corrector activadoâsubraya.url 25 175 Subrayar automáticamente las direcciones webâ
+  setv tmp.@Escriturað @Escriturað 25 65 250 4 1 1 @Corrector return 0,110
+  do_check @Escriturað check.@Escriturað
+  do_but @Escriturað but.@Escriturað
+  mrk.corrector
+  cargar.palabras
+  did-lista tok add tmp.@Escriturað
+  window -wa @Escriturað
+}
+alias rc.escritura {
+  if ($1 == 1) {
+    radios $iif(%esc.actual == predefinido,a,d) @Escriturað 25 225 Predefinidos:
+    radios $iif(%esc.actual == personalizado,a,d) @Escriturað 25 250 Personalizados
+    drawline @Escriturað
+  }
+  elseif ($1 == 2) {
+    chek $iif(%negrita,a,d) @Escriturað 25 285 Negrita
+    chek $iif(%subrayado,a,d) @Escriturað 25 305 Subrayado
+  }
+}
+alias cargar.palabras {
+  var %i = 1
+  var %k = $hget(corrector,%i).item
+  window -hl @Corrector
+  clear -l @Corrector
+  while (%k != $null) {
+    aline @corrector %k $+ $chr(9) $+ $hget(corrector,%i).data
+    inc %i
+    var %k = $hget(corrector,%i).item
+  }
+}
+menu @Escriturað {
+  mouse { if ($mouse.key == 1) refresco-lista tok add tmp.@Escriturað }
+  sclick {
+    if ($mouse.x isnum 25-97 && $mouse.y isnum 226-236) { set %esc.actual Predefinido | rc.escritura 1 }
+    elseif ($mouse.x isnum 25-106 && $mouse.y isnum 251-262) { set %esc.actual Personalizado | rc.escritura 1 }
+    elseif ($mouse.x isnum 120-273 && $mouse.y isnum 221-239) { 
+      %tmp.predefinidos = NingunaRelieveColores aleatoriosMayus/MinusMulticolor
+      combo push @Escriturað 120 221 135 70 var tmp.predefinidos select.escritura
+    }
+    elseif ($mouse.x isnum 25-163 && $mouse.y isnum 155-167) { %corr_escribe = $iif(%corr_escribe == si,no,si)
+      chek $iif(%corr_escribe == si,a,d) @Escriturað 25 155 Corregir mientras se escribe
+      if ((%corr_escribe == si) && ($server)) .timercorr $+ $cid 0 2 corr_editbox
+      else .timercorr $+ $cid off
+      drawline @Escriturað
+    }
+    elseif ($mouse.x isnum 170-210 && $mouse.y isnum 250-260) { colores select.escritura col1 }
+    elseif ($mouse.x isnum 170-210 && $mouse.y isnum 270-280) { colores select.escritura col2 }
+    elseif ($mouse.x isnum 25-71 && $mouse.y isnum 285-296) { $iif(%negrita == ,unset %negrita,set %negrita ) | rc.escritura 2 | drawline @Escriturað }
+    elseif ($mouse.x isnum 25-89 && $mouse.y isnum 305-316) { $iif(%subrayado == ,unset %subrayado,set %subrayado ) | rc.escritura 2 | drawline @Escriturað }
+    else { refresco-lista tok add tmp.@Escriturað }
+  }
+}
+
+alias select.escritura {
+  if ($1 == col1) { %esc.color = $2 | cuadro @Escriturað %esc.color 170 250 40 10 | drawline @Escriturað }
+  elseif ($1 == col2) { %esc.fondo = $2 | cuadro @Escriturað %esc.fondo 170 270 40 10 | drawline @Escriturað }
+  else { %escritura = $1- }
+}
+alias corrector {
+  if ($1 == +) {
+    var %x = $$?="¿Palabra a reemplazar?" | var %y = $$?="¿Reemplazada por?"
+    hadd corrector $gettok(%x,1,32) %y | hsave -o corrector sistema\cfg\corrector.lst | cargar.palabras | did-lista tok add tmp.@Escriturað
+  }
+  if ($1 == -) {
+    hdel corrector $gettok($sline(@Corrector,1),1,9) | hsave -o corrector sistema\cfg\corrector.lst | cargar.palabras | did-lista tok add tmp.@Escriturað
+  }
+}
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+dialog addons {
+  title "Gestor de add ons - /addons"
+  size -1 -1 150 120
+  option dbu
+  list 1, 10 15 60 60, size
+  box "Sin cargar", 2, 5 5 70 85
+  box "Cargados", 3, 74 5 70 85
+  list 4, 79 15 60 60, size
+  button "Cargar", 5, 22 77 37 11
+  button "Desargar", 6, 91 77 37 11
+  button "Cargar desde otro dir", 7, 5 95 64 11
+  button "Bajar nuevos addons", 8, 80 95 64 11
+  button "OKz", 9, 56 108 37 11, cancel
+}
+on 1:dialog:addons:*:*: {
+  if ($devent == init) {
+    carga.addons
+  }
+  if ($devent == sclick) {
+    if ($did == 5) { if ($did(1).seltext) .load -rs $$findfile($mircdiraddons,$did(1).seltext,1) | carga.addons }
+    if ($did == 6) { if ($did(4).seltext) .unload -rs $$findfile($mircdiraddons,$did(4).seltext,1) | carga.addons }
+    if ($did == 7) { .load -rs $file="Selecciona" $mircdir\*.mrc }
+    if ($did == 8) { run www.x-torm.cjb.net }
+  }
+}
+alias carga.addons {
+  did -r addons 1,4
+  var %s = $findfile($mircdiraddons,*.mrc,0)
+  while (%s > 0) {
+    var %k = $findfile($mircdiraddons,*.mrc,%s)
+    if ($script($nopath(%k))) did -a addons 4 $nopath(%k)
+    else did -a addons 1 $nopath(%k)
+    dec %s
+  }
+}
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+alias comandos {
+  if ($window(@Comandosð)) { window -a @Comandosð | return }
+  ventana @Comandosð 340 300 | titulo @Comandosð Comandos para el X-TorM
+  lista @Comandosð 10 50 320 205
+  setv tmp.@Comandosð @Comandosð 10 50 320 14 1 0 @Comandos return
+  did-lista firstf $mircdirsistema\comandos.txt tmp.@Comandosð
+  setv but.@Comandosð 140 263 60 20 OKz_OK/â | do_but @Comandosð but.@Comandosð
+  window -wa @Comandosð
+}
+menu @Comandosð {
+  mouse { if ($mouse.key == 1) { refresco-lista firstf $mircdirsistema\comandos.txt tmp.@Comandosð } }
+  sclick { refresco-lista firstf $mircdirsistema\comandos.txt tmp.@Comandosðð }
+}

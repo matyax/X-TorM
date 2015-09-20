@@ -1,0 +1,263 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                          confi1.xtr - Configuracion
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+alias configuracion {
+  var %tmp.x = $round($calc( ( $window(-3).w - 560 ) / 2 ),0),%tmp.y = $round($calc( ( $window(-3).h - 425) / 2 ),0)
+  window -Bph +b @Setupð %tmp.x %tmp.y 558 425
+  winrgn wrSelectWindow $window(@Setupð).hwnd
+  winrgn wrSetMode rmRoundRect
+  winrgn wrSetRegion 2 30 558 424 90 90
+  drawrect -rf @Setupð $%(rgb.fondo) 1 0 0 558 425
+  drawpic -nt @Setupð 65280 0 29 $mircdirskins\ $+ $%(setupdir) $+ \Setup.png
+  %icon.@Setupð = abajo 35 70 $icono(general.bmp) General_setup.gui 1/â $icono(Proteccion.bmp) Proteccion_setup.gui 2/â $icono(Apariencia.bmp) Apariencia_setup.gui 3/â $icono(Cerrar.bmp) Cerrar _ .timer -m 1 800 window -c @Setupð /â
+  do_icon @Setupð %icon.@Setupð
+  if ($hget(edit@Setup)) hfree edit@Setup
+  hmake edit@Setup
+  if ($1 == 1) { setup.gui 1 }
+  elseif ($1 == 2) { setup.gui 2 }
+  elseif ($1 == 3) { setup.gui 3 }
+  else { setup.gui 1 }
+  window -a @Setupð
+  drawline @Setupð
+}
+
+alias setup.gui {
+  if ($1 == 1) {
+    .disable #menu.setup1 #menu.setup2 | cuadro @Setupð $%(rgb.fondo) 165 69 351 310
+    caja @Setupð 165 75 217 170 General
+    setv check.@Setupð barra.utiles 175 87 Mostrar barra de utilidadesâ dialog.conex.i 175 104 Ventana de conexion al inicioâmedir.lag 175 121 Avisar cuando te nombrenâautog.conf 175 138 Autoguardar configuraciónâ scs.clones 175 155 Detectar clones en canalesâchg.nick 175 172 Detectar cambios de nicks fuera del canalâresumen 175 189 Mostrar resumen del canal al entrar âmonitor 175 206 Activar barra de mensajesâh.monitor 175 224 Ocultar la barra de mensajes si está inactiva â medir.lag 400 87 Medir lagâfireon 400 104 Iniciar FireXtorMâcanales.al.conectar 400 121 Ver canales favoritosâ color.risas  175 297 Colorear risasâcolor.sml 175 314 Colorear smileysâ
+    setv but.@Setupð 175 270 200 20 Configurar nick completion_completion/â400 168 100 30 Configurar_antispam
+    do_check @Setupð check.@Setupð | do_but @Setupð but.@Setupð 
+    caja @Setupð 390 75 120 70 Al conectar | caja @Setupð 390 155 120 55 Anti-propaganda | caja @Setupð 165 255 217 80 Completadores
+    if ($hget(edit@Setup)) hfree edit@Setup
+    hmake edit@Setup
+    drawline @Setupð
+  }
+  if ($1 == 2) {
+    .enable #menu.setup1 | .disable #menu.setup2 | cuadro @Setupð $%(rgb.fondo) 165 69 351 310
+    caja @Setupð 165 75 203 200 Protección antiflood 
+    setv but.@Setupð 375 75 135 20 Configurar FireXtorM_FireXtorM/â375 100 135 20 Configurar Kick Revenge_revenge/â385 251 40 20 +_dccvirus.config +/â455 251 40 20 -_dccvirus.config -/â
+    setv check.@Setupð no.ctcp.flood 175 90 CTCPâno.notice.flood 175 107 Noticeâno.query.flood 175 124 Queryâno.text.flood 175 141 Textoâno.invite.flood 175 158 Inviteâno.dcc.flood 175 175 DCCâref.silence 185 235 Reesforzar con /silenceâ
+    edita @Setupð 225 87 30 1 %t.ctcp.flood | texto @Setupð 265 88 peticiones en 8 Seg.
+    edita @Setupð 225 104 30 2 %t.notice.flood | texto @Setupð 265 105 mensajes en 8 Seg.
+    edita @Setupð 225 121 30 3 %t.query.flood | texto @Setupð 265 122 privados en 8 Seg.
+    edita @Setupð 225 138 30 4 %t.text.flood | texto @Setupð 265 139 mensajes en 8 Seg.
+    edita @Setupð 225 155 30 5 %t.invite.flood | texto @Setupð 265 156 invitaciones en 8 Seg.
+    edita @Setupð 225 172 30 6 %t.dcc.flood | texto @Setupð 265 173 peticiones en 8 Seg.
+    caja @Setupð 175 200 184 60 Castigo
+    texto @Setupð 185 215 Ignorar | edita @Setupð 225 213 30 7 %flood.castigo | texto @Setupð 265 215 segundos al agresor
+    caja @Setupð 375 130 135 145 Rechazar archivos
+    lista @Setupð 385 145 110 103 | dccvirus.config carga
+    do_check @Setupð check.@Setupð | do_but @Setupð but.@Setupð  | drawline @Setupð
+  }
+  if ($1 == 3) {
+    unsetv tmp.@Setupð check.@Setupð | unsetv but.@Setupð | unset %tmp.schemeselect | .enable #menu.setup2 | .disable #menu.setup1
+    cargar-skins | juntar-schemes
+    setv tmp.@Setupð @Setupð 175 85 100 12 1 $gettok($%(skindir),2,32) @Skins info.skin
+    setv but.@Setupð 290 260 120 20 .:: Cargar Skin ::._cargar.skin1/â430 305 70 20 Cargar_cargar-scheme/â
+    setv check.@Setupð tmp.t 320 215 Temas de textoâtmp.s 410 215 Sonidosâtmp.a 295 235 Apariencia del scriptâtmp.i 408 235 Color ventanasâanima.win 175 330 Mostrar animaciones en ventanasâgui.fast 175 350 Optimizar la inteface para mayor velocidadâ
+
+    cuadro @Setupð $%(rgb.fondo) 165 69 351 310
+    caja @Setupð 165 75 345 210 Skins | lista @Setupð 175 85 100 173 | bajor @Setupð 285 85 215 110 
+    did-lista firstv tmp.skins tmp.@Setupð
+    info.skin 0 $remove($gettok($%(skindir),1,32),.ini)
+    caja @Setupð 285 205 215 50 Al cargar la skin, cambiar:
+    caja @Setupð 165 295 345 80 Interfaz gráfica de las ventanas
+    texto @Setupð 175 307 Combinaciones de color:
+    combo draw @Setupð 295 305 110 $%(scheme.actual)
+    do_check @Setupð check.@Setupð | do_but @Setupð but.@Setupð
+    drawline @Setupð
+  }
+}
+alias sel-vir { return }
+#menu.setup1 off
+menu @Setupð {
+  mouse { 
+    if ($Mouse.key == 1) { refresco-lista firstv dccvirus.words tmp.@Setupð }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 87-104) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 104-121) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 121-138) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 138-155) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 155-172) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 172-189) { cursor edit }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 213-230) { cursor edit }
+    else { cursor normal }
+  }
+  sclick {
+    refresco-lista firstv dccvirus.words tmp.@Setupð
+    if ($mouse.x isnum 225-255 && $mouse.y isnum 87-104) { editar @Setupð 225 87 30 1 % t.ctcp.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 104-121) { editar @Setupð 225 104 30 2 % t.notice.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 121-138) { editar @Setupð 225 121 30 3 % t.query.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 138-155) { editar @Setupð 225 138 30 4 % t.text.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 155-172) { editar @Setupð 225 155 30 5 % t.invite.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 172-189) { editar @Setupð 225 172 30 6 % t.dcc.flood }
+    elseif ($mouse.x isnum 225-255 && $mouse.y isnum 213-230) { editar @Setupð 225 213 30 7 % flood.castigo }
+  }
+}
+#menu.setup1 end
+;---
+#menu.setup2 off
+menu @Setupð {
+  mouse { 
+    if ($Mouse.key == 1) { refresco-lista firstv tmp.skins tmp.@Setupð }
+  }
+  sclick { 
+    refresco-lista firstv tmp.skins tmp.@Setupð
+    if ($mouse.x isnum 295-425 && $mouse.y isnum 305-325) { combo push @Setupð 295 305 110 60 var tmp.schemes sel-scheme }
+  }
+}
+#menu.setup2 end
+alias sel-scheme { %tmp.schemeselect = $1- }
+alias cargar-scheme {
+  if ($exists($1) == $true) { var %tmp = 1,%tmp2 = $readini $$1 %tmp nombre,%GUI.sch = $1 | goto salta }
+  if ($exists($skindir(Gui\Gui.sch)) != $true) return
+  if (%tmp.schemeselect == $null) return
+  var %tmp = 1,%tmp2 = $readini $skindir(Gui\Gui.sch) %tmp nombre,%GUI.sch = $skindir(Gui\Gui.sch)
+  :salta
+  while (%tmp2 != $null) {
+    if (%tmp2 == %tmp.schemeselect) {
+      setv scheme.actual %tmp.schemeselect
+      setv rgb.texto $readini %GUI.sch %tmp rgb.texto
+      setv rgb.fondo $readini %GUI.sch %tmp rgb.fondo
+      setv rgb.edit $readini %GUI.sch %tmp rgb.edit
+      setv rgb.oscuro $readini %GUI.sch %tmp rgb.oscuro
+      setv rgb.claro $readini %GUI.sch %tmp rgb.claro
+      setv rgb.normal $readini %GUI.sch %tmp rgb.normal
+      setv rgb.bordewin $readini %GUI.sch %tmp rgb.bordewin
+      setv rgb.caja $readini %GUI.sch %tmp rgb.caja
+      setv rgb.titulo $readini %GUI.sch %tmp rgb.titulo
+      setv rgb.setuptxt $readini %GUI.sch %tmp rgb.setuptxt
+      setv rgb.boxclaro $readini %GUI.sch %tmp rgb.boxclaro
+      setv rgb.sombra $readini %GUI.sch %tmp rgb.sombra
+      setv texto $readini %GUI.sch %tmp texto
+      setv rgb.textobot $readini %GUI.sch %tmp rgb.textobot
+      setv rgb.rstart $readini %GUI.sch %tmp rgb.rstart
+      setv rgb.rend $readini %GUI.sch %tmp rgb.rend
+      setv rgb.sombratxt $readini %GUI.sch %tmp rgb.sombratxt
+      setv rgb.sel $readini %GUI.sch %tmp rgb.sel
+      setv botonu $readini %GUI.sch %tmp botonu
+      setv botond $readini %GUI.sch %tmp botond
+      linesep -s
+      echo -s $marc Cargado scheme de interfaz $+ $resalt $readini %GUI.sch %tmp nombre
+      echo -s $_m Por favor reabra todas sus ventanas para que los cambios sean efectivos...
+      if ($window(@Setupð)) { 
+        drawrect -rf @Setupð $%(rgb.fondo) 430 0 0 560 425 | cuadro @Setupð 1 0 30 558 35 | cuadro @Setupð 1 0 390 560 35
+        drawpic -nt @Setupð 65280 0 29 $mircdirskins\ $+ $%(setupdir) $+ \Setup.png | titulo @Setupð Configuracion del script - /Configuracion 
+        %icon.@Setupð = abajo 35 70 $icono(general.bmp) General_setup.gui 1/â $icono(Proteccion.bmp) Proteccion_setup.gui 2/â $icono(Apariencia.bmp) Apariencia_setup.gui 3/â $icono(Cerrar.bmp) Cerrar _ .timer -m 1 800 window -c @Setupð /â
+        do_icon @Setupð %icon.@Setupð
+        setup.gui 3
+      }
+      goto fin
+    }    
+    inc %tmp
+    %tmp2 = $readini %GUI.sch %tmp nombre
+  }
+  :fin
+}
+alias cargar-skins {
+  unset %tmp.skins | var %skins = $findfile($mircdirskins,*.ini,0)
+  while (%skins > 0) {
+    %tmp.skins = %tmp.skins $+ $nopath($remove($findfile($mircdirskins,*.ini,%skins),.ini)) $+ â
+    dec %skins
+  }
+}
+alias juntar-schemes {
+  if ($exists($skindir(Gui\Gui.sch)) != $true) return
+  unset %tmp.schemes
+  var %tmp = 1,%tmp2 = $readini $skindir(Gui\Gui.sch) %tmp nombre
+  while (%tmp2 != $null) {
+    %tmp.schemes =  %tmp.schemes $+ %tmp2 $+ 
+    inc %tmp
+    %tmp2 = $readini $skindir(Gui\Gui.sch) %tmp nombre
+  }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+;Soporte para skins
+alias skindir return $mircdirskins\ $+ $gettok($%(skindir),1,32) $+ \ $+ $1
+alias .rsk return $readini($skindir($gettok($%(skindir),1,32) $+ .ini),$$1,$$2)
+alias info.skin {
+  bajor @Setupð 285 85 215 110 
+  var %skin  = $mircdirskins\ $+ $$2 $+ \ $+ $2 $+ .ini,%skin2  = $mircdirskins\ $+ $$2 $+ \GUI\ $+ $2 $+ .sch
+  %tmp.t = $readini(%skin,skin,temas)
+  %tmp.s = $readini(%skin,skin,sonidos)
+  %tmp.a = $readini(%skin,skin,apariencia)
+  %tmp.i = $iif($exists(%skin2) == si,no,si)
+  texto @Setupð 290 92 - $readini(%skin,info,1)
+  texto @Setupð 290 107 - $readini(%skin,info,2)
+  texto @Setupð 290 122 - $readini(%skin,info,3)
+  texto @Setupð 290 137 - $readini(%skin,info,4)
+  do_check @Setupð check.@Setupð
+  varia.texto @Setupð 290 152 200 $readini(%skin,info,5)
+  drawline @Setupð
+}
+alias load.skins {
+  var %mpt = $findfile($mircdirskins,*.ini,0)
+  while (%mpt > 0) {
+    did -a configuracion 62 $remove($nopath($findfile($mircdirskins,*.ini,%mpt)),.ini)
+    dec %mpt
+  }
+}
+alias sonido.skin {
+  var %skin1  = $mircdirskins\ $+ $$1 $+ \ $+ $1 $+ .ini
+  var %tmp.s = $readini(%skin1,sonidos,inicio) | if (%tmp.s) setv inicio $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,clones) | if (%tmp.s) setv clones $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,conecta) | if (%tmp.s) setv conecta $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,desconecta) | if (%tmp.s) setv desconecta $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,ctcp) | if (%tmp.s) setv ctcp $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,skick) | if (%tmp.s) setv skick  $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,notice) | if (%tmp.s) setv notice $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,page) | if (%tmp.s) setv page $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,privado) | if (%tmp.s) setv privado $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,ssplit) | if (%tmp.s) setv ssplit $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,info) | if (%tmp.s) setv info $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,alerta) | if (%tmp.s) setv alerta $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,closer) | if (%tmp.s) setv closer $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,join) | if (%tmp.s) setv join $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  var %tmp.s = $readini(%skin1,sonidos,error) | if (%tmp.s) setv error $mircdirskins\ $+ $$1 $+ \ $+ %tmp.s
+  echo -s $marc Sonidos de la skin $+ $resalt $1 cargados
+}
+alias apariencia.skin {
+  setv skindir $1 $$sline(@Skins,1).ln
+  var %tps = $.rsk(apariencia,mdi)
+  if (%tps) { background -m $+ $gettok(%tps,1,32) $skindir($gettok(%tps,2,32)) }
+  var %tps = $.rsk(apariencia,fondoico)
+  if (%tps) { background -l $skindir(%tps) }
+  var %tps = $.rsk(apariencia,botones)
+  if (%tps) { background -u $skindir(%tps) }
+  var %tps = $.rsk(apariencia,comandos)
+  if (%tps) { / $+ %tps }
+  if ($exists($skindir(Setup.png))) { setv setupdir $1 }
+  if ( $exists($skindir(barra.png)) ) { setv Borramon $.rsk(Apariencia,Borramon) | setv lag1 $.rsk(Apariencia,lag1) | setv lag2 $.rsk(Apariencia,lag2) | setv barradir $1 | @barra }
+  echo -s $marc Apariencia del script de la skin $+ $resalt $1 cargados
+}
+alias cargar.skin1 {
+  tokenize 32 $$sline(@Skins,1)
+  var %skin2  = $mircdirskins\ $+ $$1 $+ \ $+ $$1 $+ .ini
+  if (%tmp.t == si) {
+    var %tmp.t = $readini(%skin2,skin,tema)
+    if ($%(tema.actual) != %tmp.t) {
+      clear -s
+      .unload -rs $%(tema.actual) 
+      .load -rs $findfile($mircdirskins,%tmp.t,1)
+      setv tema.actual %tmp.t 
+      echo -s $marc Tema de la skin $+ $resalt $1 cargado 
+    }
+  }
+  if (%tmp.s == si) { sonido.skin $$1 }
+  if (%tmp.a == si) { apariencia.skin $$1 }
+  %skin2  = $mircdirskins\ $+ $$1 $+ \
+  if (%tmp.i == si ) {
+    if ($readini(%skin2 $+ GUI\Gui.sch,Interfaz,Partes) == si) { 
+      setv guidir $1 
+      setv gui.animax $readini(%skin2 $+ GUI\Gui.sch,Interfaz,gui.animax)
+      setv gui.anima_ $readini(%skin2 $+ GUI\Gui.sch,Interfaz,gui.anima_)
+      setv gui.recorta $readini(%skin2 $+ GUI\Gui.sch,Interfaz,gui.recorta)
+    }
+    var %tps = $readini(%skin2 $+ GUI\Gui.sch,1,Nombre)
+    if (%tps != $null) { %tmp.schemeselect = %tps | cargar-scheme %skin2 $+ GUI\Gui.sch }
+  }
+}

@@ -1,0 +1,7 @@
+irc.red-latina.org
+centro.red-latina.org
+chapingo.red-latina.org
+torreon.red-latina.org
+sinaloa.red-latina.org
+mochis.red-latina.org
+mazatlan.red-latina.org

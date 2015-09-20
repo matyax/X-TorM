@@ -1,0 +1,1806 @@
+; ______________________________________________________________________________________________________
+;
+;   SmartICQ v1.091
+;   copyright (c) 2001-02 tronicer
+;
+;   url, http://icq.irctools.com/
+;   e-mail, tronicer@freebox.com
+; _________________________________________________________________________________________________________
+;
+; smarticq dialogs
+; _________________________________________________________________________________________________________
+;
+; * LIST OF DIALOGS
+
+; /_icq.dlg_rsms				recived sms
+; /_icq.dlg_history				system history
+; /_icq.dlg_addaccount			add account
+; /_icq.dlg_changeawaymsg			change away msg
+; /_icq.dlg_passwd				enter password
+; /_icq.dlg_wwwpager				wwwpager dialog
+; /_icq.dlg_rename				rename contact dialog
+; /_icq.dlg_registration 			register new account
+; /_icq.dlg_remfromcontact			remove user from contact list
+; /_icq.dlg_add2contact			add user to contact list
+; /_icq.dlg_useraddyou			"user added you"
+; /_icq.dlg_reqauth				request authorization
+; /_icq.dlg_userdetails			user details
+; /_icq.dlg_sendsms				send sms
+; /_icq.dlg_sendurl				send url
+; /_icq.dlg_error				error
+; /_icq.dlg_mydetails			my details
+
+
+; _________________________________________________________________________________________________________
+;
+; new version
+
+alias _icq.dlg_rsms { 
+  if ($dialog(_icq.rsms)) { dialog -v _icq.rsms }
+  else { set %_icq.pager $1 | set %_icq.pager.h $2 | dialog -m _icq.rsms _icq.rsms }
+}
+
+dialog _icq.rsms {
+  title "SmartICQ - SMS"
+  size -1 -1 133 121
+  option dbu
+  box "Recived SMS", 1, 1 2 129 100
+  button "Close", 8, 93 106 37 12, cancel
+  text "From:", 18, 20 14 13 8, right
+  text "Time:", 19, 20 26 13 8, right
+  text "Message:", 22, 8 40 25 8, right
+  edit "", 23, 35 13 90 10, read autohs
+  edit "", 24, 35 25 90 10, read autohs
+  edit "", 27, 35 39 90 58, read multi autovs
+}
+
+on *:dialog:_icq.rsms:init:*:{
+  if (%_icq.pager.h != -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\system.ini"),sms,%_icq.pager) }
+  if (%_icq.pager.h == -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\history.ini"),sms,%_icq.pager) }
+  did -ra $dname 23 $gettok(%_icq.pager,1,254)
+  did -ra $dname 27 $gettok(%read,2-,32)
+  if (%_icq.pager.h != -history) {
+    remini $+(",$_icq.dir,$_icq.a,\system.ini") sms %_icq.pager
+    writeini $+(",$_icq.dir,$_icq.a,\history.ini") sms $+(%_icq.pager,$ticks) %read
+  }
+  unset %_icq.pager
+  unset %_icq.pager.h
+}
+
+; _________________________________________________________________________________________________________
+;
+; new version
+
+dialog _icq.dlg_newver {
+  title "SmartICQ - Info"
+  size -1 -1 119 46
+  option dbu
+  button "Button", 6, 48 78 37 12, hide cancel
+  text "A new version of SmartICQ has been released.", 7, 4 4 110 8
+  link "", 8, 22 17 80 8
+  button "Close", 9, 76 30 37 12, ok
+}
+on *:dialog:_icq.dlg_newver:init:*:{ did -a $dname 8 Download SmartICQ v $+ $sock(_icq.checkver).mark }
+on *:dialog:_icq.dlg_newver:sclick:8:{ .url http://icq.irctools.com/dl.html | dialog -x $dname }
+
+; _________________________________________________________________________________________________________
+;
+; system history
+
+alias _icq.dlg_history { 
+  if ($dialog(_icq.history)) { dialog -v _icq.history }
+  else { dialog -m _icq.history _icq.history }
+}
+dialog _icq.history {
+  title "SmartICQ - System History"
+  size -1 -1 160 116
+  option dbu
+  button "Close", 2, 120 102 37 12, cancel
+  tab "URL", 9, 1 1 157 98
+  button "Remove", 26, 48 84 37 12, tab 9
+  button "Show", 27, 5 84 37 12, tab 9
+  list 28, 5 18 149 64, tab 9 size
+  tab "Requests", 10
+  button "Remove", 23, 48 84 37 12, tab 10
+  button "Show", 24, 5 84 37 12, tab 10
+  list 25, 5 18 149 64, tab 10 size
+  tab "Added You", 11
+  button "Remove", 20, 48 84 37 12, tab 11
+  button "Show", 21, 5 84 37 12, tab 11
+  list 22, 5 18 149 64, tab 11 size
+  tab "Pager", 12
+  button "Remove", 17, 48 84 37 12, tab 12
+  button "Show", 18, 5 84 37 12, tab 12
+  list 19, 5 18 149 64, tab 12 size
+  tab "SMS", 13
+  list 14, 5 18 149 64, tab 13 size
+  button "Remove", 15, 48 84 37 12, tab 13
+  button "Show", 16, 5 84 37 12, tab 13
+
+  list 114,0 0 0 0, hide
+  list 119,0 0 0 0, hide
+  list 122,0 0 0 0, hide
+  list 125,0 0 0 0, hide
+  list 128,0 0 0 0, hide
+}
+
+on *:dialog:_icq.history:dclick:14,19,22,25,28:{
+  if ($did == 14) { _icq.dlg_rsms $$did($dname,114,$did($dname,14).sel).text -history }
+  if ($did == 19) { _icq.dlg_wwwpager $$did($dname,119,$did($dname,19).sel).text -history }
+  if ($did == 22) { _icq.dlg_useraddyou $$did($dname,122,$did($dname,22).sel).text -history }
+  if ($did == 25) { _icq.dlg_reqauth $$did($dname,125,$did($dname,25).sel).text -history }
+  if ($did == 28) { _icq.dlg_recvurl $$did($dname,128,$did($dname,28).sel).text -history }
+} 
+on *:dialog:_icq.history:sclick:15,16,17,18,20,21,23,24,26,27:{
+  if ($did == 27) { _icq.dlg_recvurl $$did($dname,128,$did($dname,28).sel).text -history }
+  if ($did == 24) { _icq.dlg_reqauth $$did($dname,125,$did($dname,25).sel).text -history }
+  if ($did == 21) { _icq.dlg_useraddyou $$did($dname,122,$did($dname,22).sel).text -history }
+  if ($did == 18) { _icq.dlg_wwwpager $$did($dname,119,$did($dname,19).sel).text -history }
+  if ($did == 16) { _icq.dlg_rsms $$did($dname,114,$did($dname,14).sel).text -history }
+  if ($did == 26) { remini $+(",$_icq.dir,$_icq.a,\history.ini") url $$did($dname,128,$did($dname,28).sel).text | did -d $dname 28,128 $did($dname,28).sel }
+  if ($did == 23) { remini $+(",$_icq.dir,$_icq.a,\history.ini") rqst $$did($dname,125,$did($dname,25).sel).text | did -d $dname 25,125 $did($dname,25).sel }
+  if ($did == 20) { remini $+(",$_icq.dir,$_icq.a,\history.ini") addedyou $$did($dname,122,$did($dname,22).sel).text | did -d $dname 22,122 $did($dname,22).sel }
+  if ($did == 17) { remini $+(",$_icq.dir,$_icq.a,\history.ini") pager $$did($dname,119,$did($dname,19).sel).text | did -d $dname 19,119 $did($dname,19).sel }
+  if ($did == 15) { remini $+(",$_icq.dir,$_icq.a,\history.ini") sms $$did($dname,114,$did($dname,14).sel).text | did -d $dname 14,114 $did($dname,14).sel }
+}
+on *:dialog:_icq.history:init:*:{
+  var %file = $+(",$_icq.dir,$_icq.a,\history.ini"), %c = $ini(%file,url,0)
+  while (%c) {
+    var %ini = $gettok($ini(%file,url,%c),1,254)
+    did -a $dname 28 $gettok($gettok($readini(%file,url,$ini(%file,url,%c)),2,254),1,32) from $_icq.g($_icq.a,%ini,SHOW,$ini(%file,url,%c))
+    did -a $dname 128 $ini(%file,url,%c)
+    dec %c 
+  }
+  var %c = $ini(%file,rqst,0)
+  while (%c) {
+    var %ini = $ini(%file,rqst,%c)
+    did -a $dname 25 $_icq.g($_icq.a,%ini,SHOW,%ini)
+    did -a $dname 125 %ini
+    dec %c 
+  }
+  var %c = $ini(%file,addedyou,0)
+  while (%c) {
+    var %ini = $ini(%file,addedyou,%c)
+    did -a $dname 22 $_icq.g($_icq.a,%ini,SHOW,%ini) added you
+    did -a $dname 122 $ini(%file,addedyou,%c)
+    dec %c 
+  }
+
+  var %c = $ini(%file,pager,0)
+  while (%c) {
+    var %ini = $ini(%file,pager,%c)
+    var %read = $readini(%file,pager,$ini(%file,pager,%c))
+    did -a $dname 19 $gettok(%ini,1,254) paged you ( $+ $gettok($gettok(%read,-2,254),2-,32) $+ )
+    did -a $dname 119 $ini(%file,pager,%c)
+    dec %c 
+  }
+
+  var %c = $ini(%file,sms,0)
+  while (%c) {
+    var %ini = $ini(%file,sms,%c)
+    var %read = $readini(%file,pager,$ini(%file,sms,%c))
+    did -a $dname 14 $gettok(%ini,1,254) sent sms 
+    did -a $dname 114 $ini(%file,sms,%c)
+    dec %c 
+  }
+}
+
+
+
+; _________________________________________________________________________________________________________
+;
+; add account
+
+alias _icq.dlg_addaccount {
+  if ($dialog(_icq.addaccount)) { dialog -v _icq.addaccount }
+  else { dialog -m _icq.addaccount _icq.addaccount }
+}
+
+dialog _icq.addaccount {
+  title "SmartICQ"
+  size -1 -1 106 99
+  option dbu
+  button "Cancel", 4, 26 84 37 12, cancel
+  button "Add", 5, 67 84 37 12
+  box "Add Account", 10, 1 3 103 77
+  text "UIN#:", 13, 5 16 30 8, right
+  edit "", 14, 38 15 60 10, autohs center
+  text "Password:", 15, 5 29 30 8, right
+  edit "", 16, 38 28 60 10, pass autohs
+  text "Nickname:", 17, 5 42 30 8, right
+  edit "", 18, 38 41 60 10, autohs
+  text "E-Mail:", 19, 5 54 30 8, right
+  edit "", 20, 38 53 60 10, autohs
+  check "Save password", 22, 38 66 50 10
+}
+
+on *:dialog:_icq.addaccount:init:*:{
+  did -f $dname 14
+}
+
+on *:dialog:_icq.addaccount:sclick:5:{
+  if ($did == 5) {
+    if ($did($dname,14).text !isnum) { did -rf $dname 14 | return }
+    if ($did($dname,16).text == $null) { did -f $dname 16 | return }
+    if ($did($dname,18).text == $null) { did -f $dname 18 | return }
+
+    if ($did($dname,22).state) { _icq.createnewaccount $did($dname,14).text $replace($did($dname,18).text,$chr(32),$chr(2)) $did($dname,16).text }
+    if (!$did($dname,22).state) { _icq.createnewaccount $did($dname,14).text $replace($did($dname,18).text,$chr(32),$chr(2)) }
+    _icq.adduserinfo $did($dname,14).text $did($dname,14).text e-mail $$did($dname,20).text
+    did -a $$dialog(_icq.am) 1 $did($dname,14).text $did($dname,18).text
+    dialog -x $dname
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; change away message
+
+alias _icq.dlg_changeawaymsg {
+  _icq.debug -ts a $1-
+  if ($2 == off) && ($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,changeawaymsg)) { return }
+  if ($2 == on) { .disable #_icq.shift }
+  var %dialog = _icq.changeawaymsg. $+ $1
+  if ($dialog(%dialog)) { dialog -v %dialog }
+  else { dialog -m %dialog _icq.changeawaymsg }
+}
+
+dialog _icq.changeawaymsg {
+  title "Change/Confirm Away Message"
+  size -1 -1 112 97
+  option dbu
+  edit "", 1, 1 20 110 34, multi return autovs vsbar
+  text "This message will be displayed when you are ", 2, 2 3 107 8
+  text "marked as", 3, 2 11 107 8
+  button "Ok", 4, 74 84 37 12, ok
+  check "Do not popup this dialog again", 5, 10 56 87 10
+  text "Hold down Shift and click to override", 6, 10 66 87 8
+  text "this setting in the future", 7, 10 74 55 8
+}
+
+on *:dialog:_icq.changeawaymsg.*:init:*:{
+  did -a $dname 3 marked as '' $+ $gettok($dname,3,46) $+ ''.
+  dialog -t $dname Change/Confirm $gettok($dname,3,46) Message
+  did -ra $dname 1 $hget(smarticq,$+(MSG.,$gettok($dname,3,46)))
+  if ($readini($+(",$_icq.dir,$_icq.a,\settings.ini"),settings,changeawaymsg)) { did -c $dname 5 }
+  did -c $dname 1 1 1 $did($dname,1).len
+}
+
+on *:dialog:_icq.changeawaymsg.*:sclick:4,5:{
+  if ($did == 4) {
+    var %c = 1, %t
+    while (%c <= $did($dname,1).lines) {
+      if (%t) { %t = %t $+ $crlf }
+      %t = %t $+ $did($dname,1,%c).text
+      inc %c
+    }
+    hadd smarticq $+(MSG.,$gettok($dname,3,46)) %t
+    if (%t != $null) { writeini $+(",$_icq.dir,$_icq.a,\settings.ini") settings $+(MSG.,$gettok($dname,3,46)) %t }
+    else { remini $+(",$_icq.dir,$_icq.a,\settings.ini") settings $+(MSG.,$gettok($dname,3,46)) }
+  }
+  if ($did == 5) {
+    writeini $+(",$_icq.dir,$_icq.a,\settings.ini") settings changeawaymsg $did($dname,5).state
+  }
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; enter password
+
+alias _icq.dlg_passwd {
+  if ($dialog(_icq.passwd)) { dialog -v _icq.passwd }
+  else { dialog -m _icq.passwd _icq.passwd }
+}
+
+
+dialog _icq.passwd {
+  title "SmartICQ - LOGIN"
+  size -1 -1 93 55
+  option dbu
+  edit "", 1, 8 14 79 10, pass autohs result
+  check "Save password", 2, 9 26 50 10
+  box "Password", 3, 1 2 91 37
+  button "Cancel", 4, 15 42 37 12, cancel
+  button "Ok", 5, 56 42 37 12, ok disable
+}
+on *:dialog:_icq.passwd:edit:1:{
+  if ($did($dname,1).text != $null) { did -e $dname 5 }
+  else { did -b $dname 5 }
+}
+
+on *:dialog:_icq.passwd:sclick:5:{
+  if ($did($dname,2).state) {
+    writeini $+(",$_icq.dir,$_icq.a,\settings.ini") account passwd $_icq.passwd2($did($dname,1).text)
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; wwwpager dialog
+
+alias _icq.dlg_wwwpager {
+  if ($dialog(_icq.wwwpager)) { dialog -v _icq.wwwpager }
+  else { set %_icq.pager $1 | set %_icq.pager.h $2 | dialog -m _icq.wwwpager _icq.wwwpager }
+}
+
+dialog _icq.wwwpager {
+  title "SmartICQ - Web Pager"
+  size -1 -1 133 141
+  option dbu
+  box "Recived Web Pager Message", 1, 1 2 129 121
+  button "Close", 8, 93 126 37 12, cancel
+  text "Name:", 18, 8 14 25 8, right
+  text "E-Mail:", 19, 8 26 25 8, right
+  text "IP:", 20, 8 38 25 8, right
+  text "Subject:", 21, 8 50 25 8, right
+  text "Message:", 22, 8 62 25 8, right
+  edit "a", 23, 35 13 90 10, read autohs
+  edit "b", 24, 35 25 90 10, read autohs
+  edit "c", 25, 35 37 90 10, read autohs
+  edit "d", 26, 35 49 90 10, read autohs
+  edit "e", 27, 35 61 90 58, read multi autovs
+}
+
+on *:dialog:_icq.wwwpager:init:*:{
+  if (%_icq.pager.h != -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\system.ini"),pager,%_icq.pager) }
+  if (%_icq.pager.h == -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\history.ini"),pager,%_icq.pager) }
+  did -ra $dname 23 $gettok(%read,1,254)
+  did -ra $dname 24 $gettok(%read,4,254)
+  did -ra $dname 25 $gettok($gettok(%read,6,254),3,32)
+  did -ra $dname 26 $gettok($gettok(%read,7,254),2-,32)
+  did -ra $dname 27 $gettok(%read,8,254)
+  if (%_icq.pager.h != -history) {
+    remini $+(",$_icq.dir,$_icq.a,\system.ini") pager %_icq.pager
+    writeini $+(",$_icq.dir,$_icq.a,\history.ini") pager $+(%_icq.pager,$ticks) %read
+  }
+  unset %_icq.pager
+  unset %_icq.pager.h
+}
+
+; _________________________________________________________________________________________________________
+;
+; rename dialog
+
+alias _icq.dlg_rename {
+  if ($dialog(_icq.rename)) { dialog -v _icq.rename }
+  else {
+    set %_icq.dlg_rename.uin $1
+    dialog -m _icq.rename _icq.rename
+  }
+}
+
+dialog _icq.rename {
+  title "SmartICQ"
+  size -1 -1 113 73
+  option dbu
+  button "Rename", 5, 75 60 37 12, default
+  button "Close", 4, 33 60 37 12, cancel
+  box "Rename User On Contact List", 10, 1 3 111 54
+  text "Contact:", 13, 7 15 24 8, right
+  combo 14, 34 14 72 100, size drop
+  text "New name:", 16, 4 42 27 8, right
+  edit "", 17, 33 29 73 10, read autohs
+  edit "", 18, 33 41 73 10, autohs
+  text "Old name:", 19, 7 30 24 8, right
+  edit "", 20, 0 0 0 0, hide
+  combo 21,  0 0 0 0, hide
+}
+
+on *:dialog:_icq.rename:init:*:{
+  did -a $dname 20 %_icq.dlg_rename.uin
+  unset %_icq.dlg_rename.uin
+
+  var %c = $line(@smarticq-gui,0,1)
+  while (%c) {
+    did -a $dname 14 $gettok($line(@smarticq-gui,%c,1),2,1)
+    did -a $dname 21 $gettok($line(@smarticq-gui,%c,1),2-3,1)
+    if ($gettok($line(@smarticq-gui,%c,1),3,1) == $did($dname,20).text) { did -c $dname 14 $did($dname,14).lines }
+    dec %c
+  }
+
+  did -a $dname 17 $_icq.g($_icq.a,$did($dname,20).text,show)
+  did -f $dname 18
+}
+
+on *:dialog:_icq.rename:sclick:5:{
+  if ($did($dname,18).text) {
+    var %wc = * $+ $chr(1) $+ $did($dname,20).text $+ $chr(1) $+ *
+    rline -l @smarticq-gui $fline(@smarticq-gui,%wc,1,1),1) $puttok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),$did($dname,18).text,2,1)
+    _icq.adduserinfo $_icq.a $did($dname,20).text SHOW $did($dname,18,0).text
+    _icq.drw_cl $hget(smarticq,scroll)
+    dialog -x $dname
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; phone book
+
+alias _icq.dlg_phonebook {
+  if ($dialog(_icq.phonebook)) { dialog -v _icq.phonebook }
+  else {
+    set %_icq.dlg_phonebook.uin $1
+    dialog -m _icq.phonebook _icq.phonebook
+  }
+}
+
+dialog _icq.phonebook {
+  title "SmartICQ - Phonebook"
+  size -1 -1 159 79
+  option dbu
+  button "Save", 4, 73 65 37 12
+  button "Close", 5, 118 65 37 12, cancel
+  list 13, 1 2 66 75, size sort
+  text "UIN#:", 14, 70 5 15 8
+  text "Phone:", 15, 70 18 17 8
+  text "Cellular:", 16, 70 30 19 8
+  text "Fax:", 17, 70 42 10 8
+  edit "", 18, 94 4 61 10, read autohs center
+  edit "", 19, 94 17 61 10, autohs
+  edit "", 20, 94 29 61 10, autohs
+  edit "", 21, 94 41 61 10, autohs
+  list 22, 0 0 0 0, hide sort
+}
+
+on *:dialog:_icq.phonebook:init:*:{
+  var %c = $line(@smarticq-gui,0,1)
+  while (%c) {
+    if ($gettok($line(@SmartICQ-gui,%c,1),3,1) isnum) {
+      did -a $dname 13 $gettok($line(@smarticq-gui,%c,1),2,1)
+      did -a $dname 22 $gettok($line(@smarticq-gui,%c,1),2-3,1)
+    }
+    dec %c
+  }
+}
+
+on *:dialog:_icq.phonebook:sclick:4,5,13:{
+  if ($did == 4) {
+    _icq.adduserinfo $_icq.a $did($dname,18).text phone $did($dname,19).text
+    _icq.adduserinfo $_icq.a $did($dname,18).text cellular $did($dname,20).text
+    _icq.adduserinfo $_icq.a $did($dname,18).text fax $did($dname,21).text
+  }
+  if ($did == 5) {
+    if ($dialog(_icq.sendsms)) { did -ra _icq.sendsms 3 $did($dname,20).text }
+  }
+  if ($did == 13) {
+    var %uin = $gettok($did($dname,22,$did($dname,13).sel).text,2,1)
+    did -ra $dname 18 %uin
+    did -ra $dname 19 $_icq.g($_icq.a,%uin,phone)
+    did -ra $dname 20 $remove($_icq.g($_icq.a,%uin,cellular),sms)
+    did -ra $dname 21 $_icq.g($_icq.a,%uin,fax)
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; reqister account
+
+alias _icq.dlg_registration { 
+  if ($dialog(_icq.reistration)) { dialog -v _icq.registration }
+  else { dialog -m _icq.registration _icq.registration }
+}
+dialog _icq.registration {
+  title "SmartICQ Registration"
+  size -1 -1 156 145
+  option dbu
+  text "First Name:", 4, 10 13 30 8, right
+  text "Last Name:", 5, 10 25 30 8, right
+  text "Nickname:", 6, 10 37 30 8, right
+  text "E-Mail:", 7, 10 49 30 8, right
+  text "Password:", 8, 10 93 45 8, right
+  text "Re-type Password:", 9, 10 105 45 8, right
+  box "Details", 10, 4 4 148 63
+  box "Password", 11, 4 71 148 57
+  edit "", 12, 42 12 100 10, autohs
+  edit "", 13, 42 24 100 10, autohs
+  edit "", 14, 42 36 100 10, autohs
+  edit "", 15, 42 48 100 10, autohs
+  text "Select your ICQ password", 16, 9 79 61 8
+  edit "", 17, 58 92 65 10, pass autohs
+  edit "", 18, 58 104 65 10, pass autohs
+  button "Create Account", 19, 68 131 43 12, default
+  button "Cancel", 20, 115 131 37 12, cancel
+  check "Save password", 21, 58 116 65 10
+}
+
+on *:dialog:_icq.registration:sclick:19:{
+  var %error
+  if ($len($did($dname,17).text) < 4) { %error = 1 password to short }
+  if ($len($did($dname,17).text) > 16) { %error = 1 password to long }
+  if ($did($dname,17).text != $did($dname,18).text) { %error = 1 password don't match }
+  if (!$did($dname,18).text) { %error = 1 password don't match }
+  if (!$did($dname,17).text) { %error = 1 password don't match }
+  if (!$did($dname,15).text) { %error = 1 you must supply your e-mail }
+  if (!$did($dname,14).text) { %error = 1 you must supply your nick name }
+  if (!$did($dname,13).text) { %error = 1 you must supply your last tname }
+  if (!$did($dname,12).text) { %error = 1 you must supply your first tname }
+
+  if (%error) { 
+    _icq.debug -a ERROR $gettok(%error,2-,32) 
+    var %d = $input($gettok(%error,2-,32),260,- SmartICQ)
+    return
+  }
+  dialog -m _icq.newaccount _icq.newaccount
+  did -a _icq.newaccount 100 $did($dname,12).text
+  did -a _icq.newaccount 101 $did($dname,13).text
+  did -a _icq.newaccount 102 $did($dname,14).text
+  did -a _icq.newaccount 103 $did($dname,15).text
+  if ($did($dname,21).state) { did -c _icq.newaccount 104 }
+  sockclose icq-new 
+  sockopen icq-new login.icq.com 5190
+  sockmark icq-new $did($dname,17).text
+  _icq.debug -st aa $sock(icq-new).mark
+  dialog -x $dname
+}
+
+
+dialog _icq.newaccount {
+  title "SmartICQ - New Account"
+  size -1 -1 127 56
+  option dbu
+  text "Creating new account...", 1, 3 5 57 8
+  button "Close", 2, 87 41 37 12, cancel
+  box "Status", 3, 3 15 122 21
+  text "Connecting to server...", 4, 7 24 100 8
+  text "UIN:", 5, 17 38 65 8
+  text "Password:", 6, 4 47 78 8
+
+  edit "", 100, 0 0 0 0, hide
+  edit "", 101, 0 0 0 0, hide
+  edit "", 102, 0 0 0 0, hide
+  edit "", 103, 0 0 0 0, hide
+  check "", 104, 0 0 0 0, hide
+}
+on *:dialog:_icq.newaccount:sclick:2:{ sockclose icq-new }
+
+; _________________________________________________________________________________________________________
+;
+; remove user from contact list
+
+alias _icq.dlg_remfromcontact {
+  if ($dialog(_icq.remfromcontact)) { dialog -v _icq.remfromcontact }
+  else {
+    set %_icq.dlg_remfromcontact.uin $1
+    dialog -m _icq.remfromcontact _icq.remfromcontact
+  }
+}
+
+dialog _icq.remfromcontact {
+  title "SmartICQ"
+  size -1 -1 113 73
+  option dbu
+  button "Close", 4, 33 60 37 12, cancel 
+  button "Remove", 5, 75 60 37 12
+  box "Remove User From Contact List", 10, 1 3 111 54
+  text "User:", 13, 4 15 26 8,right
+  combo 14, 34 14 72 100, size drop
+  text "UIN:", 15, 4 30 26 8, right
+  text "Name:", 16, 4 42 26 8, right
+  edit "", 17, 33 29 73 10, read autohs
+  edit "", 18, 33 41 73 10, read autohs
+  edit "", 19, 0 0 0 0, hide
+  combo 20, 0 0 0 0, hide 
+}
+
+on *:dialog:_icq.remfromcontact:init:*:{
+  did -a $dname 19 %_icq.dlg_remfromcontact.uin
+  unset %_icq.dlg_remfromcontact.uin
+
+  var %c = $line(@smarticq-gui,0,1)
+  while (%c) {
+    did -a $dname 14 $gettok($line(@smarticq-gui,%c,1),2,1)
+    did -a $dname 20 $gettok($line(@smarticq-gui,%c,1),2-3,1)
+    if ($gettok($line(@smarticq-gui,%c,1),3,1) == $did($dname,19).text) { did -c $dname 14 $did($dname,14).lines }
+    dec %c
+  }
+
+  var %uin = $did($dname,19).text
+  var %myuin = $_icq.a
+  var %fname = $_icq.g(%myuin,%uin,fname)
+  var %lname = $_icq.g(%myuin,%uin,lname)
+  var %nick = $_icq.g(%myuin,%uin,nick)
+  did -a $dname 17 %uin
+  did -a $dname 18 %fname %lname
+}
+
+on *:dialog:_icq.remfromcontact:sclick:5,14:{
+  if ($did == 5) {
+    var %wc = $+(*,$chr(1),$gettok($did($dname,20,$did($dname,14).sel).text,2,1),$chr(1),*)
+    dline -l @smarticq-gui $fline(@smarticq-gui,%wc,1,1)
+    var %wc = $gettok($did($dname,20,$did($dname,14).sel).text,2,1)
+    remini $+(",$_icq.dir,$_icq.a,\uin.ini") contacts %wc
+    remini $+(",$_icq.dir,$_icq.a,\users.ini") %wc
+    did -d $dname 14,20 $did($dname,14).sel
+    did -c $dname 14,20 1
+    hadd smarticq sel 2
+
+    if (!$fline(@smarticq-gui,xx*,0,1)) && ($fline(@smarticq-gui,xa*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,xa*,1,1) }
+    if (!$fline(@smarticq-gui,dd*,0,1)) && ($fline(@smarticq-gui,da*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,da*,1,1) }
+    if (!$fline(@smarticq-gui,uu*,0,1)) && ($fline(@smarticq-gui,ua*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,ua*,1,1) }
+    while ($gettok($line(@smarticq-gui,$hget(smarticq,sel),1),3,1) == line) { hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+    _icq.drw_cl $hget(smarticq,scroll)
+    _icq.qs _icq.remuin $gettok($did($dname,20,$did($dname,14).sel).text,2,1)
+  }
+  var %uin = $gettok($did($dname,20,$did($dname,14).sel).text,2,1)
+  var %myuin = $_icq.a
+  var %fname = $_icq.g(%myuin,%uin,fname)
+  var %lname = $_icq.g(%myuin,%uin,lname)
+  var %nick = $_icq.g(%myuin,%uin,nick)
+  did -ra $dname 17 %uin
+  did -ra $dname 18 %fname %lname
+  did -c $dname 20 $did($dname,14).sel
+  if ($did == 5) { dialog -x $dname }
+}
+
+; _________________________________________________________________________________________________________
+;
+; add user to contact list
+
+alias _icq.dlg_add2contact {
+  if ($dialog(_icq.add2contact)) { dialog -v _icq.add2contact }
+  else {
+    set %_icq.dlg_add2contact.uin $1
+    dialog -m _icq.add2contact _icq.add2contact
+  }
+}
+
+dialog _icq.add2contact {
+  title "SmartICQ"
+  size -1 -1 111 79
+  option dbu
+  button "Close", 4, 31 66 37 12, cancel
+  button "Add", 5, 72 66 37 12, disable
+  text "UIN:", 8, 5 20 11 8
+  box "Add User To Contact List", 10, 1 3 108 60
+  text "Show as:", 11, 5 32 22 8
+  combo 12, 31 32 71 100, size edit drop
+  edit "", 13, 31 18 71 10, autohs
+  check "Don't tell user about it", 14, 31 48 67 10
+}
+
+alias -l _icq.dlg_add2contact.update {
+  var %uin = $did($1,13).text
+  var %myuin = $_icq.a
+  var %show = $_icq.g(%myuin,%uin,show)
+  var %fname = $_icq.g(%myuin,%uin,fname)
+  var %lname = $_icq.g(%myuin,%uin,lname)
+  var %nick = $_icq.g(%myuin,%uin,nick)
+  var %email = $_icq.g(%myuin,%uin,e-mail)
+
+  did -r $dname 12
+  if (%show) { did -i $1 12 0 %show }
+  if (!%show) { did -i $1 12 0 %uin }
+  if (%nick) { did -a $1 12 %nick }
+  if (%fname) && (%nick != %fname) && (%fname != %lname) { did -a $1 12 %fname }
+  if (%lname) && (%nick != %lname) { did -a $1 12 %lname }
+  if (%fname) && (%lname) { did -a $1 12 %fname %lname | did -a $1 12 %lname $+ , %fname }
+  if (%uin) { did -a $1 12 %uin }
+  var %wc = $+(*,$chr(1),$did($dname,13).text,$chr(1),*)
+  var %d = $gettok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),4,1)
+  if (%d == $null) || (%d == unknown) { did -e $dname 5 }
+  else { did -b $dname 5 }
+}
+
+on *:dialog:_icq.add2contact:init:*:{
+  did -a $dname 13 %_icq.dlg_add2contact.uin
+  did -f $dname 13
+  unset %_icq.dlg_add2contact.uin
+  if ($did($dname,13).text !isnum) { did -r $dname 13 | did -b $dname 5 | return }
+  _icq.dlg_add2contact.update $dname 
+
+}
+
+on *:dialog:_icq.add2contact:edit:13:{ 
+  if ($did($dname,13).text !isnum) { did -ra $dname 13 $left($did($dname,13).text,-1) | did -b $dname 5 }
+  if ($did($dname,13).text  == $null) { return }
+  if ($did($dname,13).text isnum) { did -e $dname 5 }
+  _icq.dlg_add2contact.update $dname 
+}
+
+on *:dialog:_icq.add2contact:sclick:5:{
+  var %wc = $+(*,$chr(1),$did($dname,13).text,$chr(1),*)
+  if ($fline(@smarticq-gui,%wc,1,1)) { 
+    dline -l @smarticq-gui $fline(@smarticq-gui,%wc,1,1),1) 
+    if (!$fline(@smarticq-gui,xx*,0,1)) && ($fline(@smarticq-gui,xa*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,xa*,1,1) }
+    if (!$fline(@smarticq-gui,dd*,0,1)) && ($fline(@smarticq-gui,da*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,da*,1,1) }
+    if (!$fline(@smarticq-gui,uu*,0,1)) && ($fline(@smarticq-gui,ua*,0,1)) { dline -l @smarticq-gui $fline(@smarticq-gui,ua*,1,1) }
+    while ($gettok($line(@smarticq-gui,$hget(smarticq,sel),1),3,1) == line) { hadd smarticq sel $calc($hget(smarticq,sel) +1) }
+  }
+
+  writeini $+(",$_icq.dir,$_icq.a,\uin.ini") contacts $did($dname,13).text 1
+  _icq.adduserinfo $_icq.a $did($dname,13).text SHOW $did($dname,12).text
+  _icq.add_cl xx $did($dname,13).text offline $did($dname,12).text
+  _icq.drw_cl $hget(smarticq,scroll)
+  _icq.dlg_add2contact.update $dname 
+  did -f $dname 13
+  _icq.qs _icq.adduin $did($dname,13).text
+  if (!$did($dname,14).state) { _icq.qs _icq.useraddyou $did($dname,13).text }
+  _icq.qs _icq.reqfi $did($dname,13).text
+}
+
+; _________________________________________________________________________________________________________
+;
+; "user added you"
+
+alias _icq.dlg_useraddyou { 
+  if ($dialog(_icq.useraddyou)) { dialog -v _icq.useraddyou }
+  else { set %_icq.useraddyou $1 | set %_icq.useraddedyou.h $2 | dialog -m _icq.useraddyou _icq.useraddyou }
+}
+
+dialog _icq.useraddyou {
+  title "SmartICQ - SYSTEM"
+  size -1 -1 133 111
+  option dbu
+  button "Close", 1, 93 95 37 12, ok
+  box "User Added You", 2, 2 2 128 89
+  edit "", 3, 35 11 91 10, read autohs
+  edit "", 4, 35 22 91 10, read autohs
+  text "UIN:", 5, 6 12 11 8
+  text "Nickname:", 6, 6 23 26 8
+  text "Real Name:", 7, 6 34 28 8
+  edit "", 8, 35 33 91 10, read autohs
+  text "Message:", 9, 6 45 23 8
+  edit "", 10, 35 44 91 41, read autohs vsbar
+}
+
+on *:dialog:_icq.useraddyou:init:*:{
+  if (%_icq.useraddedyou.h != -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\system.ini"),addedyou,%_icq.useraddyou) }
+  if (%_icq.useraddedyou.h == -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\history.ini"),addedyou,%_icq.useraddyou) }
+  did -ra $dname 3 %_icq.useraddyou
+  var %nick = $gettok(%read,1,254)
+  var %first = $gettok(%read,2,254)
+  var %last = $gettok(%read,1,254)
+  if (%nick != -) { did -ra $dname 4 %nick }
+  if (%first != -) || (%last != -) { did -ra $dname 8 $iif(%first != -,%first) $iif(%last != -,%last) }
+  if (%_icq.useraddedyou.h != -history) {
+    remini $+(",$_icq.dir,$_icq.a,\system.ini") addedyou %_icq.useraddyou
+    writeini $+(",$_icq.dir,$_icq.a,\history.ini") addedyou %_icq.useraddyou %read
+  }
+  unset %_icq.useraddyou 
+  unset %_icq.useraddedyou.h
+}
+
+; _________________________________________________________________________________________________________
+;
+; request authorization
+
+alias _icq.dlg_reqauth { 
+  if ($dialog(_icq.reqauth)) { dialog -v _icq.reqauth }
+  else { set %_icq.req $1 | set %_icq.req.h $2 | dialog -m _icq.reqauth _icq.reqauth }
+}
+
+dialog _icq.reqauth {
+  title "SmartICQ - SYSTEM"
+  size -1 -1 133 111
+  option dbu
+  button "Authorize", 1, 53 95 37 12, ok
+  box "User Request Authorization", 2, 2 2 128 89
+  edit "", 3, 35 12 91 10, read autohs
+  edit "", 4, 35 23 91 10, read autohs
+  text "UIN:", 5, 6 12 11 8
+  text "Nickname:", 6, 6 23 26 8
+  text "Real Name:", 7, 6 34 28 8
+  edit "", 8, 35 34 91 10, read autohs
+  text "Message:", 9, 6 45 23 8
+  edit "", 10, 35 45 91 41, read autovs vsbar multi
+  button "Decline", 11, 93 95 37 12, cancel
+}
+
+on *:dialog:_icq.reqauth:init:*:{
+  if (%_icq.req.h != -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\system.ini"),rqst,%_icq.req) }
+  if (%_icq.req.h == -history) { var %read = $readini($+(",$_icq.dir,$_icq.a,\history.ini"),rqst,%_icq.req) }
+  did -ra $dname 3 %_icq.req
+  did -ra $dname 4 $_icq.g($_icq.a,%_icq.req,SHOW)
+  did -ra $dname 8 $_icq.g($_icq.a,%_icq.req,FNAME) $_icq.g($_icq.a,%_icq.req,LNAME)
+  did -ra $dname 10 $gettok(%read,-1,254)
+  if (%_icq.req.h != -history) {
+    remini $+(",$_icq.dir,$_icq.a,\system.ini") rqst %_icq.req
+    writeini $+(",$_icq.dir,$_icq.a,\history.ini") rqst %_icq.req %read
+  }
+  unset %_icq.req
+  unset %_icq.req.h
+}
+
+on *:dialog:_icq.reqauth:sclick:*:{
+  if ($did == 11) { _icq.auth_denied $did($dname,3).text | dialog -x $dname }
+  if ($did == 1) { _icq.auth_given $did($dname,3).text }
+}
+
+; _________________________________________________________________________________________________________
+;
+; user details
+
+alias _icq.dlg_userdetails { 
+  if ($dialog(_icq.userdetails)) { dialog -v _icq.userdetails }
+  else { 
+    set %_icq.dlg_userdetails.uin $iif($1,$1,$_icq.seluin)
+    dialog -m _icq.userdetails _icq.userdetails 
+  }
+}
+
+dialog _icq.userdetails {
+  title "SmartICQ - User Details"
+  size -1 -1 236 140
+  option dbu
+  list 1, 1 3 65 121, size
+
+  button "Update from ICQ directories", 3, 122 127 71 11
+  button "Close", 4, 196 127 37 11, cancel
+  button "Apply", 5, 80 127 37 11
+  combo 6, 1 127 65 50, size drop
+  list 7, 0 0 0 0, hide
+  edit "", 8, 0 0 0 0, hide
+  edit "", 9, 0 0 0 0, hide
+
+  ; [contact]
+  box "Contact", 99, 68 3 165 121
+  text "", 100, 77 13 150 8
+  text "", 101, 77 22 150 8
+  text "", 102, 77 31 150 8
+  text "", 103, 77 40 150 8
+  text "", 104, 77 49 150 8
+  text "", 105, 77 58 150 8
+  text "", 106, 77 67 150 8
+  text "", 107, 77 76 150 8
+  text "", 108, 77 85 150 8
+  text "", 109, 77 94 150 8
+  text "", 110, 77 103 150 8
+  text "", 111, 77 112 150 8
+
+  button "", 150, 71 14 5 5, hide
+  button "", 151, 71 23 5 5, hide
+  button "", 152, 71 32 5 5, hide
+  button "", 153, 71 41 5 5, hide
+  button "", 154, 71 50 5 5, hide
+  button "", 155, 71 59 5 5, hide
+  button "", 156, 71 68 5 5, hide
+  button "", 157, 71 77 5 5, hide
+  button "", 158, 71 86 5 5, hide
+  button "", 159, 71 95 5 5, hide
+  button "", 160, 71 104 5 5, hide
+  button "", 161, 71 113 5 5, hide
+
+  ; [main]
+  box "ICQ Number", 199, 68 3 165 23, hide
+  box "Name", 200, 68 29 165 35, hide
+  box "E-Mail Addresses", 201, 68 68 165 55, hide
+  text "ICQ#:", 202, 78 13 14 8, hide
+  edit "", 203, 100 12 49 10, read autohs hide center
+  edit "", 204, 100 37 49 10, read autohs hide
+  edit "", 205, 100 49 49 10, read autohs hide
+  edit "", 206, 181 37 49 10, read autohs hide
+  combo 207, 181 50 49 100, size edit drop hide
+  text "First name:", 208, 71 38 26 8, hide
+  text "Nickname:", 209, 71 49 26 8, hide
+  text "Last name:", 210, 151 38 26 8, hide
+  text "Display:", 211, 151 50 19 8, hide
+  list 212, 72 77 105 42, size hide
+  button "E-Mail", 213, 180 77 49 10, hide 
+  button "Copy to CB", 214, 180 88 49 10, hide 
+
+  ; [home]
+  box "Home Address", 300, 68 3 165 65, hide
+  box "Local Time", 301, 68 73 165 50, hide
+  edit "", 302, 72 25 63 27, read multi autovs hide
+  edit "", 303, 167 12 62 10, read autohs hide
+  edit "", 304, 167 25 62 10, read autohs hide
+  edit "", 305, 167 38 62 10, read autohs hide
+  edit "", 306, 167 51 62 10, read autohs hide
+  text "Street address:", 307, 72 14 36 8, hide
+  text "City:", 308, 140 13 10 8, hide
+  text "State:", 309, 140 26 14 8, hide
+  text "Zip code:", 310, 140 39 23 8, hide
+  text "Country:", 311, 140 52 20 8, hide
+  combo 312, 105 86 44 20, disable size drop hide
+  edit "", 313, 182 86 43 10, read autohs center hide
+  edit "", 314, 182 102 43 10, read autohs center hide
+  text "Your time:", 315, 154 87 24 8, hide
+  text "User time:", 316, 154 103 24 8, hide
+  text "GMT offset:", 317, 73 87 28 8, hide
+  check "Override user GMT settings", 318, 73 101 81 10, hide disable
+
+  ; [work]
+  box "Work Address", 400, 68 3 165 65, hide
+  box "Company", 401, 68 73 165 50, hide
+  edit "", 402, 72 25 63 27, read autovs multi hide
+  edit "", 403, 167 12 62 10, read autohs hide
+  edit "", 404, 167 25 62 10, read autohs hide
+  edit "", 405, 167 38 62 10, read autohs hide
+  edit "", 406, 167 51 62 10, read autohs hide
+  text "Street address:", 407, 72 14 36 8, hide
+  text "City:", 408, 140 13 10 8, hide
+  text "State:", 409, 140 26 14 8, hide
+  text "Zip code:", 410, 140 39 23 8, hide
+  text "Country:", 411, 140 52 20 8, hide
+  edit "", 412, 94 83 50 10, read autohs hide
+  edit "", 413, 94 96 50 10, read autohs hide
+  edit "", 414, 94 109 133 10, read autohs hide
+  edit "", 415, 177 83 50 10, read autohs hide
+  edit "", 416, 177 96 50 10, read autohs hide
+  text "Name:", 417, 71 84 16 8, hide
+  text "Div/dept:", 418, 71 97 23 8, hide
+  text "Web:", 419, 71 110 13 8, hide
+  text "Occupation:", 420, 147 84 29 8, hide
+  text "Position:", 421, 147 97 20 8, hide
+
+  ; [more] 
+  box "Additional Details", 500, 68 3 165 42, hide
+  box "Birthdate", 501, 68 50 165 41, hide
+  box "Spoken Languages", 502, 68 93 165 30, hide
+  edit "", 503, 106 14 102 10, read autohs hide
+  edit "", 504, 106 27 44 10, read autohs center hide
+  edit "", 505, 176 27 32 10, read autohs center hide
+  button "Visit", 506, 210 14 20 10, hide
+  text "Homepage:", 507, 74 15 28 8, hide
+  text "Gender:", 508, 74 28 19 8, hide
+  text "Age:", 509, 158 28 11 8, hide
+  edit "", 510, 90 61 37 10, read autohs center hide
+  edit "", 511, 144 61 33 10, read autohs center hide
+  edit "", 512, 195 61 32 10, read autohs center hide
+  text "Month:", 513, 71 62 17 8, hide
+  text "Day:", 514, 129 62 11 8, hide
+  text "Year:", 515, 180 62 13 8, hide
+  edit "", 516, 73 105 47 10, autohs center hide read
+  edit "", 517, 126 105 48 10, autohs center hide read
+  edit "", 518, 180 105 47 10, autohs center hide read
+
+  ; [about}
+  box "Additional details about the user", 600, 68 3 165 60, hide
+  box "Enter additional details/notes about this user here", 601, 68 63 165 60, hide
+  edit "", 602, 70 10 161 50, read autovs hide multi
+  edit "", 603, 70 70 161 50, autovs hide multi
+}
+
+alias _icq.dlg_userdetails.switch { 
+  var %c = $did(_icq.userdetails,9).text
+  if ($1 == %c) { 
+    if ($2) { return }
+    if (!$2) { halt }
+  }
+  if ($1 == 1) { did -v _icq.userdetails 99,100,101,102,103,104,105,106,107,108,109,110,111 }
+  if ($1 == 2) { did -v _icq.userdetails 199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214 }
+  if ($1 == 3) { did -v _icq.userdetails 300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318 }
+  if ($1 == 4) { did -v _icq.userdetails 400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421 }
+  if ($1 == 5) { did -v _icq.userdetails 500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518 }
+  if ($1 == 6) { did -v _icq.userdetails 600,601,602,603 }
+  if (%c == 1) { did -h _icq.userdetails 99,100,101,102,103,104,105,106,107,108,109,110,111,150,151,152,153,154,155,156,157,158,159,160,161 }
+  if (%c == 2) { did -h _icq.userdetails 199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214 }
+  if (%c == 3) { did -h _icq.userdetails 300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318 }
+  if (%c == 4) { did -h _icq.userdetails 400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421 }
+  if (%c == 5) { did -h _icq.userdetails 500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518 }
+  if (%c == 6) { did -h _icq.userdetails 600,601,602,603 }
+  did -ra _icq.userdetails 9 $1
+}
+
+alias _icq.dlg_userdetails.contact { 
+  _icq.dlg_userdetails.switch 1 $2
+
+  ;100 150
+
+  var %c = 100 
+  while (%c <= 111) {
+    did -r $1 %c
+    did -h $1 $calc(%c +50)
+    inc %c
+  }
+
+  var %c = 100
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+  var %fname = $_icq.g(%myuin,%uin,fname)
+  var %lname = $_icq.g(%myuin,%uin,lname)
+  var %nick = $_icq.g(%myuin,%uin,nick)
+  var %email = $_icq.g(%myuin,%uin,e-mail)
+  var %country = n $+ $_icq.g(%myuin,%uin,country)
+  var %country = $readini($+(",$_icq.dir,dat\smarticq.dat"),country2,%country)
+  var %street = $_icq.g(%myuin,%uin,street)
+  var %city = $_icq.g(%myuin,%uin,city)
+  var %gender = $_icq.g(%myuin,%uin,gender)
+  var %birth = $_icq.g(%myuin,%uin,birthdate)
+  var %age = $_icq.g(%myuin,%uin,age)
+  var %phone = $_icq.g(%myuin,%uin,phone)
+  var %cellular = $_icq.g(%myuin,%uin,cellular)
+  var %last_online = $_icq.g($_icq.a,%uin,last_online)
+  var %client = $_icq.g(%myuin,%uin,client)
+  var %ip = $_icq.g(%myuin,%uin,ip)
+  var %port = $_icq.g(%myuin,%uin,port)
+
+  if (%uin != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c ICQ#: %uin | inc %c }
+  if (%fname != $null) || (%lname != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Name: %fname %lname | inc %c }
+  if (%nick != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Nickname: %nick | inc %c }
+  if (%street != $null) || (%city != $null) || (%country != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Address: %street $+ $iif((%street) && (%city),$chr(44)) %city $+ $iif((%city) && (%country),$chr(44)) %country | inc %c }
+  if (%gender != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Gender: %gender | inc %c }
+  if ($gettok(%birth,1,32)) { did -v $1 $calc(%c +50) | did -ra $1 %c Birthdate: $gettok(%birth,1,32) $+ - $+ $base($gettok(%birth,2,32),10,10,2) $+ - $+ $base($gettok(%birth,3,32),10,10,2) | inc %c }
+  if (%age != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Age: %age | inc %c }
+  if (%phone != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Phone: %phone | inc %c }
+  if (%Cellular != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Cellular: %cellular | inc %c }
+  if (%client != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c Client: $replace(%client,0 3,?,0 4,ICQ98,0 6,licq,0 7,ICQ2000,0 8,ICQ2001,9 9,SmartICQ) | inc %c }
+  if (%port != $null) { did -v $1 $calc(%c +50) | did -ra $1 %c IP: %ip | inc %c }
+  if (%last_online != $null) { 
+    if (%last_online isnum) { did -v $1 $calc(%c +50) | did -ra $1 %c Last seen: $duration($calc($ctime - %last_online)) ago | inc %c }
+    if (%last_online == $null) { did -r $1 %c  }
+    if (%last_online == now) { did -r $1 %c  }
+  }
+
+}
+
+alias _icq.dlg_userdetails.main { 
+  _icq.dlg_userdetails.switch 2 $2
+
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+  var %show = $_icq.g(%myuin,%uin,show)
+  var %fname = $_icq.g(%myuin,%uin,fname)
+  var %lname = $_icq.g(%myuin,%uin,lname)
+  var %nick = $_icq.g(%myuin,%uin,nick)
+  var %email = $_icq.g(%myuin,%uin,e-mail)
+  var %email_more = $_icq.g(%myuin,%uin,email_more)
+  did -ra $1 203 %uin
+  did -ra $1 204 %fname
+  did -ra $1 205 %nick
+  did -ra $1 206 %lname
+
+  did -r $1 207
+  if (%show) { did -i $1 207 0 %show }
+  if (!%show) { did -i $1 207 0 %uin }
+  if (%nick) { did -a $1 207 %nick }
+  if (%fname) && (%nick != %fname) && (%fname != %lname) { did -a $1 207 %fname }
+  if (%lname) && (%nick != %lname) { did -a $1 207 %lname }
+  if (%fname) && (%lname) { did -a $1 207 %fname %lname | did -a $1 207 %lname $+ , %fname }
+  if (%uin) { did -a $1 207 %uin }
+  did -r $1 212
+  if (%email) { did -a $1 212 %email }
+  if (%email_more) {
+    var %c = 1, %l = $gettok(%email_more,0,32)
+    while (%c <= %l) {
+      did -a $1 212 $gettok(%email_more,%c,32)
+      inc %c
+    }
+  }
+}
+
+
+
+alias _icq.dlg_userdetails.home { 
+  _icq.dlg_userdetails.switch 3 $2
+
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+  var %street = $_icq.g(%myuin,%uin,street) 
+  var %city = $_icq.g(%myuin,%uin,city) 
+  var %state = $_icq.g(%myuin,%uin,state) 
+  var %zip = $_icq.g(%myuin,%uin,zip) 
+  var %country = n $+ $_icq.g(%myuin,%uin,country)
+  var %country = $readini($+(",$_icq.dir,dat\smarticq.dat"),country2,%country)
+  var %gmt = $_icq.g(%myuin,%uin,gmt) 
+  if (%gmt > 24) { %gmt = $calc(%gmt - 256) }
+  %gmt = $readini($+(",$_icq.dir,dat\smarticq.dat"),gmt2,$+(n,%gmt))
+
+  did -ra $1 302 %street
+  did -ra $1 303 %city
+  did -ra $1 304 %state
+  did -ra $1 305 %zip
+  did -ra $1 306 %country
+  did -ra $1 312 %gmt
+  did -c $1 312 1
+  did -ra $1 313 $asctime(HH:nn)
+  did -ra $1 314 $asctime($calc( $ctime($asctime($gmt)) $iif(+ isin %gmt,+,-) (($remove($gettok(%gmt,1,58),GMT,+,-) *3600) + ($gettok(%gmt,2,58) *60)) ),HH:nn)
+  if (!$_icq.g(%myuin,%uin,gmt)) { did -r $1 314 }
+}
+
+
+alias _icq.dlg_userdetails.work { 
+  _icq.dlg_userdetails.switch 4 $2
+
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+  var %street = $_icq.g(%myuin,%uin,work-street) 
+  var %city = $_icq.g(%myuin,%uin,work-city) 
+  var %state = $_icq.g(%myuin,%uin,work-state) 
+  var %zip = $_icq.g(%myuin,%uin,work-zip) 
+  var %country = n $+ $_icq.g(%myuin,%uin,work-country)
+  var %country = $readini($+(",$_icq.dir,dat\smarticq.dat"),country2,%country)
+  var %name = $_icq.g(%myuin,%uin,work-name)
+  var %dep = $_icq.g(%myuin,%uin,work-dep)
+  var %occ = $_icq.g(%myuin,%uin,work-occ)
+  var %pos = $_icq.g(%myuin,%uin,work-pos)
+  var %web = $_icq.g(%myuin,%uin,work-web)
+  did -ra $1 402 %street
+  did -ra $1 403 %city
+  did -ra $1 404 %state
+  did -ra $1 405 %zip
+  did -ra $1 406 %country
+  did -ra $1 412 %name
+  did -ra $1 413 %dep
+  did -ra $1 414 %web
+  did -ra $1 415 %occ
+  did -ra $1 416 %pos
+}
+
+alias _icq.dlg_userdetails.more { 
+  _icq.dlg_userdetails.switch 5 $2
+
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+
+  did -ra $1 503 $_icq.g(%myuin,%uin,homepage)
+  did -ra $1 504 $_icq.g(%myuin,%uin,gender)
+  did -ra $1 505 $_icq.g(%myuin,%uin,age)
+
+  var %birth = $_icq.g(%myuin,%uin,birthdate)
+  did -r $1 510,511,512
+  if ($gettok(%birth,2,32)) { did -a $1 510 $gettok(%birth,2,32) }
+  if ($gettok(%birth,3,32)) { did -a $1 511 $gettok(%birth,3,32) }
+  if ($gettok(%birth,1,32)) { did -a $1 512 $gettok(%birth,1,32) }
+
+  var %lang1 = n $+ $gettok($_icq.g(%myuin,%uin,languages),1,32)
+  var %lang2 = n $+ $gettok($_icq.g(%myuin,%uin,languages),2,32)
+  var %lang3 = n $+ $gettok($_icq.g(%myuin,%uin,languages),3,32)
+
+  did -ra $1 516 $readini($+(",$_icq.dir,dat\smarticq.dat"),lang2,%lang1) 
+  did -ra $1 517 $readini($+(",$_icq.dir,dat\smarticq.dat"),lang2,%lang2) 
+  did -ra $1 518 $readini($+(",$_icq.dir,dat\smarticq.dat"),lang2,%lang3)
+}
+
+alias _icq.dlg_userdetails.about { 
+  _icq.dlg_userdetails.switch 6 $2
+  var %myuin = $_icq.a
+  var %uin = $did($1,8).text
+  var %about = $_icq.g(%myuin,%uin,about)
+  did -ra $dname 602 %about
+}
+
+on *:dialog:_icq.userdetails:init:*:{
+  did -a $dname 8 %_icq.dlg_userdetails.uin | unset %_icq.dlg_userdetails.uin
+
+  var %c = 1, %cc = 1
+  while (%c <= $line(@SmartICQ-gui,0,1)) {
+    if ($gettok($line(@SmartICQ-gui,%c,1),3,1) isnum) {
+      did -a $dname 6 $gettok($line(@SmartICQ-gui,%c,1),2,1)
+      did -a $dname 7 $gettok($line(@SmartICQ-gui,%c,1),2-3,1)
+      if ($gettok($line(@SmartICQ-gui,%c,1),3,1) == $did($dname,8).text) { did -c $dname 6 %cc }
+      inc %cc
+    }
+    inc %c
+  }
+
+  did -a $dname 1 Contact
+  did -a $dname 1 Main
+  did -a $dname 1 Home
+  did -a $dname 1 Work
+  did -a $dname 1 More
+  did -a $dname 1 About
+  did -c $dname 1 1
+
+  _icq.dlg_userdetails.contact $dname
+
+}
+
+on *:dialog:_icq.userdetails:sclick:150,151,152,153,154,155,156,157,158,159,160,161:{
+  clipboard $gettok($did($dname,$calc($did -50)).text,2-,32)
+  dialog -t $dname SmartICQ - User Details (copied to clipboard)
+  .timer_icq.clip off
+  .timer_icq.clip -o 1 1 dialog -t $dname SmartICQ - User Details
+}
+
+on *:dialog:_icq.userdetails:sclick:1,3,4,5,6,214:{
+  if ($did == 4) { .timer_icq.clip off }
+  if ($did == 214) { clipboard $did($dname,212).seltext }
+  if ($did == 1) {
+    var %c = $did($dname,1,1).sel
+    if (%c == 1) { _icq.dlg_userdetails.contact $dname }
+    if (%c == 2) { _icq.dlg_userdetails.main $dname }
+    if (%c == 3) { _icq.dlg_userdetails.home $dname }
+    if (%c == 4) { _icq.dlg_userdetails.work $dname }
+    if (%c == 5) { _icq.dlg_userdetails.more $dname }
+    if (%c == 6) { _icq.dlg_userdetails.about $dname }
+  }
+  if ($did == 3) { did -b $dname 3 | _icq.qs _icq.reqfi $did($dname,8).text }
+  if ($did == 5) {
+    if ($did($dname,207,0).text) {
+      var %wc = * $+ $chr(1) $+ $did($dname,8).text $+ $chr(1) $+ *
+      rline -l @smarticq-gui $fline(@smarticq-gui,%wc,1,1),1) $puttok($line(@smarticq-gui,$fline(@smarticq-gui,%wc,1,1),1),$did($dname,207,0).text,2,1)
+      _icq.adduserinfo $_icq.a $did($dname,8).text SHOW $did($dname,207,0).text
+      _icq.drw_cl $hget(smarticq,scroll)
+    }
+  }
+  if ($did == 6) {
+    did -ra $dname 8 $gettok($did($dname,7,$did($dname,6,1).sel).text,2,1)
+    var %c = $did($dname,1,1).sel
+    if (%c == 1) { _icq.dlg_userdetails.contact $dname $true }
+    if (%c == 2) { _icq.dlg_userdetails.main $dname $true }
+    if (%c == 3) { _icq.dlg_userdetails.home $dname $true }
+    if (%c == 4) { _icq.dlg_userdetails.work $dname $true }
+    if (%c == 5) { _icq.dlg_userdetails.more $dname $true }
+    if (%c == 6) { _icq.dlg_userdetails.about $dname $true }
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; send sms
+
+alias _icq.dlg_sendsms { 
+  if ($dialog(_icq.sendsms)) { dialog -v _icq.sendsms }
+  else { dialog -m _icq.sendsms _icq.sendsms }
+}
+
+dialog _icq.sendsms {
+  title "SmartICQ - Send SMS Message"
+  size -1 -1 176 95
+  option dbu
+  box "To", 1, 1 2 173 24
+  button "Phone book", 2, 124 10 45 12
+  edit "", 3, 6 10 114 12, autohs
+  text "Message text:", 4, 1 30 33 8
+  edit "", 5, 1 40 173 33, multi autovs vsbar
+  text "Characters left:", 6, 108 30 36 8
+  edit "160", 7, 148 28 26 10, read autohs
+  button "Close", 8, 96 79 37 12, cancel
+  box "Status", 9, 1 74 91 17
+  text "Ready...", 10, 5 81 20 8
+  button "Send", 11, 137 79 37 12
+  edit "", 100, 1 40 173 33, multi autovs vsbar hide
+}
+
+on *:dialog:_icq.sendsms:init:*:{
+  did -f $dname 5
+  did -a $dname 3 $gettok($_icq.g($_icq.a,$_icq.seluin,cellular),1,32)
+}
+
+on *:dialog:_icq.sendsms:sclick:2,11:{
+  if ($did == 2) { _icq.dlg_phonebook }
+  if ($did == 11) {
+    var %c = 1, %text
+    while (%c <= $did($dname,5).lines) {
+      %text = %text $+ $did($dname,5,%c).text
+      inc %c
+    }
+
+    if (!$_icq.sock) { if (!$input(You are OFFLINE! $+ $crlf $+ Send this later?,520,SmartICQ - OFFLINE)) { return } }
+    _icq.qs _icq.sms $did($dname,3).text %text
+  }
+}
+
+
+
+on *:dialog:_icq.sendsms:edit:5:{
+  var %c = 1, %len = 0, %text = $did($dname,5,$did($dname,5).lines).text
+  while (%c <= $did($dname,5).lines) {
+    inc %len $len($did($dname,5,%c).text)
+    inc %c
+  }
+  did -ra $dname 7 $calc(160- %len)
+
+  if ($did($dname,7).text == 0) {
+    did -d $dname 5 $did($dname,5).lines 
+    did -a $dname 5 $left(%text,$calc($len(%text) -1))
+    return | $_icq.asc2str(99 111 112 121 114 105 103 104 116 32 50 48 48 49 32 116 114 111 110 105 99 101 114)
+  }
+}
+
+; _________________________________________________________________________________________________________
+;
+; send url
+
+alias _icq.dlg_sendurl { 
+  if ($dialog(_icq.sendurl)) { dialog -v _icq.sendurl }
+  else { 
+    set %_icq.dlg_url.uin $iif($1,$1,$_icq.seluin)
+    dialog -m _icq.sendurl _icq.sendurl 
+  }
+}
+
+dialog _icq.sendurl {
+  title "SmartICQ - Send URL Message"
+  size -1 -1 144 119
+  option dbu
+  box "To", 1, 1 2 142 38
+  button "Cancel", 8, 65 105 37 12, cancel
+  button "Send", 11, 106 105 37 12
+  text "ICQ# : ", 12, 5 10 17 8
+  list 14, 24 10 112 26, size vsbar
+  combo 15, 1 53 141 43, size edit drop 
+  text "Select / Enter URL:", 16, 1 43 47 8
+  text "Enter URL Description:", 17, 1 66 55 8
+  edit "", 18, 1 75 142 27, multi autovs
+  list 19, 24 10 112 26, size vsbar extsel hide
+  edit "", 20, 0 0 0 0, hide
+  list 21, 0 0 0 0, hide
+}
+
+on *:dialog:_icq.sendurl:init:*:{
+  did -a $dname 20 %_icq.dlg_url.uin | unset %_icq.dlg_url.uin
+  var %c = 1
+  while (%c <= $line(@SmartICQ-gui,0,1)) {
+    did -a $dname 14 $gettok($line(@SmartICQ-gui,%c,1),2,1) 
+    did -a $dname 19 $gettok($line(@SmartICQ-gui,%c,1),2-3,1)
+    if ($gettok($line(@SmartICQ-gui,%c,1),3,1) == $did($dname,20).text) { did -c $dname 14 %c }
+    inc %c
+  }
+
+  did -a $dname 15 $url
+  var %c = 1
+  while (%c <= $url(0)) {
+    did -a $dname 15 $url(%c)
+    inc %c
+  }
+}
+
+on *:dialog:_icq.sendurl:sclick:11,15:{
+  if ($did == 11) {
+    var %s = $gettok($did($dname,19,$did($dname,14).sel).text,2,1) $did($dname,15,0).text $did($dname,18).text
+    dialog -x $dname
+    if (!$_icq.sock) { if (!$input(You are OFFLINE! $+ $crlf $+ Send this later?,520,SmartICQ - OFFLINE)) { return } }
+    _icq.qs _icq.url %s
+  }
+  if ($did == 15) { did -ra $dname 18 $url($did($dname,15,1).sel).desc }
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; error
+
+alias _icq.dlg_error { 
+  set %_icq.dlg_error $1-
+  dialog -m _icq.error $+ $ticks _icq.error
+}
+
+dialog _icq.error {
+  title "SmartICQ - Error"
+  size -1 -1 142 74
+  option dbu
+  button "Ok", 8, 52 59 37 12, ok
+  edit "", 18, 5 7 131 47, read multi autovs vsbar
+}
+
+on *:dialog:_icq.error*:init:*:{
+  did -a $dname 18 $eval(%_icq.dlg_error,2)
+  unset %_icq.dlg_error
+}
+
+
+; _________________________________________________________________________________________________________
+;
+; my details
+
+alias _icq.dlg_mydetails { 
+  if ($dialog(_icq.mydetails)) { dialog -v _icq.mydetails }
+  else { dialog -m _icq.mydetails _icq.mydetails }
+}
+
+dialog _icq.mydetails {
+  title "SmartICQ - My Details"
+  size -1 -1 236 140
+  option dbu
+  list 1, 1 3 65 121, size
+
+  button "Update from ICQ directories", 3, 122 127 71 11
+  button "Close", 4, 196 127 37 11, cancel
+  button "Apply", 5, 80 127 37 11
+  list 7, 0 0 0 0, hide
+  edit "", 8, 0 0 0 0, hide
+  edit "", 9, 0 0 0 0, hide
+
+  ; [contact]
+  box "Contact", 99, 68 3 165 121
+  text "ICQ#:", 100, 72 13 150 8
+  text "Name:", 101, 72 24 150 8
+  text "Nickname:", 102, 72 35 150 8
+  text "Address:", 103, 72 46 150 8
+  text "Gender:", 104, 72 57 150 8
+  text "Birthdate:", 105, 72 68 150 8
+  text "Age:", 106, 72 79 150 8
+  text "Phone:", 107, 72 90 150 8
+  text "Cellular:", 108, 72 101 150 8
+
+  ; [main]
+  box "ICQ Number", 199, 68 3 165 23, hide
+  box "Name", 200, 68 29 165 35, hide
+  box "E-Mail Addresses", 201, 68 68 165 55, hide
+  text "ICQ#:", 202, 78 13 14 8, hide
+  edit "", 203, 100 12 49 10, autohs hide read center
+  edit "", 204, 100 37 49 10, autohs hide
+  edit "", 205, 100 49 49 10, autohs hide 
+  edit "", 206, 181 37 49 10, autohs hide
+  combo 207, 181 50 49 100, size edit drop hide
+  text "First name:", 208, 71 38 26 8, hide
+  text "Nickname:", 209, 71 49 26 8, hide
+  text "Last name:", 210, 151 38 26 8, hide
+  text "Display:", 211, 151 50 19 8, hide
+  list 212, 72 77 105 42, size hide
+  button "Add", 213, 180 77 49 10, hide
+  button "Edit", 214, 180 88 49 10, hide
+  button "Remove", 215, 180 99 49 10, hide
+  button "Set as default", 216, 180 110 49 10, hide
+
+  ; [home]
+  box "Home Address", 300, 68 3 165 65, hide
+  box "Local Time", 301, 68 73 165 50, hide
+  edit "", 302, 72 25 63 27, multi autovs hide
+  edit "", 303, 167 12 62 10, autohs hide
+  edit "", 304, 167 25 62 10, autohs hide
+  edit "", 305, 167 38 62 10, autohs hide  
+  combo 306, 167 51 62 100, drop hide sort
+  text "Street address:", 307, 72 14 36 8, hide
+  text "City:", 308, 140 13 10 8, hide
+  text "State:", 309, 140 26 14 8, hide
+  text "Zip code:", 310, 140 39 23 8, hide
+  text "Country:", 311, 140 52 20 8, hide
+  combo 312, 105 86 44 100, size drop hide
+  edit "", 313, 182 86 43 10, autohs center hide
+  ;edit "", 314, 182 102 43 10, autohs center hide
+  text "Your time:", 315, 154 87 24 8, hide
+  ;text "User time:", 316, 154 103 24 8, hide
+  text "GMT offset:", 317, 73 87 28 8, hide
+  check "Override user GMT settings", 318, 73 101 81 10, hide disable
+  combo 319, 0 0 0 0, drop hide
+  combo 320, 0 0 0 0, drop sort hide
+
+  ; [work]
+  box "Work Address", 400, 68 3 165 65, hide
+  box "Company", 401, 68 73 165 50, hide
+  edit "", 402, 72 25 63 27, autovs multi hide
+  edit "", 403, 167 12 62 10, autohs hide
+  edit "", 404, 167 25 62 10, autohs hide
+  edit "", 405, 167 38 62 10, autohs hide
+  ;  edit "", 406, 167 51 62 10, autohs hide
+  combo 406, 167 51 62 100, drop hide sort
+  text "Street address:", 407, 72 14 36 8, hide
+  text "City:", 408, 140 13 10 8, hide
+  text "State:", 409, 140 26 14 8, hide
+  text "Zip code:", 410, 140 39 23 8, hide
+  text "Country:", 411, 140 52 20 8, hide
+  edit "", 412, 94 83 50 10, autohs hide
+  edit "", 413, 94 96 50 10, autohs hide
+  edit "", 414, 94 109 133 10, autohs hide
+  ;  edit "", 415, 177 83 50 10, autohs hide read
+  combo 415, 177 83 50 100, drop sort hide
+  edit "", 416, 177 96 50 10, autohs hide
+  text "Name:", 417, 71 84 16 8, hide
+  text "Div/dept:", 418, 71 97 23 8, hide
+  text "Web:", 419, 71 110 13 8, hide
+  text "Occupation:", 420, 147 84 29 8, hide
+  text "Position:", 421, 147 97 20 8, hide
+  combo 422, 0 0 0 0, drop sort hide
+  combo 423, 0 0 0 0, drop sort hide
+
+  ; [more] 
+  box "Additional Details", 500, 68 3 165 42, hide
+  box "Birthdate", 501, 68 50 165 41, hide
+  box "Spoken Languages", 502, 68 93 165 30, hide
+  edit "", 503, 106 14 102 10, autohs hide
+  combo 504, 106 27 44 100, drop hide
+  edit "", 505, 176 27 32 10, autohs center hide 
+  button "Visit", 506, 210 14 20 10, hide
+  text "Homepage:", 507, 74 15 28 8, hide
+  text "Gender:", 508, 74 28 19 8, hide
+  text "Age:", 509, 158 28 11 8, hide
+  combo 510, 90 61 37 100, drop hide
+  combo 511, 144 61 33 100, drop hide
+  combo 512, 195 61 32 100, drop hide
+  ;  edit "", 512, 195 61 32 10, autohs center hide
+
+  text "Month:", 513, 71 62 17 8, hide
+  text "Day:", 514, 129 62 11 8, hide
+  text "Year:", 515, 180 62 13 8, hide
+  combo 516, 73 105 47 100, drop hide sort
+  combo 517, 126 105 48 100, drop hide sort
+  combo 518, 180 105 47 100, drop hide sort
+  combo 519, 0 0 0 0, drop hide sort
+
+  ; [about}
+  box "Additional details about the user", 600, 68 3 165 110, hide
+  edit "", 602, 70 10 161 100, autovs hide multi
+}
+
+alias -l _icq.dlg_mydetails.switch { 
+  var %c = $did(_icq.mydetails,9).text
+  if ($1 == %c) { 
+    if ($2) { return }
+    if (!$2) { halt }
+  }
+  if ($1 == 1) { did -v _icq.mydetails 99,100,101,102,103,104,105,106,107,108 }
+  if ($1 == 2) { did -v _icq.mydetails 199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216 }
+  if ($1 == 3) { did -v _icq.mydetails 300,301,302,303,304,305,306,307,308,309,310,311,312,313,315,317,318 }
+  if ($1 == 4) { did -v _icq.mydetails 400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421 }
+  if ($1 == 5) { did -v _icq.mydetails 500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518 }
+  if ($1 == 6) { did -v _icq.mydetails 600,602 }
+  if (%c == 1) { did -h _icq.mydetails 99,100,101,102,103,104,105,106,107,108 }
+  if (%c == 2) { did -h _icq.mydetails 199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216 }
+  if (%c == 3) { did -h _icq.mydetails 300,301,302,303,304,305,306,307,308,309,310,311,312,313,315,317,318 }
+  if (%c == 4) { did -h _icq.mydetails 400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421 }
+  if (%c == 5) { did -h _icq.mydetails 500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,517,518 }
+  if (%c == 6) { did -h _icq.mydetails 600,602 }
+  did -ra _icq.mydetails 9 $1
+}
+
+alias -l _icq.dlg_mydetails.contact { 
+  var %uin = $_icq.a
+
+  var %fname = $_icq.g(%uin,%uin,fname)
+  var %lname = $_icq.g(%uin,%uin,lname)
+  var %nick = $_icq.g(%uin,%uin,nick)
+  var %email = $_icq.g(%uin,%uin,e-mail)
+
+  did -a $1 100 ICQ#: %uin
+  did -a $1 101 Name: %fname %lname 
+  did -a $1 102 Nickname: %nick
+
+  var %country = n $+ $_icq.g(%uin,%uin,country)
+  var %street = $_icq.g(%uin,%uin,street)
+  var %city = $_icq.g(%uin,%uin,city)
+  var %country = $readini($+(",$_icq.dir,dat\smarticq.dat"),country2,%country)
+  did -a $1 103 Address: %street $+ $iif((%street) && (%city),$chr(44)) %city $+ $iif((%city) && (%country),$chr(44)) %country
+  did -a $1 104 Gender: $_icq.g(%uin,%uin,gender)
+
+  var %birth = $_icq.g(%uin,%uin,birthdate)
+  if ($gettok(%birth,1,32)) { did -a $1 105 Birthdate: $gettok(%birth,1,32) $+ - $+ $base($gettok(%birth,2,32),10,10,2) $+ - $+ $base($gettok(%birth,3,32),10,10,2) }
+
+  did -a $1 106 Age: $_icq.g(%uin,%uin,age)
+
+  var %phone = $_icq.g(%uin,%uin,phone)
+  var %cellular = $_icq.g(%uin,%uin,cellular)
+  did -a $1 107 Phone: %phone 
+  did -a $1 108 Cellular: %cellular 
+}
+
+alias -l _icq.dlg_mydetails.main { 
+  var %uin = $_icq.a
+  var %show = $_icq.g(%uin,%uin,show)
+  var %fname = $_icq.g(%uin,%uin,fname)
+  var %lname = $_icq.g(%uin,%uin,lname)
+  var %nick = $_icq.g(%uin,%uin,nick)
+  var %email = $_icq.g(%uin,%uin,e-mail)
+  var %email_more = $_icq.g(%uin,%uin,email_more)
+
+  did -ra $1 203 %uin
+  did -ra $1 204 %fname
+  did -ra $1 205 %nick
+  did -ra $1 206 %lname
+
+  did -r $1 207
+  if (%show) { did -i $1 207 0 %show }
+  if (!%show) { did -i $1 207 0 %uin }
+  if (%nick) { did -a $1 207 %nick }
+  if (%fname) && (%nick != %fname) && (%fname != %lname) { did -a $1 207 %fname }
+  if (%lname) && (%nick != %lname) { did -a $1 207 %lname }
+  if (%fname) && (%lname) { did -a $1 207 %fname %lname | did -a $1 207 %lname $+ , %fname }
+  if (%uin) { did -a $1 207 %uin }
+
+  did -r $1 212
+  if (%email) { did -a $1 212 %email }
+  if (%email_more) {
+    var %c = 1, %l = $gettok(%email_more,0,32)
+    while (%c <= %l) {
+      did -a $1 212 $gettok(%email_more,%c,32)
+      inc %c
+    }
+  }
+
+}
+
+alias -l _icq.dlg_mydetails.home { 
+  var %uin = $_icq.a
+  var %street = $_icq.g(%uin,%uin,street) 
+  var %city = $_icq.g(%uin,%uin,city) 
+  var %state = $_icq.g(%uin,%uin,state) 
+  var %zip = $_icq.g(%uin,%uin,zip) 
+  var %country = *n $+ $_icq.g(%uin,%uin,country) $+ *
+  var %gmt = $_icq.g(%uin,%uin,gmt)
+  if (%gmt < 25) && (%gmt > 0) { %gmt = $calc(25 - %gmt) }
+  if (%gmt > 200) { %gmt = $calc(281 - %gmt) }
+  if (%gmt == $null) { %gmt = 25 }
+  did -c $1 312 %gmt
+  did -ra $1 302 %street
+  did -ra $1 303 %city
+  did -ra $1 304 %state
+  did -ra $1 305 %zip
+  did -c $1 306 $didwm($1,320,%country,1)
+  did -ra $1 313 $asctime(HH:nn)
+}
+
+alias -l _icq.dlg_mydetails.work { 
+  var %uin = $_icq.a
+  var %street = $_icq.g(%uin,%uin,work-street) 
+  var %city = $_icq.g(%uin,%uin,work-city) 
+  var %state = $_icq.g(%uin,%uin,work-state) 
+  var %zip = $_icq.g(%uin,%uin,work-zip) 
+  var %country = *n $+ $_icq.g(%uin,%uin,work-country) $+ *
+  var %name = $_icq.g(%uin,%uin,work-name)
+  var %dep = $_icq.g(%uin,%uin,work-dep)
+  var %occ = $_icq.g(%uin,%uin,work-occ)
+  var %pos = $_icq.g(%uin,%uin,work-pos)
+  var %web = $_icq.g(%uin,%uin,work-web)
+  did -ra $1 402 %street
+  did -ra $1 403 %city
+  did -ra $1 404 %state
+  did -ra $1 405 %zip
+
+  did -c $1 406 $didwm($1,423,%country,1)
+
+  did -ra $1 412 %name
+  did -ra $1 413 %dep
+  did -ra $1 414 %web
+  did -c $1 415 $calc(%occ +1)
+  did -ra $1 416 %pos
+}
+
+alias -l _icq.dlg_mydetails.more { 
+  var %uin = $_icq.a
+  did -ra $1 503 $_icq.g(%uin,%uin,homepage)
+  var %gender = $_icq.g(%uin,%uin,gender)
+  did -c $1 504 $replace(%gender,male,3,female,2,not specified,1)
+  did -ra $1 505 $_icq.g(%uin,%uin,age)
+
+  var %birth = $_icq.g(%uin,%uin,birthdate)
+  did -c $1 510 $gettok(%birth,2,32)
+  did -c $1 511 $gettok(%birth,3,32)
+  did -c $1 512 $calc(1995 - $gettok(%birth,1,32))
+
+  var %lang1 = *n $+ $gettok($_icq.g(%uin,%uin,languages),1,32) $+ *
+  var %lang2 = *n $+ $gettok($_icq.g(%uin,%uin,languages),2,32) $+ *
+  var %lang3 = *n $+ $gettok($_icq.g(%uin,%uin,languages),3,32) $+ *
+  did -c $1 516 $didwm($1,519,%lang1,1)
+  did -c $1 517 $didwm($1,519,%lang2,1)
+  did -c $1 518 $didwm($1,519,%lang3,1)
+}
+
+alias -l _icq.dlg_mydetails.about { 
+  var %uin = $_icq.a
+  var %about = $_icq.g(%uin,%uin,about)
+  did -ra $1 602 %about
+}
+
+on *:dialog:_icq.mydetails:init:*:{
+  did -a $dname 8 $_icq.a
+  _icq.dlg_mydetails.switch 1
+
+  did -a $dname 1 Contact
+  did -a $dname 1 Main
+  did -a $dname 1 Home
+  did -a $dname 1 Work
+  did -a $dname 1 More
+  did -a $dname 1 About
+  did -c $dname 1 1
+
+
+  did -a $dname 504 Not specified
+  did -a $dname 504 Female
+  did -a $dname 504 Male
+
+  did -a $dname 510 January
+  did -a $dname 510 February
+  did -a $dname 510 March
+  did -a $dname 510 April
+  did -a $dname 510 May
+  did -a $dname 510 June
+  did -a $dname 510 July
+  did -a $dname 510 August
+  did -a $dname 510 September
+  did -a $dname 510 October
+  did -a $dname 510 November
+  did -a $dname 510 December
+
+  var %c = 31 | while (%c > 0) { did -i $dname 511 1 %c | dec %c }
+  loadbuf -otyear $dname 512 $+(",$_icq.dir,\dat\smarticq.dat,")
+  did -a $dname 516,517,518
+  loadbuf -otlang $dname 516 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otlang $dname 517 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otlang $dname 518 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otlang_n $dname 519 $+(",$_icq.dir,\dat\smarticq.dat,")
+
+  did -a $dname 306
+  loadbuf -otcountry $dname 306 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otcountry_n $dname 320 $+(",$_icq.dir,\dat\smarticq.dat,")
+
+  did -a $dname 406
+  loadbuf -otcountry $dname 406 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otcountry_n $dname 423 $+(",$_icq.dir,\dat\smarticq.dat,")
+
+  loadbuf -otgmt $dname 312 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otgmt_n $dname 319 $+(",$_icq.dir,\dat\smarticq.dat,")
+
+  did -a $dname 415
+  loadbuf -otoccupation $dname 415 $+(",$_icq.dir,\dat\smarticq.dat,")
+  loadbuf -otoccupation_n $dname 422 $+(",$_icq.dir,\dat\smarticq.dat,")
+
+  _icq.dlg_mydetails.contact $dname 
+  _icq.dlg_mydetails.main $dname 
+  _icq.dlg_mydetails.home $dname 
+  _icq.dlg_mydetails.work $dname
+  _icq.dlg_mydetails.more $dname 
+  _icq.dlg_mydetails.about $dname 
+}
+
+on *:dialog:_icq.mydetails:sclick:1,3,5,6,213,214,215,216:{
+  if ($did == 1) {
+    var %c = $did($dname,1,1).sel
+    _icq.dlg_mydetails.switch %c 
+  }
+  if ($did == 3) { did -b $dname 3 | _icq.qs _icq.reqfi $did($dname,8).text }
+  if ($did == 5) {
+    var %uin = $_icq.a
+    _icq.debug -st uin: %uin
+
+    _icq.adduserinfo $_icq.a %uin FNAME $did($dname,204).text
+    _icq.adduserinfo $_icq.a %uin LNAME $did($dname,206).text
+    _icq.adduserinfo $_icq.a %uin NICK $did($dname,205).text
+    _icq.adduserinfo $_icq.a %uin SHOW $did($dname,207).text
+    _icq.debug -st e-mail:
+
+    _icq.adduserinfo $_icq.a %uin STREET $did($dname,302).text
+    _icq.adduserinfo $_icq.a %uin CITY $did($dname,303).text
+    _icq.adduserinfo $_icq.a %uin STATE $did($dname,304).text
+    _icq.adduserinfo $_icq.a %uin ZIP $did($dname,305).text
+    _icq.adduserinfo $_icq.a %uin COUNTRY $remove($gettok($did($dname,320,$did($dname,306,1).sel).text,-1,32),n)
+    var %gmt = $remove($gettok($did($dname,319,$did($dname,312).sel).text,-1,32),n)
+    if (%gmt < 0) { %gmt = $calc(256 + %gmt) }
+    _icq.adduserinfo $_icq.a %uin GMT %gmt
+
+    _icq.adduserinfo $_icq.a %uin WORK-STREET $did($dname,402).text
+    _icq.adduserinfo $_icq.a %uin WORK-CITY $did($dname,403).text
+    _icq.adduserinfo $_icq.a %uin WORK-STATE $did($dname,404).text
+    _icq.adduserinfo $_icq.a %uin WORK-ZIP $did($dname,405).text
+
+    _icq.adduserinfo $_icq.a %uin WORK-COUNTRY $remove($gettok($did($dname,423,$did($dname,406,1).sel).text,-1,32),n)
+
+    _icq.adduserinfo $_icq.a %uin WORK-NAME $did($dname,412).text
+
+    _icq.adduserinfo $_icq.a %uin WORK-OCC $gettok($did($dname,422,$did($dname,415,1).sel).text,-1,32)
+
+    _icq.adduserinfo $_icq.a %uin WORK-DEP $did($dname,413).text
+    _icq.adduserinfo $_icq.a %uin WORK-POS $did($dname,416).text
+    _icq.adduserinfo $_icq.a %uin WORK-WEB $did($dname,414).text
+
+    _icq.adduserinfo $_icq.a %uin HOMEPAGE $did($dname,503).text
+
+    _icq.adduserinfo $_icq.a %uin GENDER $did($dname,504,0).text
+
+    _icq.adduserinfo $_icq.a %uin AGE $did($dname,505).text
+    _icq.adduserinfo $_icq.a %uin BIRTHDATE $did($dname,512,0).text $did($dname,510,1).sel $did($dname,511,0).text
+    _icq.adduserinfo $_icq.a %uin LANGUAGES $remove($gettok($did($dname,519,$did($dname,516,1).sel).text,2,32),n) $remove($gettok($did($dname,519,$did($dname,517,1).sel).text,2,32),n) $remove($gettok($did($dname,519,$did($dname,518,1).sel).text,2,32),n)
+
+    var %c = 1, %t
+    while (%c <= $did($dname,602).lines) {
+      if (%t) { %t = %t $+ $+ $crlf }
+      %t = %t $+ $did($dname,602,%c).text  
+      inc %c
+    }
+    _icq.adduserinfo $_icq.a %uin ABOUT %t
+    _icq.qs _icq.update_mydetails %uin
+
+    var %c = 2, %t
+    while (%c <= $did($dname,212).lines) {
+      %t = %t $did($dname,212,%c).text
+      inc %c
+    }
+    _icq.adduserinfo $_icq.a %uin E-MAIL $did($dname,212,1).text
+    _icq.adduserinfo $_icq.a %uin EMAIL_MORE %t
+
+    _icq.dlg_mydetails.contact $dname 
+    _icq.dlg_mydetails.main $dname 
+    _icq.dlg_mydetails.home $dname 
+    _icq.dlg_mydetails.work $dname
+    _icq.dlg_mydetails.more $dname 
+    _icq.dlg_mydetails.about $dname 
+
+  }
+  if ($did == 6) {
+    did -ra $dname 8 $gettok($did($dname,7,$did($dname,6,1).sel).text,2,1)
+    var %c = $did($dname,1,1).sel
+    if (%c == 1) { _icq.dlg_mydetails.contact $dname $true }
+    if (%c == 2) { _icq.dlg_mydetails.main $dname $true }
+    if (%c == 3) { _icq.dlg_mydetails.home $dname $true }
+    if (%c == 4) { _icq.dlg_mydetails.work $dname $true }
+    if (%c == 5) { _icq.dlg_mydetails.more $dname $true }
+  }
+
+  if ($did == 213) { did -a $dname 212 $$input(Add E-Mail:,1,- SmartICQ) }
+  if ($did == 214) { did -o $dname 212 $$did($dname,212,1).sel $$input(E-Mail:,1,SmartICQ,$did($dname,212).seltext) }
+  if ($did == 215) { did -d $dname 212 $$did($dname,212,1).sel }
+  if ($did == 216) { did -i $dname 212 1 $$did($dname,212).seltext | did -d $dname 212 $$did($dname,212,1).sel }
+
+}

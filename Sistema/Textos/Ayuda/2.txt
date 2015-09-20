@@ -1,0 +1,8 @@
+  Cómo entrar a un canal.
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  Hay dos comandos para entrar a un canal: 
+€
+  /join #canal 
+  /j canal 
+€
+  Usa el que te quede más cómodo :-)  

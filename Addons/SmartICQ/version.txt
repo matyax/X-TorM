@@ -1,0 +1,356 @@
+- v1.091 - 07/06/02 - update (public)
+
+  1. fixed gui-bug in mIRC v6.02. this happened because khaled actually fixed the 
+     /drawcopy command in mIRC.
+  2. fixed stupid ALT+F1 bug. also a mIRC v6.02 thingy.
+
+
+- v1.09 - 05/05/02 - update (public)
+
+  thanks to gott, mrcool, unaimed
+
+  1. fixed stupid bug with the auto-away / auto-na stuff.
+  2. fixed so skin filenames doesn't need to end with .skin.
+  3. fixed so incoming messages won't be echoed twice.
+  4. fixed bug with the [phonebook] dialog.
+  5. fixed problem with dbl-clicking to open a message window when then contact list is
+     maximized.
+  6. fixed small quirk with the [add contact] dialog. the editbox will now have the focus
+     when it opens.
+
+
+- v1.08 - 03/05/02 - update (public)
+
+  thanks to Matthias.
+
+  1. fixed MAJOR bug. smarticq didn't recieve messages from miranda, jabber and some versions
+     of trillian. this is now hopefully fixed!
+  2. fixed bug with the [user details] dialog.
+
+
+- v1.07 - 08/04/02 - update (public)
+
+  thanks to F1nk, Cataphract, |^aCE^| and BigBezus for bug-reports.
+
+  1. removed "remove" (skin) button from [preferences] dialog.
+  2. added "reload" (skin) button to [preferences] dialog. makes it easier for skinners.
+  3. fixed space-in-dir bug when trying to load skin.
+  4. fixed a bug which caused smarticq to conflict with the fractal script and maybe other
+     scripts also. 
+  5. fixed bug with systray tip. 
+  6. fixed so the systray icon will be killed when you unload SmartICQ. 
+  7. removed online, unknown, offline from listbox in the [user details] dialog. 
+  8. fixed bugs with [add contact] dialog.
+  9. fixed bug when getting "user added you" & "request for auth" messages.
+ 10. fixed so the [search white pages] dialog won't be closed when you're searching.
+ 11. fixed so the [user details] dialog will be updated correctly when you change contact.
+ 12. fixed /signal bug for mIRC v5.91 when loading skins.
+
+
+- v1.05 - 06/04/02 - update (public)
+
+  1. fixed so the version checker dialog will be closed when you click on the link.
+  2. fixed a design bug with the version checker dialog.
+  3. fixed bug with #smarticq client. sent /commands as messages.
+  4. fixed so the #smarticq client will reconnect if disconnected.
+  5. fixed bug with unloading plug-ins.
+  6. added faq.txt to menu.
+  7. tweaked all code to support a secret plug-in project.
+  8. added a dialog to view incoming sms messages.
+  9. added sms messages to the [history] dialog.
+ 10. fixed small gui bug.
+ 11. fixed bugs with minimize and close buttons. 
+ 12. fixed so the contact list window position/state will be saved when mirc exits.
+ 13. fixed design bugs in the [preferences] dialog that happened for some users.
+ 14. rewrote all code for skin loading. it will now unzip and do all the boring work for you.
+     the only drawback is that you need to download all the skins you like again.
+     but this way is much, much better.
+
+
+- v1.01 - 24/03/02 - update (public)
+
+  1. made installing more fool-proof.
+  2. fixed bugs with message window settings in preferences dialog.
+  3. tweaked preferences dialog a bit.
+  4. made it very simple to connect and chat on the official channel for smarticq.
+  5. added faq.txt.
+
+
+- v1.0 - 17/03/02 - PUBLIC RELEASE 1
+
+  1. made so you can dbl-click in the listboxes in the [system history] dialog.
+  2. fixed bug with account manager. didn't checked if you had selected an account.
+  3. fixed problem with timers stealing resources.
+  4. fixed a couple of bugs with quick-remove.
+  5. added a version checker.
+  6. fixed bug with removing skin. didn't worked at all.
+  7. fixed bug with updating user details for new accounts.
+
+
+- v0.997 - 10/03/02 - RC1 (public)
+
+  1. fixed bug with minimized contact list at startup.
+  2. finally made so skins can change fonts:
+ 
+     add this to your skin.ini file:
+ 
+      [fonts]
+      normal_text=<font>
+      normal_text.size=<size>
+      normal_text.bold=<$true|$false>
+      systemnotice_text=<font>
+      systemnotice_text.size=<size>
+      systemnotice_text.bold=<$true|$false>
+
+     example:
+
+      [fonts]
+      normal_text=arial
+      normal_text.size=10
+      normal_text.bold=$false
+      systemnotice_text=arial
+      systemnotice_text.size=10
+      systemnotice_text.bold=$false
+
+  3. fixed bug with disconnecting while there are unknown contacts in your list. freezed mirc.
+  4. fixed bug with adding contacts while msg window is open.
+  5. fixed bug with msg window settings in the [preferences] dialog.
+
+
+- v0.995 - 07/03/02 - update (private)
+
+  1. made so you can hold down [B] to hide the contacts. 
+  2. added -restart switch to /_icq.
+  3. updated all urls to smarticq website.
+  4. added webpager messages to [system notices] menu and [system history] dialog.
+  5. fixed a few skin bugs. didn't hide invisible color.
+  6. made it possible for skins to change font.
+  7. fixed scrollbar bug. freaked out if you had < 12 contacts and tried to move it w/ the mouse.
+  8. added e-mail to skin description.
+  9. fixed flickering when moving the selection with up/down-keys.
+ 10. fixed so offline "url messages" will be shown.
+ 11. fixed so offline "requests" will be shown.
+ 12. fixed so offline "user added you" will be shown.
+ 13. fixed so offline "webpager messages" will be shown.
+ 14. fixed so you won't need to enter a key for blowfish-encryption.
+ 15. fixed CTRL+F4 bug.
+ 16. made so the active URL in your browser will be added to the list of URL's in [send url] 
+     dialog.
+ 17. fixed bug with [my details] dialog. didn't save "display name".
+ 18. fixed ALOT of bugs with the ignore system in [preferences] dialog.
+ 19. added ignore submenu to contact list menu.
+ 20. fixed bug with msg window menu.
+ 21. fixed small gui bug.
+ 22. added online/offline/unknown delimiters.
+ 23. fixed so unknown contacts won't change status.
+ 24. fixed flickering when dbl-clicking the titlebar to maximize the contact list. 
+ 25. fixed bug with skin path. didn't worked if you moved smarticq to another directory.
+ 26. fixed bug with account manager.
+
+
+- v0.99 - 22/02/02 - update (private) 
+  
+  1. props to wayne gretzky :P
+  2. fixed so the contact list button will be grouped together with all other smarticq buttons.
+  3. fixed MAJOR bug with invisible status.
+  4. [removed]
+  5. added more SIGNALS. (read readme.txt for more information).
+  6. fixed so you can deleted your account from icq.
+  7. fixed bug when minimizing contact list in desktop mode.
+  8. change alot of stuff with the skins:
+
+     - skins are now able to draw a background for the contact list. 
+       view skins/test/test.png for an example.
+
+     - version updated to v3.
+       change version=2 under [skin] to version=3 
+
+     - fixed so skins can change colors for system notices.   
+       add this to your skins .ini file under [colors]:   
+
+         systemnotice_text=r,g,b
+         systemnotice_hltext=r,g,b
+
+        (r,g,b = the rgb value of the color)
+
+     - removed background color from .ini.
+       remove background=x,x,x under [colors].       
+
+  9. fixed gui bug.
+ 10. fixed another gui bug. didn't hide invisible color for scrollbar.
+ 11. made so you can click&drag the scrollbar.
+ 12. removed contact list button highlighting.
+ 13. tweaked the drawing of contacts.
+ 14. fixed so you can select several contacts in the msg window settings in [preferences] dialog.
+ 15. fixed bug when sending "user added you". didn't send firstname and lastname.
+ 16. rewrote all "system notices" code.
+ 17. fixed so the gui pic won't be cached. will make it easier to reload a skin.
+ 18. rewrote all "skin loading" code. won't mess up anymore.
+ 19. cleaned up some code.
+ 20. fixed so you can remove skins.
+ 21. fixed msg window position. used positions in wrong order.
+ 22. added backgrounds support for skins. check out one of the skins for an example.
+ 23. tweaked incoming status change. 
+ 24. fixed so the smarticq search window will be grouped togheter with smarticq windows.
+ 25. added [system history] dialog.
+ 26. removed "request password before apply changes".
+ 27. binded [backspace] to [system history] dialog.
+
+
+- v0.976 - 18/02/02 - update (public)
+
+  1. fixed so msg window will be renamed if you get a msg from an unknown contact.
+  2. fixed bug with minimizing contact list if all windows is minimized.
+  3. changed some error dialogs.
+  4. fixed MAJOR bug. sent url to wrong contact.
+
+
+- v0.975 - 18/02/02 - update (private)
+
+  1. fixed bug with signals and mIRC 5.9x. couldn't start smarticq.
+  2. fixed problem with default msg window settings for new accounts.
+  3. fixed so msg window will be activated if it's already open and you try to open it through
+     the contact list menu.
+  4. added more SIGNALS. (read readme.txt for more information).
+  5. fixed bug with msg windows.
+  6. fixed flickering when opening contact list.
+  7. fixed bug with blowfish encryption. didn't worked if you didn't supply a key.
+  8. fixed /bcopy bug when connecting. (?)
+  9. fixed bug with minimizing the contact list if it was on the desktop.
+ 10. now places msg windows at the end of the switchbar.
+ 11. tweaked /_icq.print_msg some.
+ 12. fixed alignment in search window.
+ 13. fixed bug with plugin manager. didn't unload/load selected plugin.
+ 14. fixed so only the 600 last lines in the log will be shown in msg windows.
+ 15. added "view log" to msg window menu.
+ 16. fixed bug with the notice system.
+ 17. fixed bug with blowfish. didn't use local var if disabled.
+ 18. fixed bug with plugin manager. didn't liked spaces in dir.
+
+
+- v0.97 - 16/02/02 - update (private)
+
+  1. fixed bug with SET_PERMISSIONS.
+  2. tweaked "session start mark".
+  3. tweaked "on input" routine.
+  4. fixed bugs with blowfish encryption settings in [preferences] dialog.
+  5. added alot of warnings and stuff to the blowfish encryption.
+  6. fixed so you must enter a key for the blowfish encryption before sending a message.
+  7. fixed bug with auto update.
+  8. fixed bug with auto connecting. would halt all other script processing after connecting
+     to icq.
+  9. fixed bug with saving some settings for msg windows in [preferences] dialog.
+ 10. fixed blowfish bug. really dumb one. 
+ 11. added a '*' before each blowfish encrypted message you send/get.
+ 12. [removed]
+ 13. added a 'o' before each offline message you get.
+ 14. fixed so msg windows will be updated if settings in [preferences] dialog was changed.
+ 15. tweaked some [preferences] dialog code.
+ 16. added plug-in manager.
+ 17. fixed bug with popup notices. (mirc6).
+ 18. fixed gui bug. didn't draw the contact list if you removed the contact list from the 
+     desktop in titlebar mode.
+ 19. fixed bug with "start minimized" if you had "open on start" checked.
+ 20. removed dcc send. added as plug-in.
+ 21. added more SIGNALS. (read readme.txt for more information).
+ 22. fixed bug with titleonstart.
+ 23. fixed bugs with dbl-clicking titlebar.
+ 24. added some checks to see if the @smarticq window has the correct size.
+ 25. fixed dbl-click bug. triggering twice sometimes.
+ 26. removed auto update. added as plug-in.
+ 27. added support for line markers in msg windows.
+ 28. fixed some flickering in [preferences] dialog.
+ 29. fixed so the selection won't change if you dbl-click in the contact list.
+ 30. [removed]
+ 31. fixed so you can change password while offline.
+ 32. added "read away msg" to msg window menu.
+ 33. fixed bug with user details. couldn't update.
+ 34. fixed so the status button will change to online if you connect from the account manager.
+ 35. fixed bug with the account manager. couldn't connect.
+ 36. fixed bug with SIGNALS. smarticq.start didn't worked. 
+
+
+- v0.96 - 10/02/02 - update (private)
+
+  1. fixed MAJOR bug with [preferences] dialog. /copy error.
+  2. added "session start mark" to msg windows. will mark each new session. on by default.
+  3. added more SIGNALS. (read readme.txt for more information).
+  4. fixed bug with auto update.
+  5. fixed so @smarticq-gui can't be closed.
+  6. changed skin standard. this version can only load v2 skins.
+  7. tweaked some code.
+  8. fixed so you can easily unload smarticq. /_icq.unload
+  9. fixed "require password before apply settings".
+ 10. added reconnect on disconnection.
+ 11. fixed bug with changing password.
+ 12. added "all users may add me and see my online/offline status" option.
+ 13. added "allow others to view my online/offline status from the web" option.
+ 14. fixed so [status button] will change to offline if connection attempt failed. 
+
+
+- v0.95 - 08/02/02 - BETA THREE (private)
+
+  1. fixed bug with [user details] dialog. timer was not turned off if dialog was closed.
+  2. added update system. will automatically update smarticq to the newest version.
+  3. fixed so you will get a warning if you don't supply all information when registering a 
+     new account.
+  4. fixed bug with registering a new account. icq doesn't allow short/long passwords.
+  5. fixed bug when changing account. didn't close old connections.
+  6. fixed bug with registering a new account. didn't liked spaces in nickname.
+  7. fixed bug with account manager. didn't close dialog if you already was connected.
+  8. fixed so away/na/occupied/dnd messages will be saved.
+  9. added blowfish encryption/decryption for messages.
+ 10. tweaked sms parser.
+ 11. tweaked key up/down code. 2k smaller.
+ 12. tweaked gui code. 8k smaller.
+ 13. fixed "download skins" link.
+ 14. added option for multi-line editboxes in msg-windows.
+ 15. added option for flat style in msg-windows (default).
+ 16. added support for custom events (signals). this will make it more easy to script stuff
+     for smarticq.
+ 17. fixed bug with msg-window position/size. didn't opened window at "remembered" pos/size if
+     you had saved "default" pos/size for msg-windows.
+ 18. fixed so window pos/size will be the same after you changed any option.
+ 19. added option to save pos/size when closing msg-window.
+ 20. added option for making msg-windows look like a tool window.
+ 21. removed internal border from the contact list window (mirc6).
+ 22. mstealth.exe removed. doesn't work with mirc6.
+ 23. fixed bug with internal border for contact list. dbl-click titlebar didn't worked, extra
+     rows at the bottom of the window. (mirc6).
+ 24. fixed "snapping" bug. (mirc6).
+ 25. added "send queue". will send everything you tried to send while offline when you go online
+     again.
+ 26. fixed so the contact list will be minimized when you start it if it was minimized when you
+     closed it.
+ 27. added option "minimize on start".
+ 28. added option "titlebar on start".
+ 29. re-organized some stuff in the [preferences] dialog.
+ 30. added "add to contact list" to msg-window menu. if contacts isn't on your contact list.
+ 31. fixed bug with internal beeper for the notice system. it didn't beeped. ;)
+ 32. fixed so the contact list window icon will be highlighted if someone changes status mode.
+ 33. changed default auto away and auto n/a message.
+ 34. fixed bug with auto away. was turned off if you disconnected from irc server.
+ 35. away synching will now use the away msg that you used for irc.
+ 36. added "do not popup msg if you are in dnd/occupied status" to [preferences] dialog.
+ 37. fixed bug with auto back.
+ 38. cleaned up some code.
+ 39. fixed so all timers are offline timers. won't stop if you disconnect from irc.
+ 40. fixed so uin will be added to contact list if you get an url from unknown contact.
+ 41. changed name of /gui directory to /skins.
+ 42. made so all skins will have there own directory in the /skins directory.
+ 43. removed systray icons from the core and added them to the skins instead. will allow 
+     different icons for different skins. 
+
+
+- v0.851 - 12/02/02 - update (public beta)
+
+ 1. fixed mirc v6.1 bugs.
+
+
+- v0.85 - 31/01/02 - update (first public beta)
+
+ 1. fixed [rename contact] bug. didn't rename msg-window.
+ 2. fixed bug with [send sms] dialog. character counter didn't worked right.
+ 3. fixed dcc send bug. 
+
+

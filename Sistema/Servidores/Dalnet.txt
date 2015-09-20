@@ -1,0 +1,13 @@
+irc.eu.dal.net
+irc.dal.net
+vancouver.bc.ca.dal.net
+barovia.oh.us.dal.net
+hebron.in.us.dal.net
+sodre.nj.us.dal.net
+liberty.nj.us.dal.net
+viking.no.eu.dal.net
+powertech.no.eu.dal.net
+raptor.ab.ca.dal.net
+sahara.ca.us.dal.net
+algo.se.eu.dal.net
+galaxy-c.ca.us.dal.net

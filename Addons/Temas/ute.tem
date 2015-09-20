@@ -1,0 +1,258 @@
+;Formato universal de temas en español. UTE
+;Script de ejemplo con una plantilla redireccionadora de tema
+;Este tipo de formato se basará en una tabla hash y un solo remoto fijo
+;
+;Los posibles alias y acciones adicionales irán incluidos en la tabla siguiendo el siguiente patrón:
+;
+; <Nombrealias> <código del alias en formato modificado>
+;  Ejemplo: canales return &chan(0)
+;
+; Para llamar al alias desde dentro del tema se usara &alias en la siguiente forma:
+;
+; <Entrada> &nick ha baneado a &banmask &alias(calculaclones,&nick)
+; donde calculaclones es una entrada en la tabla del tema. Los alias son invocados con un $eval.
+;
+;
+; La idea de este nuevo formato es aportar mayor flexibilidad y velocidad a los temas existentes.
+; Por esta razón se implanta en esta plantilla el soporte para varios idiomas y esquemas.
+; Este remoto buscará las posibles plantillas de idioma cada vez que se cargue un nuevo tema.
+; De existir dichas plantillas fijará el idioma elegido por el usuario y solo buscara 
+; las entradas referentes a ese idioma.Todo esto se explica en este cuerpo con mas claridad.
+; ***********************************************************************************************
+;
+;
+; Alias básicos, información del tema
+
+alias tok58 return $gettok($1,$2,58)
+alias tok7 return $gettok($1,$2,7)
+
+;Ruta de la carpeta de instalacion de temas, para usar como identificadores en el evento inicial de carga
+;Asi al cargar un tema se ejecuta siempre la entrada CARGA.1 , desde la que es posible cargar/descargar remotos
+;con load -rs $ute $+ Mitema\Mifichero.mrc
+;Es posible especificar varios comandos en la entrada CARGA simplemente incrementando para cada comando
+;el valor numerico. Asi CARGA.2 se ejecutaria en segundo lugar.
+;Esto permite ejecutar alias directamente desde la tabla hash, usando los valores &origen,&nick. 
+;
+;Por ejemplo nada impide ejecutar en Español.TextoCanal.1 que la entrada sea $sh.txt(&origen,&address,&nick,&msg)
+
+alias UTE.DIR return $readini($script(ute.mrc),Tema,Carpeta)
+
+alias UTE.version return 0.1
+
+alias ute.info {
+  if ( $1 = autor ) { if ( $hget(utemp,_autor) ) return $ifmatch | else return Desconocido }
+  elseif ( $1 = version ) { if ( $hget(utemp,_version) ) return $ifmatch | else return No indicada }
+  elseif ( $1 = mircver )  { if ( $hget(utemp,_mircver) ) return $ifmatch | else return No indicada }
+  elseif ( $1 = Nombre ) { if ( $hget(utemp,_Nombre) ) return $ifmatch | else return No indicado }
+  elseif ( $1 = fecha ) { if ( $hget(utemp,_fecha) ) return $ifmatch | else return No indicada }
+  elseif ( $1 = esquemas )  { if ( $hget(utemp,_esquemas) ) return $ifmatch | else return No soporta esquemas }
+  elseif ( $1 = idiomas )  { if ( $hget(utemp,_idiomas) ) return $ifmatch | else return No multilingue }
+  ;Lo inferior es para cambiar los valores RGB
+  elseif ( $1 = esquema )  { if ( $hget(utemp,$+(esquema,.,$2)) ) return $ifmatch | else return Error,esquema $2 no encontrado! }
+  ;Y esto otro para los colores en si
+  elseif ( $1 = colores )  { if ( $hget(utemp,colores) ) return $ifmatch | else return  }
+  elseif ( $1 = lenguaje )  return $hget(uted,lenguaje) 
+  elseif ( $1 = rawmode ) {  if ( $hget(ute,es.rawmode) )  return $ifmatch | else return $hget(uted,es.rawmode) }
+  elseif ( $1 = rutaute )  return $hget(uted,rutaute) 
+  elseif ( $1 = fuente )  return $hget(utemp,rutaute) 
+  else return Opcion desconocida
+}
+
+;Alias que devuelven los cambios de modo, tanto para rawmode como para bans,ops,deops y usermodes.
+;items utilizables,, &nick:nick que realiza la accion, &tarnick:nick objetivo de accion
+;                    &banmask:mascara de baneo, &address: address del nick que dispara el evento
+;                    &origen:canal o lugar en que se dispara la accion, &modos:eso mismo
+alias ute.modos {
+  var %s $replace($2-,$chr(36),$chr(136),$chr(44),$chr(1),$chr(37),$chr(13),$chr(123),$chr(14),$chr(125),$chr(16),[,$chr(17),],$chr(18),$chr(35),$chr(19),$chr(124),$chr(20))
+  var %address $replace($tok58($wildtok(%s,&address*,1,7),2-),$chr(38),$chr(9))
+  var %nick $replace($tok58($wildtok(%s,&nick*,1,7),2-),$chr(38),$chr(9))
+  var %tarnick $replace($tok58($wildtok(%s,&tarnick*,1,7),2-),$chr(38),$chr(9))
+  var %banmask $replace($tok58($wildtok(%s,&banmask*,1,7),2-),$chr(38),$chr(9))
+  var %origen $replace($tok58($wildtok(%s,&origen*,1,7),2-),$chr(38),$chr(9))
+  var %modos $replace($tok58($wildtok(%s,&modos*,1,7),2-),$chr(38),$chr(9))
+  var %target $replace($tok58($wildtok(%s,&target*,1,7),2-),$chr(38),$chr(9))
+  var %prefijo $replace($tok58($wildtok(%s,&prefijo*,1,7),2-),$chr(38),$chr(9))
+  var %script $replace($tok58($wildtok(%s,&script*,1,7),2-),$chr(38),$chr(9))
+  if ( $hmatch(ute,$+($hget(uted,lenguaje),.,$1,.*),0) > 0 ) {
+    var %it $ifmatch, %i 0, %rt
+    while ( %i < %it ) { inc %i | var %rt  %rt $iif(%i != 1,$chr(7)) $hget(ute,$hmatch(ute,$+($hget(uted,lenguaje),.,$1,., [ %i ] ),1))   }
+    return $replace($eval($replace( [ %rt ] ,&address,%address,&script,%script,&prefijo,%prefijo,&target,%target,%address,&nick,%nick,&tarnick,%tarnick,&banmask,%banmask,&modos,%modos,&origen,%origen),2),$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+  }  
+  else return $replace($eval($replace($hget(uted,$+($hget(uted,lenguaje),.,$1)),&address,%address,&script,%script,&prefijo,%prefijo,&target,%target,&nick,%nick,&tarnick,%tarnick,&banmask,%banmask,&modos,%modos,&origen,%origen),2),$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+}
+
+
+;En la siguiente sección se engloban todos los raws, notifys, watch,mensajes de join,part y quit,kicks,alias msg y notice
+; &r1: primer item de un raw, habitualmente tu nick, .. &rn: Item enesimo de un raw
+; &nick: nick que dispara el evento, &address: direccion, &origen: ventana de origen del evento
+; &msg: Mensaje asociado a un kick,notify,part,quit...
+
+alias ute.display {
+  var %s $replace($2-,$chr(36),$chr(136),$chr(44),$chr(1),$chr(37),$chr(13),$chr(123),$chr(14),$chr(125),$chr(16),[,$chr(17),],$chr(18),$chr(35),$chr(19),$chr(124),$chr(20))
+  if ( raw isin $1 ) goto raw
+  var %script $replace($tok58($wildtok(%s,&script*,1,7),2-),$chr(38),$chr(9))
+  var %msg $replace($tok58($wildtok(%s,&msg*,1,7),2-),$chr(38),$chr(9))
+  var %nick $replace($tok58($wildtok(%s,&nick*,1,7),2-),$chr(38),$chr(9))
+  var %origen $replace($tok58($wildtok(%s,&origen*,1,7),2-),$chr(38),$chr(9))
+  var %address $replace($tok58($wildtok(%s,&address*,1,7),2-),$chr(38),$chr(9))
+  var %tarnick $replace($tok58($wildtok(%s,&tarnick*,1,7),2-),$chr(38),$chr(9))
+  var %target $replace($tok58($wildtok(%s,&target*,1,7),2-),$chr(38),$chr(9))
+  var %prefijo $replace($tok58($wildtok(%s,&prefijo*,1,7),2-),$chr(38),$chr(9))
+  ;La siguiente variable sera para aquellas tablas ute de tema que den facilidades a mensajes genericos del script en cuestion
+  if ( $hmatch(ute,$+($hget(uted,lenguaje),.,$1,.*),0) ) {
+    var %it $ifmatch, %i 0, %rt
+    while ( %i < %it ) { inc %i | var %rt  %rt $iif(%i != 1,$chr(7)) $hget(ute,$hmatch(ute,$+($hget(uted,lenguaje),.,$1,., [ %i ] ),1))  }
+    if ( $hget(ute,$+(Sonido,.,$1)) ) if ( $hget(uted,rutaute) ) splay $ifmatch $+ $hget(ute,$+(Sonido,.,$1))
+    return $replace($eval($replace(%rt,&prefijo,%prefijo,&target,%target,&address,%address,&msg,%msg,&tarnick,%tarnick,&script,%script,&origen,%origen,&nick,%nick),2),$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+  }  
+  else return $replace($eval($replace($hget(uted,$+($hget(uted,lenguaje),.,$1)),&prefijo,%prefijo,&target,%target,&address,%address,&script,%script,&msg,%msg,&tarnick,%tarnick,&origen,%origen,&nick,%nick),2),$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+  :raw
+  var %s $replace(%s,$chr(38),$chr(9))
+  var %script $replace($tok58($wildtok(%s,&script*,1,7),2-),$chr(38),$chr(9))
+  if ( $hmatch(ute,$+($hget(uted,lenguaje),.,$1,.*),0) ) {
+    var %it $ifmatch, %i 0, %rt
+    while ( %i < %it ) { inc %i | var %rt %rt $iif(%i != 1,$chr(7)) $hget(ute,$hmatch(ute,$+($hget(uted,lenguaje),.,$1,., [ %i ] ),1))  }
+    tokenize 32 %s
+    var %dl $count(%rt,&r), %d 0
+    while ( %d < %dl ) { 
+      inc %d 
+      var %item = $calc( $pos(%rt,&r,1) + 3 )
+      while ( $istok(1.2.3.4.5.6.7.8.9.0.-,$mid(%rt,%item,1) ,46)  )  inc %item 
+      var %pos = $pos(%rt,&r,1), %item $mid(%rt, [ %pos ] , $calc(%item - %pos)), %eval $eval($+($,$mid(%item,3,1),$iif(- isin %item,-) ),2)
+      var %rt $replace(%rt, [ %item ] , [ %eval ] )
+    }
+    return $replace($eval($replace(%rt,&r, $),2),&script,%script,$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+  }
+  else  {
+    var  %d = 0, %rt $hget(uted,$+($hget(uted,lenguaje),.,$1)), %dl $count(%rt,&r)
+    tokenize 32 %s
+    while ( %d < %dl ) { 
+      inc %d 
+      var %item = $calc( $pos(%rt,&r,1) + 3 )
+      while ( $istok(1.2.3.4.5.6.7.8.9.0.-,$mid(%rt,%item,1) ,46)  )  inc %item 
+      var %pos = $pos(%rt,&r,1), %item $mid(%rt, [ %pos ] , $calc(%item - %pos)), %eval $eval($+($,$mid(%item,3,1),$iif(- isin %item,-) ),2)
+      var %rt $replace(%rt, [ %item ] , [ %eval ] )
+    }
+    return $replace($eval($replace(%rt,&r, $),2),&script,%script,$chr(136),$chr(36),$chr(1),$chr(44),$chr(9),$chr(38),$chr(13),$chr(37),$chr(14),$chr(123),$chr(16),$chr(125),$chr(17),[,$chr(18),],$chr(19),$chr(35),$chr(20),$chr(124))
+  }
+}
+
+
+;Permite ejecutar alias insertados en la tabla hash como identificadores llamandolos desde la tabla
+alias ute.id if ( $hget(ute,$1) ) return $eval($ifmatch,2)
+
+;Ejecucion de alias vitales para el sistema de temas
+;
+;Aqui se encuadrán tanto la carga de esquemas y bitmaps en la primera carga del tema
+;como las subsecuentes acciones ON START y ON EXIT/UNLOAD.
+;
+;Dado que el esquema es abierto es posible usar identificadores normales del mirc en estos eventos
+
+alias ute.ejecuta {
+  if ( !$hget(ute) )  return 
+  var %m $hmatch(ute,$+($1,.*),0), %i 0
+  while ( %i < %m ) { inc %i |  $eval($hget(ute,$hmatch(ute,$+($1,.*), [ %i ] )),2) }
+}
+
+;CARGA Fuente en formato ->TAHOMA,10 por ejemplo. La utilidad es interna al script, se usara ute.fuente para cargar fuentes por el engine
+alias ute.font font $1-
+
+;Carga valores RGB
+alias ute.col  {
+  var %i -1
+  while ( %i < 15 ) { inc %i | color %i $gettok($1-,%i,44) }
+}
+;Cambia asignacion de colores del mirc
+alias ute.col2 {
+  var %items Action.CTCP.Highlight.Info.Info2.Invite.Join.Kick.Mode.Nick.Normal.Notice.Notify.Other.Own.Part.Quit.Topic.Wallops.Whois.Background.Editbox.EditBox Text.ListBox.Listbox Text.Title text
+  var %i = 0 |  while ( %i < 26 ) { inc %i | color $gettok(%items,%i,46) $gettok($1,%i,44) }
+}
+;Resetea a los colores por defecto del mirc
+alias _r.c_ {
+  var %i -1
+  while ( %i < 15 ) { inc %i | color -r %i }
+  ute.col2 6,4,5,2,3,3,3,3,3,3,1,5,7,6,1,3,2,3,5,1,0,0,1,0,1,6
+}
+;Alias bucleano para cargar imagenes desde ute.fondo
+alias ute.background {
+  if ( $1 = toolbar ) background $iif($2,-l $2,-lx)
+  elseif ( $1 = botonestoolbar ) background $iif($2,-u $2,-ux)
+  elseif ( $1 = switchbar ) background $iif($2,-h $2,-hx)
+  elseif ( $1 = Canales ) {
+    var %sc $scon(0), %a 0
+    var %w = centrado.rellenar.normal.estirar.mosaico.foto, %w2 = -ec.-ef.-en.-er.-et.-ep
+    if ( $3 )  var %d $gettok(%w2,$findtok(%w,$2,1,46),46), %sf $3 | else var %d -ex
+    while ( %a < %sc ) { 
+      inc %a | scon %a
+      var %i = 0, %ni = $chan(0) 
+      if ( %ni )  {  while ( %i < %ni ) { inc %i | background %d  $chan(%i) %sf } }
+      else writeini $shortfn($mircini) background wchannel $shortfn($+($ute.dir $+ $3)) $chr(44)  $findtok(%w,$2,1,46)
+    }
+  }
+  elseif ( $1 = Privados ) {
+    var %sc $scon(0), %a 0
+    var %w = centrado.rellenar.normal.estirar.mosaico.foto, %w2 = -ec.-ef.-en.-er.-et.-ep
+    if ( $3 )  var %d $gettok(%w2,$findtok(%w,$2,1,46),46) | else var %d -ex
+    while ( %a < %sc ) { 
+      inc %a | scon %a
+      var %i = 0, %ni = $query(0) 
+      if ( %ni )  {  while ( %i < %ni ) { inc %i | background %d $query(%i) %sf } }
+      else writeini $shortfn($mircini) background wquery $shortfn($+($ute.dir $+ $3)) $chr(44)  $findtok(%w,$2,1,46)
+    }
+  }
+  elseif ( $1 = MDI ) {
+    var %w = centrado.rellenar.normal.estirar.mosaico.foto, %w2 = -cm.-fm.-nm.-rm.-tm.-pm
+    if ( $3 )  var %d $gettok(%w2,$findtok(%w,$2,1,46),46) | else var %d -mx
+    background  %d
+  }
+  elseif ( $1 = Estado ) {
+    var %sc $scon(0), %a 0
+    while ( %a < %sc ) { inc %a | scon %a 
+      var %w = centrado.rellenar.normal.estirar.mosaico.foto, %w2 = -cs.-fs.-ns.-rs.-ts.-ps
+      if ( $3 )  var %d $gettok(%w2,$findtok(%w,$2,1,46),46) | else var %d -sx
+      background  %d
+    }
+  }
+}
+alias principal de la carga de imagenes. Si, hay un huevo de whiles por ahi metidos xD
+alias ute.fondo {
+  ute.background Estado |  ute.background MDI |  ute.background Canales |  ute.background Privados |  ute.background Toolbar 
+  ute.background Botonestoolbar | ute.background switchbar 
+  if ($hget(ute,ImagenEstado))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background Estado %d }
+  if ($hget(ute,ImagenMDI))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background MDI %d }
+  if ($hget(ute,ImagenToolbar))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background Toolbar %d }
+  if ($hget(ute,ImagenBotonesToolbar))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background BotonesToolbar %d }
+  if ($hget(ute,ImagenSwitchbar))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background Switchbar %d }
+  if ($hget(ute,ImagenCanales))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background Canales %d }
+  if ($hget(ute,ImagenPrivados))  { var %d $ifmatch | if ( $isfile($gettok($ifmatch,2,32)) ) ute.background Privados %d }
+}
+alias ute.fuente {
+  var %cids $scid(0), %cid 0
+  while ( %cid < %cids ) { 
+    inc %cid 
+    scon %cid
+    if ( $hget(ute,fuenteEstado) ) {
+      var %fnt $ifmatch | if ( $gettok(%fnt,-1,32) = <n> )  { var %switch -b  | var %fnt $remove(%fnt,<n>) } 
+      var %fx $gettok(%fnt,1,44) $+ $chr(44) $+ $calc($iif(%switch,700,400) + $gettok(%fnt,244))
+      font $iif(%switch,-bs,-s)  %fnt  | writeini $shortfn($mircini) fonts fstatus %fx 
+      unset %switch
+    }
+    if ( $hget(ute,FuentePrivados)) {
+      var %fnt $ifmatch | if ( $gettok(%fnt,-1,32) = <n> )  { var %switch -b  | var %fnt $remove(%fnt,<n>) } 
+      var %fx $gettok(%fnt,1,44) $+ $chr(44) $+ $calc($iif(%switch,700,400) + $gettok(%fnt,244))
+      var %iq 0   | while ( $query( [ %iq ] ) ) { inc %iq | ute.font %switch $query( [ %iq ] ) %fnt   } | writeini $shortfn($mircini) fonts fmessage %fx | writeini $shortfn($mircini) Fonts fquery %fx 
+      unset %switch
+    }
+    if ($hget(ute,FuenteCanales)) {
+      var %fnt $ifmatch | if ( $gettok(%fnt,-1,32) = <n> )  { var %switch -b  | var %fnt $remove(%fnt,<n>) } 
+      var %fx $gettok(%fnt,1,44) $+ $chr(44) $+ $calc($iif(%switch,700,400) + $gettok(%fnt,244))
+      var %ic 0  |  while ( $chan( [ %ic ] ) ) {  inc %ic | ute.font %switch $chan( [ %ic ] ) %fnt  | remini $shortfn($mircini) fonts f $+ $chan( [ %ic ] ) } | writeini $shortfn($mircini) fonts fchannel %fx
+      unset %switch
+    }
+    if ( $hget(ute,fuentechats) ) {
+      var %fnt $ifmatch | if ( $gettok(%fnt,-1,32) = <n> )  { var %switch -b  | var %fnt $remove(%fnt,<n>) } 
+      var %fx $gettok(%fnt,1,44) $+ $chr(44) $+ $calc($iif(%switch,700,400) + $gettok(%fnt,244))
+      var %ich 0 |  while ( $chat(%ich) ) { inc %ich | ute.font %switch $chat(%ich) %fnt } 
+    }
+  }
+}

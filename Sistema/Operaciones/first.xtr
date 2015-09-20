@@ -1,0 +1,139 @@
+alias primer {
+  if ($window(@Primerð)) { window -a @Primerð | return }
+  ventana @Primerð 550 300 | Titulo @Primerð Primer inicio del X-TorM | window -wa @Primerð
+  primeros.timers
+}
+alias primeros.timers {
+  relleno @Primerð 3 31 542 260 | unsetv but.@Primerð
+  drawline @Primerð
+  var %n = 1,%t = 200
+  while ($mid(X-TorM,%n,1)) { 
+    var %x = $gettok(220 242 255 275 295 310,%n,32) , 
+    .timer -m 1 %t if ($window(@Primerð)) { drawtext -r @Primerð $rgb(102,153,255) Tahoma 30 %x 40 $mid(X-TorM,%n,1) }
+    .timer -m 1 $calc(%t + 100) if ($window(@Primerð)) { drawtext -r @Primerð $rgb(204,204,255) Tahoma 30 %x 40 $mid(X-TorM,%n,1) }
+    .timer -m 1 $calc(2600 + (%n * 200)) if ($window(@Primerð)) { drawtext -r @Primerð $rgb(102,153,255) Tahoma 30 %x 40 $mid(X-TorM,%n,1) }
+    inc %n | inc %t 400
+  }
+  .timer -m 1 3900 if ($window(@Primerð)) { primer.bucle }
+}
+alias primer.bucle {
+  caja @Primerð 210 40 132 38
+  drawtext -r @Primerð $rgb(204,204,255) Tahoma 10 20 80 By
+  var %x = 10
+  while (%x < 229) {
+    drawcopy @Primerð %x 80 30 15 @Primerð $calc(%x + 1) 80
+    inc %x 1
+  }
+  drawtext -or @Primerð $rgb(227,208,186) Tahoma 10 470 80 MaTyAs666
+  %x = 469
+  while (%x > 255) {
+    drawcopy @Primerð %x 80 65 15 @Primerð $calc(%x - 1) 80
+    dec %x
+  }
+  caja @Primerð 230 77 95 20
+  drawline @Primerð
+  primer.textos 1
+}
+alias primer.textos {
+  if ($1 == 1) {
+    texto @Primerð 10 120 Bienvenido al X-TorM Script. A continuación se le mostrarán una serie de consejos e información acerca del X-TorM
+    texto @Primerð 10 132 y se le pedira que configure alguas opciones para un mejor funcionamiento del script.
+    texto @Primerð 10 144 Presione el boton "Siguiente" para continuar...
+    setv but.@Primerð 460 265 70 20 Siguiente_primer.textos 2/â
+    do_but @Primerð but.@Primerð
+    drawline @Primerð
+  }
+  if ($1 == 2) {
+    relleno @Primerð 3 31 542 260 | .timertrip off
+    setv but.@Primerð 460 265 70 20 Siguiente_primer.textos 3/â380 265 70 20 Atras_primeros.timers/â
+    do_but @Primerð but.@Primerð
+    texto cent @Primerð 40 Licencia del X-TorM
+    texto @Primerð 10 80 Queda totalmente prohibida la copia total o parcial del código de este script, así como de cualquier gráfico, sin mi 
+    texto @Primerð 10 92 (MaTyAs666) autorización.
+    texto @Primerð 10 114 Comunmente no sedo ningún trozo de mi código a nadie, pero si deseas algo de mi script tenés que pedirmelo por mail 
+    texto @Primerð 10 126 a matyas_666@hotmail.com
+    texto @Primerð 10 148 En caso de que yo encuentre algún código/utilidad/diálogo o lo que sea del X-TorM Script en otro script, el autor de
+    texto @Primerð 10 160 esa copia será considerado plagiador y puesto en evidencia en todas las webs para público conocimiento.
+    texto @Primerð 10 182 Queda bajo la responsabilidad única del usuario los posibles daños que pueda recibir por el indebido uso del X-TorM. 
+    texto @Primerð 10 194 El autor del script se excluye de toda responsabilidad por los daños que el usuario pueda recibir por el IRC, debido a 
+    texto @Primerð 10 206 ataques de terceros.
+    texto @Primerð 10 218 X-TorM lleva protecciones contra la mayoría de los ataques, pero es necesario el uso de parches y actualizaciones 
+    texto @Primerð 10 230 del sistema operativo, asi como la utilización de un firewall.
+    texto @Primerð 10 252 .::[MaTyAs666]::. (13/11/2001)
+    drawline @Primerð
+  }
+  if ($1 == 3) {
+    relleno @Primerð 3 31 542 260
+    setv but.@Primerð 460 265 70 20 Siguiente_primer.textos 4/â380 265 70 20 Atras_primer.textos 2/â70 145 120 20 Protecciones_configuracion 2/â
+    do_but @Primerð but.@Primerð | unsetv check.@Primerð
+    texto cent @Primerð 40 Seguridad
+    texto @Primerð 10 80 Este script protege contra ataques de IRC como floods, envío de virus, ataques en canales y otros ataques de IRC; 
+    texto @Primerð 10 92 pero no te protege de armas contra el sistema operativo como nukes, etc. Por eso, te recomiendo que 
+    texto @Primerð 10 104 mantengas actualizado tu sistema operativo con los ultimos parches y que tengas un firewall.
+    texto @Primerð 10 126 Como este es tu primera vez con el X-TorM, te recomiendo que CONFIGURES LAS PROTECCIONES.
+    texto @Primerð 10 148 Click aca -> 
+    drawline @Primerð
+  }
+  if ($1 == 4) {
+    relleno @Primerð 3 31 542 260 | .timertrip off
+    setv but.@Primerð 460 265 70 20 Siguiente_primer.textos 5/â380 265 70 20 Atras_primer.textos 3/â10 105 50 20 Temas_temas/â10 135 50 20 Skins_.timer 1 1 configuracion 3 /â10 165 50 20 Fondos_fondos /â
+    setv check.@Primerð gui.fast 10 242 Relleno degradado de ventanas activadoâ
+    do_but @Primerð but.@Primerð | do_check @Primerð check.@Primerð
+    texto cent @Primerð 40 Interface
+    texto @Primerð 10 80 Este script trae múltiples funciones para cambiar su interface, de acuerdo con los gustos del usuario: 
+    texto @Primerð 70 104 Si no te gustan los colores de fondo y texto de los canales y ventana de estado, mediante el selecctor
+    texto @Primerð 70 116 de temas (que lo podes abrir desde la barra o el panel de control) podes cambiar los temas de texto.
+    ;
+    texto @Primerð 70 134 También podes bajar estos paquetes que modifican los fondos, colores, sonidos, etc. Las skins se pueden
+    texto @Primerð 70 146 bajar desde la web del X-TorM.
+    ;
+    texto @Primerð 70 164 Si querés cambiar o sacar el fondo de una ventana, del estado o de lo que sea, mediante el selector de
+    texto @Primerð 70 176 fondos podes hacerlo. Las imágenes incluidas estan en $mircdirImg\Fondos .
+    ;
+    texto @Primerð 10 200 La nueva interfaz del X-TorM contsta de una utilidad para dibujar los degradados en fondos y controles de diálogo. En
+    texto @Primerð 10 212 caso de que una ventana tarde mucho tiempo en abrirse, podes desactivar esta opción, la que luego podes reactivar
+    texto @Primerð 10 224 en la ventana de configuración del script (F3).
+    ;
+    drawline @Primerð
+  }
+  if ($1 == 5) {
+    relleno @Primerð 3 31 542 260 | .timertrip off | unsetv check.@Primerð
+    setv but.@Primerð 460 265 70 20 Siguiente_primer.textos 6/â380 265 70 20 Atras_primer.textos 4/â
+    do_but @Primerð but.@Primerð
+    texto cent @Primerð 40 Configuración
+    texto @Primerð 10 80 Desde el diálogo de configuración del script vas a poder configurar gran parte de las opciones del script. Para acceder
+    texto @Primerð 10 92 a éste podés hacerlo desde la barra de utilidades o con la tecla F3. 
+    texto @Primerð 10 114 También desde el panel de control se puede acceder fácilmente a la configuración total del script. Para abrir 
+    texto @Primerð 10 126 este panel podes hacerlo con la tecla F4, desde el menú principal <[X-TorM $xversion ]> o desde la barra.
+    texto @Primerð 10 148 Te recomiendo que cada vez que actualices el script revises las nuevas opciones y configures el script a tu gusto
+    texto @Primerð 10 160 pero acordate: "No toques lo que no conoces" .
+    drawline @Primerð
+  }
+  if ($1 == 6) {
+    relleno @Primerð 3 31 542 260 | .timertrip off
+    setv but.@Primerð 460 265 70 20 Terminar_.timer 1 1 primer.cierra/â380 265 70 20 Atras_primer.textos 5/â
+    do_but @Primerð but.@Primerð
+    texto cent @Primerð 40 Creditos
+    texto @Primerð 10 80 El script...
+    texto @Primerð 10 92 Los sonidos fueron recopilados de varias páginas al igual que los archivos de chistes y textos.
+    texto @Primerð 10 104 Las dlls son propiedad de sus respectivos autores, a quienes algunos desconozco.
+    texto @Primerð 10 116 Los menus para control de bots son del X-Cript (c) TeMpEsT y Arphean.
+    texto @Primerð 10 128 El script no contiene add ons-utilidades de terceros.
+    texto @Primerð 10 150 Bueno... llego la hora de reconocer a quienes "colaboran" con el X-TorM:
+    texto @Primerð 10 162 Miembros del X-TorM Team que prueban este script y critican (MaNSoN, KronoS, ^MaXeL^)
+    texto @Primerð 10 174 Gracias a la gente de #neuquen que usa el X-TorM... y también a los que no, :P
+    texto @Primerð 10 186 A Xoumphonp gran apoyo sin el cual me habiria sido todo más dificil... gracias loco!
+    texto @Primerð 10 198 Gracias a AnTr0,  [DaRkO] (discípulo del precious, betatester rlzz xD) y al Compy (xD) por su inmensa colaboracion.
+    texto @Primerð 10 210 A MijT (amigazo) por la ayuda con el hosting... mil gracias loco! Tambien para Warbox!
+    texto @Primerð 10 222 A todos mis amig@s de Neuquen y los que andan por la red.
+    texto @Primerð 10 234 A mi vieja por parirme y vancarse la cuenta de teléfono, :P
+    texto @Primerð 10 246 Y principalmente... a vos por utilizar el X-TorM... Que lo disfrutes!
+    drawline @Primerð
+  }
+}
+on 1:close:@Primerð: { unset %arranque | .unload -rs first.xtr }
+alias primer.cierra {
+  cierra_win @Primerð
+  .timer 1 1 cpanel | .timer 1 1 configuracion 1 | unset %arranque
+  .unload -rs first.xtr
+}

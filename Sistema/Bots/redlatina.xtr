@@ -1,0 +1,172 @@
+;------------------------------------------------------------------
+;      Menús de Red Latina - Adaptados por Kandi-Man   -   X-CRiPt 
+;-----------------------------------------------------------------
+Menu Menubar,Status {
+  $iif(red-latina.org isin $server,Red Latina)
+  .Registrar Canal: mensaje X register #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?" $$?="¿Descripción?"
+  .Dar Op:mensaje X op #$$?="¿Nombre del canal?(sin #)" $$?="¿A que Nick?"
+  .Quitar Op:mensaje X op #$$?="¿Nombre del canal?(sin #)" - $+ $$?="¿A qué Nick?"
+  .-
+  .Registrar nick: mensaje Ns register $$?="¿Password?"
+  .Identificarte ( $me ) :mensaje Ns identify $$?="¿Password?"
+  .Hacer ghost a un nick: mensaje Ns ghost $$?="¿Qué nick?" $$?="¿Password?"
+  .Borrar nick: mensaje Ns drop $$?="¿Qué Nick?"
+  .-
+  .Enviar mensaje:mensaje Ms send $$?="¿A quien?" $$?="What's the message?"
+  .Leer último mensaje:mensaje Ms read last
+  .-
+  .X
+  ..Registrar Canal: mensaje X register #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?" $$?="¿Descripcion?"
+  ..Borrar Canal: mensaje X drop #$$?="¿Nombre del canal?(sin #)"
+  ..Identificarse como fundador: mensaje X identify #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?"
+  ..-
+  ..Co-Founder
+  ...Ver lista: mensaje X cfounder #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara :mensaje X cfounder #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje X cfounder #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara :mensaje X cfounder #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  ..Super-op
+  ...Ver lista: mensaje X sop #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara :mensaje X Sop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje X Sop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara :mensaje X Sop #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  .. Auto-Op
+  ...Ver lista: mensaje X aop #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara: mensaje X Aop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje X Aop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara: mensaje X Aop #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  .. Auto-Voice
+  ...Ver lista: mensaje X avoice #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara: mensaje X avoice #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje X avoice #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara: mensaje X avoice #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  ..Auto-Kick
+  ...Ver lista: mensaje X akick #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara: mensaje X Akick #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick :mensaje X Akick #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué nick quieres añadir?"
+  ...Borrar Nick/Máscara: mensaje X Akick #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  ..-
+  ..Clear
+  ...Quitar modos: mensaje X clear # modes
+  ...Quitar bans: mensaje X clear # bans
+  ...Quitar ops: mensaje X clear # ops
+  ...Quitar voices: mensaje X clear # voices 
+  ...Dar kick a todos : mensaje X clear # users    
+  ..Bloquear modos
+  ...Invite only(+i)
+  ....On : mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +i
+  ....Off : mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -i
+  ...Limite de usuarios(+l)
+  ....On : mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +l $$?="¿Limite de Usuarios? Ej: 20"
+  ....Off : mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -l
+  ...Canal Privado(+p)
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +p
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -p
+  ...Canal Secreto(+s)
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +s
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -s
+  ...Password para entrar(+k)
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +k $$?="¿Password?"
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -k
+  ...Moderado (+m)
+  ....On:mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +m
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -m
+  ...No Mensajes Externos(+n)
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +n
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -n
+  ...Solo ops cambian topic(+t)
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock +t
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock -t
+  ...-
+  ...Especificar modos: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock $$?="¿Qué modos quieres bloquear?"
+  ...Quitar todos los modos: mensaje X set #$$?="¿Nombre del canal?(sin #)" mlock *
+  ..Bloqueo de Topic
+  ...Solo el fundador: X set #$$?="¿Nombre del canal?(sin #)" topiclock founder
+  ...Solo S-op's: mensaje X set #$$?="¿Nombre del canal?(sin #)" topiclock sop
+  ...DesBloquear topic: mensaje X set #$$?="¿Nombre del canal?(sin #)" topiclock off
+  ..Opciones del canal
+  ...Cambiar fundador: :mensaje X #$$?="¿Nombre del canal?(sin #)" founder $$?="¿Nick del nuevo fundador?"
+  ...Cambiar Password: mensaje X set #$$?="¿Nombre del canal?(sin #)" passwd $$?="¿Nuevo password?"
+  ...Cambiar descripcion: mensaje X set #$$?="¿Nombre del canal?(sin #)" desc $$?="¿Nueva Descripcion?"
+  ...Cambiar URL del canal: mensaje X set #$$?="¿Nombre del canal?(sin #)" url $$?="¿Nueva URL?"
+  ...-
+  ...Op solo a-ops,s-ops
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" opguard on
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" opguard off
+  ...Mantener Topic
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" keeptopic on
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" keeptopic off
+  ...Permitir ops
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" leaveops on
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" leaveops off
+  ...Canal Privado
+  ....On:mensaje X set #$$?="¿Nombre del canal?(sin #)" private on
+  ....Off :mensaje X set #$$?="¿Nombre del canal?(sin #)" private off
+  ...Solo op registrados
+  ....On: mensaje X set #$$?="¿Nombre del canal?(sin #)" ident on
+  ....Off: mensaje X set #$$?="¿Nombre del canal?(sin #)" ident off
+  ...Nivel para leer Memos
+  ....Ninguno:mensaje X set #$$?="¿Nombre del canal?(sin #)" memo none
+  ....-
+  ....A-op:mensaje X set #$$?="¿Nombre del canal?(sin #)" memo aop
+  ....S-op:mensaje X set #$$?="¿Nombre del canal?(sin #)" memo sop
+  ....Fundador: mensaje X set #$$?="¿Nombre del canal?(sin #)" memo founder
+  ..Quitar Ban
+  ...A mi! :mensaje X unban #$$?="¿Nombre del canal?(sin #)" me
+  ...A todos: mensaje X unban #$$?="¿Nombre del canal?(sin #)" all
+  ..Información de canal: X info #$$?="¿Nombre del canal?(sin #)"
+  ..Invitar al canal :mensaje X invite #$$?="¿Nombre del canal?(sin #)" $$?="¿A qué Nick?"
+  ..Listar canales:mensaje X list $$?="¿Con qué patrón? $crlf Ejemplo: *mp3* $crlf Para listar todos pon: *"
+  .Ns
+  ..Opciones de nick
+  ...Cambiar password :mensaje Ns set password $$?="¿Password?"
+  ...Protección Kill
+  ....On:mensaje Ns set kill on
+  ....Off:mensaje Ns set kill off
+  ...Cambiar URL asociada :mensaje Ns set URL $$?="Escribe la URL"
+  ...No recibir memos
+  ....No recibes:mensaje Ns set nomemo on
+  ....Sí recibes:mensaje Ns set nomemo off
+  ..Identificarte ( $me ) :mensaje Ns identify $$?="¿Password?"
+  ..Tirar a tu clon: mensaje Ns ghost $$?="¿Qué nick?" $$?="¿Password?"
+  .. Release (soltar nick): mensaje Ns release $$?="¿Qué Nick?" $$?="¿Password?"
+  ..Informacion del nick: mensaje Ns info $$?="¿Qué Nick?"
+  ..Listar nicks :mensaje Ns list $$?="¿Patrón de búsqueda? $crlf Ejemplo: pedro* $crlf para buscar todos pon: *"
+  .Ms
+  ..Enviar mensaje a nick:mensaje Ns send $$?="¿A quien?" $$?="What's the message?"
+  ..Enviar mensaje a canal:mensaje Ns send #$$?="¿A qué canal?(sin #)" $$?="¿Mensaje?"
+  ..- 
+  ..Ver Lista mensajes:mensaje Ms list
+  ..Leer mensaje
+  ...Mensaje 1:mensaje Ms read 1
+  ...Mensaje 2:mensaje Ms read 2
+  ...Mensaje 3:mensaje Ms read 3
+  ...Mensaje 4:mensaje Ms read 4
+  ...Mensaje 5:mensaje Ms read 5
+  ... Otro:mensaje Ms read $$?="¿Que numero de mensaje?"
+  ..Borrar mensaje
+  ...Mensaje 1:mensaje Ms del 1
+  ...Mensaje 2:mensaje Ms del 2
+  ...Mensaje 3:mensaje Ms del 3
+  ...Mensaje 4:mensaje Ms del 4
+  ...Mensaje 5:mensaje Ms del 5
+  ... Otro:mensaje Ms del $$?="¿Que numero de mensaje?"
+  ..Recuperar mensaje
+  ...Mensaje 1:mensaje Ms undel 1
+  ...Mensaje 2:mensaje Ms undel 2
+  ...Mensaje 3:mensaje Ms undel 3
+  ...Mensaje 4:mensaje Ms undel 4
+  ...Mensaje 5:mensaje Ms undel 5
+  ... Otro:mensaje Ms del $$?="¿Que numero de mensaje?"
+  ..-
+  ..Leer Mensaje al canal: mensaje Ms read $$?="¿Que numero de mensaje?"
+  ..Borrar Mensaje al canal: mensaje Ms del $$?="¿Que numero de mensaje?"
+  ..Recuperar Mensaje al canal: mensaje Ms undel $$?="¿Que numero de mensaje?"
+  ..-
+  ..Redirigir mensajes
+  ...Activar:mensaje Ms forward $$?="¿Redirigir a qué nick?" $$?="¿Password para ese nick?"
+  ...Desactivar:mensaje Ms forward -
+  ...Estado:mensaje Ms forward
+  ..Vaciar papelera memos:mensaje Ms purge
+}
+;-------------------------------------------------------------------------------------------------------------------------------------------------

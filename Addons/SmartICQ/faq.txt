@@ -1,0 +1,47 @@
+---------------------------------------------------------
+
+SmartICQ - Frequently Asked Questions
+updated 02/05/02
+
+---------------------------------------------------------
+
+Q: How do i install it?
+A: - Extract the ZIP into your mIRC directory.
+   - Start mIRC.
+   - Type "/load -rs smarticq\smarticq.mrc".
+   - Type "/icq" or "/smarticq".
+
+Q: I tried registering a new account and it never got past "Getting UIN..."?
+A: Make sure you're not connected to icq through another client - this is one of the reasons 
+   that can halt the registering process. If it still doesn't work, try change your password to 
+   something else. It will also not work if you're behind a firewall of some sort..
+
+Q: Can i import my contact list to SmartICQ?
+A: Yes, you can. Follow these steps: (you must use mIRC v6.0x)
+   - open the preferences dialog.
+   - click on "plug-in manager".
+   - load "import.smarticq-plugin.mrc".
+   - close the preferences dialog.
+   - click on "settings".
+   - goto "plugins".
+   - click on "import contact list".
+
+Q: How do i install a skin?
+A: - Choose a skin and download it.
+   - Save it in your SmartICQ/skins/ directory (make sure the filename ends with .skin and 
+     not .zip - very important).
+   - Open up the preferences dialog.
+   - Select the skin in the list and press [Load].
+
+Q: Will you add MSN or AIM?
+A: Heh, maybe. But probably not.
+
+Q: I've found a bug, what should i do?
+A: E-mail a description of it to tronicer@freebox.com.
+
+Q: When upgrading, can i just unzip the files over the old files?
+A: Yes, it won't remove your settings or anything. Just be sure that mIRC isn't running.
+   SO REMEMBER - EXIT mIRC FIRST AND THEN UNZIP THE FILES!!!!!
+
+Q: Could you script something for me?
+A: No, don't have time.. 

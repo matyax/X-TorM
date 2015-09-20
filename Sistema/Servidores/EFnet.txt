@@ -1,0 +1,4 @@
+irc.carrier1.net.uk
+irc.efnet.pl
+efnet.demon.co.uk
+au.rr.efnet.net

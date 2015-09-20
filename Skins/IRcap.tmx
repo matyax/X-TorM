@@ -1,0 +1,101 @@
+;Info
+12*** 10 M0M0 12(10 xtorm12@10siad.virtual 12)10 entra [15:08]
+12*** 6 MaTyAs666 12(6 xtorm12@6R00lZ.virtual 12)6 sale [15:08]
+12> Che loko! Aca siempre pasa lo mismo!
+6<2[-]6> Ja, si. Uno entra, otro sale, vos hablas, yo hablo, uno sale, etc. jeje
+12*** 4 Arphean 12[4 hack12@4DasS3.virtual 12]4 cierra [15:09]
+12> Hagamos que cambie!
+12*** topic: ElOp pone: Sigan la rutina! :P
+;Fin info
+;TEMA GR-X PARA X-TORM
+on 1:load: {
+  fuentes 11 Tahoma
+  set.colores pone 16777215,0,8323072,37632,255,127,10223772,32764,65535,64512,9671424,16776960,16515072,16711935,8355711,13816530
+  clear -s
+  colour action 6 
+  colour ctcp 4 
+  colour highlight 10 
+  colour info 2 
+  colour info2 3  
+  colour invite 3 
+  colour join 3 
+  colour kick 6 
+  colour mode 3 
+  colour nick 3 
+  colour normal 1 
+  colour notice 5 
+  colour notify 15 
+  colour other 4 
+  colour own 5 
+  colour part 6 
+  colour quit 4 
+  colour topic 3 
+  colour wallops 9 
+  colour whois 1 
+  colour listbox 1 
+  colour editbox 0 
+  colour background 15 
+  colour editbox text 1 
+  colour listbox text 15
+  credit
+  .timer -m 1 500 fuente
+  background -sx
+}
+alias nresalt return 14
+alias resalt return 4
+alias logo return 0,0|14,14|0,1 X-TorM 14,14|0,0| 1Script
+alias alerta { echo -es 4[Alerta] $1- }
+alias info { echo -es 12[Info] $1- }
+alias marc return 12***
+alias _m return 12*
+alias _ctcp { echo -es 4[CTCP]  $+ $1 $+ : $2- }
+alias _notice { echo -es 3[Notice] $1 $+ : $2- }
+alias bnotice { echo -es 0,3 $1  $2- }
+
+alias _join { echo $1 $marc 10 $2 12(10 $replace($3,@,12@10) 12)10 entra $timestamp $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc 10 $2 12(10 $replace($3,@,12@10) 12)10 entra $timestamp - Clones: 2 $4- | return }
+alias _part { echo $1 $marc 6 $2 12(6 $replace($3,@,12@6) 12)6 sale $timestamp }
+alias _quit { 
+  if ($1 == -split) { $marc 4 $2 12[4 $replace($3,@,12@4) 12]4 cierra $timestamp [ $+ $4- $+ 4 ] - Servidor en Split }
+  if ($3 == $null) { return $marc 4 $1 12[4 $replace($2,@,12@4) 12]4 cierra $timestamp }
+  else { return $marc 4 $1 12[4 $replace($2,@,12@4) 12]4 cierra $timestamp] [ $+ $3- $+ 4 ] }
+}
+alias _nick { return $marc 2 $+ $1 es ahora12 $2 }
+alias _mNick { return 14 $+ $timestamp 2Tu nick es ahora12 $1 }
+alias _text { echo $1 6<2 $+ $2 $+ 6> $3- }
+alias _mtext { echo $1 12> $2- | .msg $1 $2- }
+alias _discon { echo -es 2*** No conectado a servidor }
+alias _mode { echo $1 $marc 2modo: $3 pone 6[12 $+ $2 $4- $+ 6] }
+alias _kick { echo $1 $marc 4 $3 2ha sido expulsado por $2 $iif($4 != $null,6( $+ $4- $+ 6)) }
+alias _topic { echo $1 $marc 2topic: $2- }
+alias _ptopic { echo $1 $marc Puesto por2 $2 el2 $3 a las2 $4- horas | eblanco $1 }
+alias _ctopic { echo $1 $marc 2topic: $2 pone: $3- }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo -s 14,14!0,2 X8TorM 4,8 $xversion 15,15!12 
+  echo -s 12 Http://www.xtorm-script.cjb.net  -  Http://www.zac-online.com 
+  echo -s 12 Http://www.x-torm.com.ar
+  echo -s mIRC $version (c) Khaled Mardam-Bey  IRcap (c) GSi
+  echo -s X-TorM (c) MaTyAs666, 8/1/2002 | linesep -s
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $marc 2Modos:10 $chan($1).mode 2 Usuarios:10 $nick($1,0) 2 Ops:10 $nick($1,0,o) 2 Voz:10 $nick($1,0,v)
+
+}
+
+[info]
+autor=MaTyAs666
+comentarios=Tema dedicado al IRcap.
+colores=pone 16777215,0,8323072,37632,255,127,10223772,32764,65535,64512,9671424,16776960,16515072,16711935,8355711,13816530
+back=13816530
+fuente=Tahoma 10

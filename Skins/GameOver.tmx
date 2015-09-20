@@ -1,0 +1,99 @@
+;Info
+12[14:53] 7J:10 $me $+  (xtorm@xxxx.infoviasux.com.ar)
+12[14:59] 7P:10 MaTyAs666 (xtorm@ip.spoofeada.je.je)
+14> Hola!
+14(EngU) Hola $me !
+12[15:00] 7Q:10 ^MaNSoN^ (pantera@xxx.argentina.net)
+12[15:02] 10 EngU ahora es7 ^ElMengU^
+10#Vistaprevia 12[15:10] Topic by7 $me $+ : Aguante el X-TorM!
+;Fin info
+;TEMA X-TORM
+on 1:load: {
+  fuentes 12 MS Sans Serif
+  set.colores pone 16777215,0,8404992,37632,255,144,14680176,32764,65535,65280,12607488,16776960,16515072,16711935,8355711,12632256
+  cls -s
+  colour editbox text 1
+  colour editbox 0
+  colour background 0
+  colour listbox 1
+  colour listbox text 11
+  colour action 14
+  colour ctcp text 10
+  colour highlight text 10
+  colour info text 2
+  colour info2 text 2
+  colour invite text 10
+  colour join text 10
+  colour kick text 10
+  colour mode text 10
+  colour nick text 10
+  colour normal text 1
+  colour notice text 14
+  colour notify text 2
+  colour other text 1
+  colour own text 5
+  colour part text 10
+  colour quit text 10
+  colour topic text 10
+  colour wallops text 10
+  colour whois text 10
+  credit
+  .timer -m 1 500 fuente
+  background -sx
+}
+alias nresalt return 14
+alias resalt return 7
+alias logo return -:: X-ToRm Script ::-
+alias alerta { echo -es $marc 10(7alerta10) $1- }
+alias info { echo -es $marc 10(7info10) $1- }
+alias marc return 12 $+ $timestamp $+ 
+alias _m return 12 $+ $timestamp $+ 
+alias _ctcp { echo -es $marc 10(7CTCP10) $1 $+ : $2- }
+alias _notice { echo -es 10(7notice10) $1 $+ : $2- }
+alias bnotice { echo -es 10(7 $+ $1 $+ 10) $2- }
+
+alias _join { echo $1 $marc 7J:10 $2 $+  ( $+ $3 $+ ) $iif($4 != $null,7>10 era7 $4) | return }
+alias cjoin { echo $1 $marc 7J:10 $2 $+  ( $+ $3 $+ ) 7>10 Clones:7 $4- | return }
+alias _part { echo $1 $marc 7P:10 $2 $+  ( $+ $3 $+ ) }
+alias _quit { 
+  if ($1 == -split) { return $marc 7Q:10 $2 $+  ( $+ $3 $+ ) ( $+ $4- $+ ) 7>10 Servidor en Split }
+  if ($3 == $null) { return $marc 7Q:10 $1 $+  ( $+ $2 $+ ) }
+  else { return $marc 7Q:10 $1 $+  ( $+ $2 $+ ) ( $+ $3- $+ ) }
+}
+alias _nick { return $marc 10 $+ $1 ahora es7 $2 }
+alias _mNick { return $marc 10Tu nuevo nick es:7 $1 }
+alias _text { echo $1 14( $2 ) $3- }
+alias _mtext { echo $1 14> $2- | .msg $1 $2- }
+alias _discon { echo -es 2*** No conectado al servidor }
+alias _mode { echo $1 10 $+ $1 $marc Modo $3 :7 $2 $iif($4 != $null,10a7 $4-) }
+alias _kick { echo $1 $marc 10 $+ $2 $+ :7 KICK10 a7 $3 ( $4- ) }
+alias _topic { echo $1 $_m 10Topic: $2- }
+alias _ptopic { echo $1 $_m 10Puesto por7 $2 10el7 $3 10a las7 $4- 10horas | eblanco $1 }
+alias _ctopic { echo $1 10 $+ $1 $marc Topic by7 $2 $+ : $3- }
+
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  eblanco -s | eblanco -s | eblanco -s | eblanco -s 
+  echo                       10Nueva sesión con el X-TorM 7v $+ $xversion 10a las7 $time
+}
+alias mjoin { echo $1 $marc 10Entras en $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $1 $marc Modos:14 $chan($1).mode Usuarios:14 $nick($1,0) Ops:14 $nick($1,0,o) Voz:14 $nick($1,0,v)
+  eblanco $1
+}
+[info]
+autor=MaTyAs666
+web=www.x-torm.cjb.net
+comentarios=Tema dedicado al GameOver con fondos blancos y colores azules y naranjas.
+back=16777215
+fuente=Arial 10
+colores=pone 16777215,0,8404992,37632,255,144,14680176,32764,65535,65280,12607488,16776960,16515072,16711935,8355711,12632256

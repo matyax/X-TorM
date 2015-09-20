@@ -1,0 +1,97 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>MSNMIRC - Aide</title>
+<style type="text/css">
+a {FONT-WEIGHT: bold; FONT-SIZE: 10pt; COLOR: #002980; FONT-FAMILY: tahoma}
+p {FONT-WEIGHT: bold; FONT-SIZE: 8pt; COLOR: #000000; FONT-FAMILY: tahoma}
+A:link {FONT-WEIGHT: bold; FONT-SIZE: 8pt; COLOR: #002980; FONT-FAMILY: tahoma; TEXT-DECORATION: none}
+A:visited {FONT-WEIGHT: bold; FONT-SIZE: 8pt; COLOR: #002980; FONT-FAMILY: tahoma; TEXT-DECORATION: none}
+A:active {FONT-WEIGHT: bold; FONT-SIZE: 8pt; COLOR: #002980; FONT-FAMILY: tahoma; TEXT-DECORATION: none}
+A:hover {FONT-WEIGHT: bold; FONT-SIZE: 8pt; COLOR: #6699CC; FONT-FAMILY: tahoma; TEXT-DECORATION: none}
+</style>
+</head>
+<body bottommargin="0" topmargin="0" rightmargin="0" leftmargin="0">
+<table width="100%" bgcolor="#D3D3D3" cellspacing="0" cellpadding="0" bordercolor="#000000" style="border: thin dotted">
+<tr><td><img src="msnmirc.png" border="0" width="350" height="105"></td></tr></table><br>
+<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">
+<table bgcolor="#D3D3D3" cellspacing="0" cellpadding="4" bordercolor="#000000" style="border: thin dotted"><tr><td>
+<nobr><a>
+<a href="#1">› Introduction</a><br>
+<a href="#2">› Configurations</a><br>
+<a href="#tags">&nbsp;&nbsp;&nbsp;&nbsp;› Tags</a><br>
+<a href="#3">› Connexion</a><br>
+<a href="#4">› Dialog principal</a><br>
+<a href="#5">› Conversation</a><br>
+<a href="#6">› Réception de fichiers</a><br>
+<a href="#7">› Crédits</a><br>
+</nobr>
+</td></tr></table>
+<br><center><table><tr><td><a href="http://www.scriptsdb.org/comments.php?id=216" target="_blank"><img src="sdblogo.png" border="0" width="88" height="31"></a></td></tr></table></center>
+</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td width="100%" valign="top">
+<table width="100%" bgcolor="#D3D3D3" cellspacing="0" cellpadding="4" bordercolor="#000000" style="border: thin dotted"><tr><td>
+<a name="1"><a>Introduction
+<p>Voici la seconde version de mon fameux client MSN Messenger pour mIRC. Cette fois-ci, la mise à jour ne consiste pas qu'en quelques
+bug fixes, mais plutôt en un recoding intégral de l'addon! Cette version supporte maintenant les emoticons, les conversations multi-users, la réception de fichier
+(en développement), support multilingue, la création de ses thèmes de discussion avec tags, et plusieurs autres fonctions dont la traditionelle connexion en statut
+Apparaitre hors ligne. Cet addon utilise le protocol MSNP9, celui utilisé par MSN Messenger 6.0, l'ancienne version de l'addon utilisait MSNP7, une version maintenant
+désuète qui ne fonctionne plus. J'aimerais remercié plusieurs personnes, ce que je ferai dans les crédits tout en bas de cette page. Pour toute question, merci de me
+contacter par email.
+<br><hr>
+<a name="2"><a>Configurations
+<p><u>Onglet Général</u><br>
+<br>› Vous pouvez vous connecter en statut Apparaitre hors ligne, ce que l'on ne peut pas faire avec MSN Messenger, donc vos contacts ne voient pas que vous vous êtes connectés.<br>
+› Lorsque vous vous connectez, vos contacts sont ajoutés dans des groupes qui sont fermés, pour voir les contacts lors de leur ajout, vous pouvez activer l'option pour ouvrir
+les groupes de contacts.<br>› Cette version de MSNMIRC support les sons wav, donc vous pouvez les activer pour lorsque vous recevez un message ou lorsque un contact se connecte.<br>
+› La fenêtre qui vous indique qu'un de vos contacts s'est connecté peut avoir deux styles, soit un design comme Windows, avec bordure 3D, ou bien une simple ligne noire comme
+contour, vous pouvez aussi choisir combien de temps vous voulez la garder ouverte avant qu'elle ne se ferme automatiquement.<br>› Pour l'ouverture d'un popup, vous pouvez choisir si vous
+voulez que le popup s'ouvre lors d'un click droit ou bien d'un clic gauche de la souris.<br>› Finalement, le support multilingue! Vous pouvez changer la langue de l'addon quand vous le voudrez.
+<br><br>
+<u>Onglet Conversations</u><br>
+<br>› L'option de mettre en gras le message que l'on envoie, cela s'affichera en gras sur l'écran de votre contact.<br>› Entre chaque message reçu, le choix de sauter une ligne ou non pour espacer
+la conversation.<br>› Chaque conversation est stockée sous un fichier HTML, le choix de garder ces fichiers pour les consulter après utilisation ou bien de les effacer.<br>› Lors de l'ouverture d'une
+conversation, vous pouvez réduire automatiquement cette fenêtre dans la barre des tâches, ce qui peut vous permettre de ne pas encombrer votre écran de fenêtres ouvertes lorsque vous êtes absents
+et que MSNMIRC est en fonction.<br>› Lorsque vous êtes absents sur IRC, MSNMIRC peut prendre le relais en annonçant à vos contacts que vous êtes absents avec le même message que celui sur IRC.<br>
+› Encore dans la configuration de votre thème de conversation, vous pouvez choisir entre l'affichage du pseudo ou de l'email de vos contacts. <br>› Si vous cochez la case pour créer votre propre thème de
+conversation, vous pourrez, à l'aide du HTML et de tags pré-formattés, obtenir un thème réellement à votre goût. Pour la liste des tags, consultez la section Tags juste ci-dessous.
+<br><br>
+<a name="tags"><a>Tags
+<p>Pour afficher l'heure: &lt;time&gt;<br>
+Pour afficher le pseudo ou l'email de la personne: &lt;nick&gt;<br><br>
+Vous pouvez également utilisez n'importe quel tag HTML comme &lt;b&gt;, &lt;u&gt;, &lt;br&gt;, &lt;font&gt;, etc..
+<br><hr>
+<a name="3"><a>Connexion
+<p>Pour se connecter, j'ai créé un raccourci, vous n'avez qu'à appuyer sur la touche F4, sinon il y a les popups. Vous n'avez
+qu'à mettre votre adresse email complète avec votre mot de passe pour vous connecter à MSN Messenger. Le dialog principal devrait
+s'ouvrir automatiquement par la suite. Si la connexion s'avère très lente, c'est souvent dû à Passport.NET avec qui je rencontre
+beaucoup de problèmes de lenteur et souvent le serveur est mort, donc je ne peux pas contourner le problème, c'est semblable à MSN
+Messenger et je dois utiliser ces serveurs.
+<br><hr>
+<a name="4"><a>Dialog principal
+<p>Vos contacts seront situés dans les différents groupes, double-click sur le groupe pour l'ouvrir ou le fermer. Par la suite, utilisez
+les popups pour gérer vos contacts, dialoguer avec lui, ou voir son profil. Les menus situés dans le haut du dialog servent à avoir un
+accès rapide à quelques commandes utiles comme les configurations, l'aide ou l'ajout d'un contact.
+<br><hr>
+<a name="5"><a>Conversation
+<p>Pour envoyer un message, écrire le message dans l'edit box dans le bas, et appuyer sur Enter pour l'envoyer. Pour mettre un emoticon dans son message, cliquer
+sur le bouton à droite de Envoyer, puis choisir l'emoticon que vous voulez inclure dans le message. L'onglet Liste Des Usagers vous donnera
+la liste des usagers qui participent actuellement à la conversation, donc qui recevront vos messages. Pour inviter un contact, aller dans l'onglet
+du même nom et choisissez un contact, puis cliquez sur Inviter, dans la conversation, s'il a bien été invité, vous le verrez vous rejoindre. Pour
+imprimer la conversation en cours, il suffit de cliquer sur le bouton Imprimer.
+<br><hr>
+<a name="6"><a>Réception de fichiers
+<p>Ceci n'est pas terminé, donc vous pouvez rencontrer plusieurs problèmes lors de la réception de fichiers.<br><br>Lorsqu'un de vos contacts vous
+envoie un fichier, vous recevrez un avis, et vous pourrez soit accepter, soit refuser. Si vous acceptez, vous ne verrez pas le progrès de
+téléchargement du fichier, donc vous pourrez demander à la personne qui vous l'envoie. Par contre, lorsque le téléchargement sera terminé, vous
+serez notifiez de la fin du téléchargement.
+<br><hr>
+<a name="7"><a>Crédits
+<p>Cet addon a été pensé et codé puis recodé par Artwerks. Je remercie grandement Nightmare qui m'a soutenu tout au long du coding pour ses tests et
+ses bonnes idées qui étaient nombreuses. Pour la réception de fichiers, mon code étant trop lent dû à la lenteur de mIRC, sax m'a codé un
+dll qui faisait la même chose que mon code, mais en une fraction du temps que prenait mIRC à le réaliser, donc c'est très apprécié aussi!
+Je remercie tous ceux qui ont testé l'addon et ceux qui ont commenté mes divers screenshots pour me donner des idées. Pour me contacter, regarder
+le À Propos.. de l'addon.<br><br>Merci, vos commentaires positifs et suggestions sont grandement appréciés.
+</td></tr></table>
+</td></tr></table>
+</body>
+</html>

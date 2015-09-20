@@ -1,0 +1,15 @@
+  Central de escritura
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Para seleccionar los estilos de escritura tenés que ir a la central
+  de escritura (8º ícono en la barra del script o desde el menú principal,
+  sección configuración). 
+€
+  Una vez ahí, en el recuadro de estilos de escritura se van a ver 4
+  opciones:
+€
+  Estilos PREDEFINIDOS: Son estilos de escritura "complejos" que incluye
+  el script, que puede ser escritura con relieve, colores aleatorios, 
+  texto en MaYuSCuLaS y MiNuSCuLaS con negrita, multicolor y ninguno.
+  Estilos PERSONALIZADOS: Podes elegir los colores de fondo y texto. 
+  NEGRITA: Texto en negrita 
+  SUBRAYADO: Texto subrayado.

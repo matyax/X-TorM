@@ -1,0 +1,44 @@
+/j canal -> Entrar a un canal
+/p canal -> Salir de un canal
+/nick nuevonick -> Cambia tu apodo de IRC
+/op nick nick2... -> Da op a alguien en canal activo
+/deop nick nick2... -> Saca op a alguien en canal activo
+/voz nick nick2... -> Da voz a alguien en canal activo
+/devoz nick nick2... -> Saca voz a alguien en canal activo
+/ban #canal nick -> Banea a alguien de un canal
+/Kick #canal nick -> Patea a alguien del un canal
+/utiles -> Barra de utiles
+/antispam -> Configuración de el antispam
+/sonidos -> Configuración de los sonidos
+/antivirus -> Configuración del antivirus
+/conecta -> Diálogo de conexión
+/cpanel -> Panel de control
+/fondos -> Selector de fondos
+/revenge -> Configuración del Kick/Ban revenge
+/cprotect -> Configuración de la protección en canales
+/escrituras -> Configuración de la escritura y ortografía
+/groserias -> Configuración de las palabras prohibidas
+/nick_ -> Nick registrados en IRC-Hispano
+/nick2 -> Nick registrados por NiCK2 en IRC-Hispano
+/buscador -> Motor de búsqueda en IRC
+/addons -> Gestor de addons
+/comandos -> Abre este diálogo
+/tips -> Consejos útiles sobre el X-TorM Script
+/encripta -> Encriptado de texto
+/configuracion -> Abre el diálogo de configuración general
+/canales -> Canales preferidos
+/f-version -> Configuración del fake version
+/completion -> Configuración del nick completion
+/dialogaway -> Diálgo de away
+/temas -> Selector de temas de texto
+/send nick archivo -> Manda un archivo a alguien
+/chat nick -> Ejecuta un dcc chat
+/ping nick -> Envía un ping
+---- Teclas de acceso rápido ----
+F1 -> Ayuda del script
+F2 -> Cancelar reentrada despues de KICK o Ban
+F3 -> Configuración general del script
+F4 -> Panel de control del X-TorM
+F5 -> Gestor de archivos recibidos
+F6 -> Limpiar ventana activa
+F8 -> Notice a los ops del canal

@@ -1,0 +1,4 @@
+  Sistema de ayuda del X-TorM
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Bienvenido al sistema de ayuda del X-TorM Script. Selecciona el tema
+  de ayuda en la lista de la izquierda.

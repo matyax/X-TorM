@@ -1,0 +1,291 @@
+; ******************************************************
+; chan.xcr
+;
+; (c) 1998-2001 TeMpEsT. Prohibida la copia total o 
+; parcial de este archivo.
+;
+; v3. Menubar & Status Terra services menus.
+; ******************************************************
+alias isterra { if (terra.es isin $2) || (anillo.adm isin $2) return TERRA Services }
+menu MenuBar,Status {
+  $isterra
+  .CHaN
+  ..Identificarte como fundador
+  ...Configurar
+  ....$gettok(%fundador,1,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",1,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",1,44)
+  ....$gettok(%fundador,2,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",2,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",2,44)
+  ....$gettok(%fundador,3,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",3,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",3,44)
+  ....$gettok(%fundador,4,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",4,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",4,44)
+  ....$gettok(%fundador,5,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",5,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",5,44)
+  ....$gettok(%fundador,6,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",6,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",6,44)
+  ....$gettok(%fundador,7,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",7,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",7,44)
+  ....$gettok(%fundador,8,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",8,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",8,44)
+  ....$gettok(%fundador,9,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",9,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",9,44)
+  ....$gettok(%fundador,10,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",10,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",10,44)
+  ...-
+  ...$gettok(%fundador,1,44): mensaje chan@services.terra.es identify $gettok(%fundador,1,44) $gettok(%fundador.pass,1,44)
+  ...$gettok(%fundador,2,44): mensaje chan@services.terra.es identify $gettok(%fundador,2,44) $gettok(%fundador.pass,2,44)
+  ...$gettok(%fundador,3,44): mensaje chan@services.terra.es identify $gettok(%fundador,3,44) $gettok(%fundador.pass,3,44)
+  ...$gettok(%fundador,4,44): mensaje chan@services.terra.es identify $gettok(%fundador,4,44) $gettok(%fundador.pass,4,44)
+  ...$gettok(%fundador,5,44): mensaje chan@services.terra.es identify $gettok(%fundador,5,44) $gettok(%fundador.pass,5,44)
+  ...$gettok(%fundador,6,44): mensaje chan@services.terra.es identify $gettok(%fundador,6,44) $gettok(%fundador.pass,6,44)
+  ...$gettok(%fundador,7,44): mensaje chan@services.terra.es identify $gettok(%fundador,7,44) $gettok(%fundador.pass,7,44)
+  ...$gettok(%fundador,8,44): mensaje chan@services.terra.es identify $gettok(%fundador,8,44) $gettok(%fundador.pass,8,44)
+  ...$gettok(%fundador,9,44): mensaje chan@services.terra.es identify $gettok(%fundador,9,44) $gettok(%fundador.pass,9,44)
+  ...$gettok(%fundador,10,44): mensaje chan@services.terra.es identify $gettok(%fundador,10,44) $gettok(%fundador.pass,10,44)
+  ..-
+  ..Dar op (+o): mensaje chan@services.terra.es op #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Quitar op (-o): mensaje chan@services.terra.es deop #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Dar voz (+v): mensaje chan@services.terra.es voice #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Quitar voz (-v): mensaje chan@services.terra.es devoice #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Kickear (+k): mensaje chan@services.terra.es kick #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Accesos al canal
+  ...Registrar Usuario: mensaje chan@services.terra.es access #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Nivel? 0-500"
+  ...Cambiar nivel: mensaje chan@services.terra.es access #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Nuevo Nivel? 0-500"
+  ...Borrar Usuario: mensaje chan@services.terra.es access #$$?="¿Canal?(sin #)" del $$?="¿Nick?" 
+  ...Lista de registros:mensaje chan@services.terra.es access #$$?="¿Canal?(sin #)" list
+  ...Cantidad de registrados:mensaje chan@services.terra.es access #$$?="¿Canal?(sin #)" count
+  ..Lista de Auto-kick
+  ...Añadir Usuario: mensaje chan@services.terra.es akick #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Motivo?"
+  ...Borrar Usuario: mensaje chan@services.terra.es akick #$$?="¿Canal?(sin #)" del $$?="¿Nick?"
+  ...Listar Usuarios: mensaje chan@services.terra.es akick #$$?="¿Canal?(sin #)" list
+  ..-
+  ..Información de canal: mensaje chan@services.terra.es info #$$?="¿Canal?(sin #)"
+  ..Listar canales registrados: mensaje chan@services.terra.es list
+  ..Invitarse uno mismo: mensaje chan@services.terra.es invite #$$?="¿Canal?(sin #)"
+  ..Limpiar lista bans: mensaje chan@services.terra.es unban #$$?="¿Canal?(sin #)"
+  ..Lista de IRCops conectados: mensaje chan@services.terra.es ircops
+  ..Lista de OPers conectados: mensaje nick opers
+  ..-
+  ..Niveles 
+  ...Ver lista:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" list
+  ...Resetear niveles: mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" reset
+  ...-
+  ...Auto-op(@) 
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set autoop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis autoop 
+  ...Auto-voz(+v) 
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set autovoice $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis autovoice
+  ...Auto-deop  
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set autodeop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis autodeop
+  ...Requerir nivel para entrar
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set nojoin $$?="¿Qué nivel requiere Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis nojoin 
+  ...Nivel para invite
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set invite $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis invite
+  ...Auto kick baneados
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set akick $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis akick
+  ...Cambiar Opciones
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set set $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis set
+  ...Limpiar canal
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set clear $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis clear   
+  ...Desbanear
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set unban $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis unban
+  ...Dar/Quitar @p 
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set opdeop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis opdeop
+  ...Ver lista de accesos
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set acc-list $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis acc-list
+  ...Registrar/Borrar usuarios
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set acc-change $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis acc-change
+  ...Leer mensajes del canal
+  ....Cambiar nivel:mensaje chan@services.terra.es levels #$$?="¿Canal?(sin #)" set memo $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@services.terra.es levels #$$?="¿Canal?" dis memo
+  ..Opciones del canal
+  ...Cambiar fundador: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" founder $$?="¿Nick?"
+  ...Cambiar password fundador: cambiapass.fundador #$$?="¿Canal?(sin #)" $$?*="¿Nuevo password?"
+  ...Cambiar Descripción:  mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" desc $$?="¿Nueva Descripción?"
+  ...Cambiar URL: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" url $$?="¿Nueva URL?"
+  ...Mensaje de bienvenida: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" entrymsg $$?="¿Nuevo mensaje?"
+  ...Cambiar Topic: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" topic $$?="¿Nuevo topic?"
+  ...Cambiar Sucesor: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" successor $$?="¿Nuevo Sucesor del canal?"
+  ...Proteger Topic
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" keeptopic on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" keeptopic off
+  ...Solo registrados cambian topic
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" topiclock on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" topiclock off
+  ...Proteger modos
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" mlock on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" mlock off
+  ...Canal privado
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" private on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" private off
+  ...Solo registrados entran
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" restricted on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" restricted off
+  ...Solo registrados tienen @p
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" secureops on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" secureops off
+  ...Sólo registrados tienen +voz
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" securevoices on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" securevoices off
+  ...Sólo CHaN quita @op
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" leaveops on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" leaveops off
+  ...Sólo CHaN quita +voz
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" leavevoices on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" leavevoices off
+  ...Aviso Memos canal
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" memoalert on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" memoalert off
+  ...Cybers se pueden desbanear
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" unbancyber on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" unbancyber off
+  ...Chivato (ISSUED)
+  ....on:mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" issued on
+  ....off: mensaje chan@services.terra.es set #$$?="¿Canal?(sin #)" issued off
+  ..Limpiar canal
+  ...Limpiar modos: mensaje chan@services.terra.es clear #$$?="¿Canal?(sin #)" modes
+  ...Borrar lista bans: mensaje chan@services.terra.es clear #$$?="¿Canal?(sin #)" bans
+  ...Deop masivo: mensaje chan@services.terra.es clear #$$?="¿Canal?(sin #)" ops
+  ...De-voice masivo: mensaje chan@services.terra.es clear #$$?="¿Canal?(sin #)" voices
+  ...Kick masivo: mensaje chan@services.terra.es clear #$$?="¿Canal?(sin #)" users
+  .NiCK
+  ..Identificarse ( $me ):{
+    if $findtok(%nickregi,$me,1,44) == $null { echo -s 2***No tienes registrado ese nick o no lo has configurado en en menu "Bots de Servicio"->"Passwords nicks" }
+    else { mensaje NiCK@services.terra.es identify $gettok(%nickregi.pass,$findtok(%nickregi,$me,1,44),44) }
+  }
+  ..-
+  ..Registrar nick:mensaje NiCK@services.terra.es register $$?="¿Tu direccion de email?(no valen gratis)"
+  ..-
+  ..Añadir máscara: mensaje NiCK@services.terra.es access add $$?="¿Qué máscara?"
+  ..Borrar máscara: mensaje NiCK@services.terra.es access del $$?="¿Qué máscara?"
+  ..Lista de máscaras: mensaje NiCK@services.terra.es access list
+  ..Recuperar nick: mensaje NiCK@services.terra.es recover $$?="¿Qué nick quieres recuperar?" $$?*="¿Password para ese nick?"
+  ..Hacer caer a tu clon: mensaje NiCK@services.terra.es ghost $$?="¿Qué nick lleva?" $$?*="¿Password para ese nick?"
+  ..Estado del nick: mensaje NiCK@services.terra.es status $$?="¿De qué nick?"
+  ..Información del nick: mensaje nick info $$?="¿De qué nick?"
+  ..Información del nick (EXTRA): mensaje nick info $$?="¿De qué nick?" ALL
+  ..Listar nicks registrados: mensaje NiCK@services.terra.es list $$?="¿Con qué patron? $crlf ejemplo: *@*.arrakis.es"
+  ..-
+  ..Opciones del nick
+  ...Cambiar password: cambiapass.nick $$?*="¿Nuevo password?"
+  ;  ...Cambiar idioma
+  ;  ....Inglés: mensaje NiCK@services.terra.es set language 1
+  ;  ....Japonés (EUC): mensaje NiCK@services.terra.es set language 2
+  ;  ....Japonés (JIS): mensaje NiCK@services.terra.es set language 3
+  ;  ....Japonés (SJIS): mensaje NiCK@services.terra.es set language 4
+  ;  ....Portugués: mensaje NiCK@services.terra.es set language 5
+  ;  ....Castellano: mensaje NiCK@services.terra.es set language 6
+  ;  ....Turco: mensaje NiCK@services.terra.es set language 7
+  ...Cambiar URL asociada: mensaje NiCK@services.terra.es set URL $$?="¿Nueva URL?"
+  ...Cambiar email asociado: mensaje NiCK@services.terra.es set email $$?="¿Nuevo email?"
+  ...Proteccion de KILL
+  ....on: mensaje NiCK@services.terra.es set change on
+  ....off: mensaje NiCK@services.terra.es set change off
+  ....-
+  ....rápido (20 seg): mensaje NiCK@services.terra.es set change quick
+  ....inmediato: mensaje NiCK@services.terra.es set change immed
+  ...Modo Secure
+  ....on: mensaje NiCK@services.terra.es set secure on
+  ....off: mensaje NiCK@services.terra.es set secure off
+  ...Modo privado
+  ....on: mensaje NiCK@services.terra.es set private on
+  ....off: mensaje NiCK@services.terra.es set private off
+  ...Esconder informacion
+  ....on: mensaje NiCK@services.terra.es set hide on
+  ....off: mensaje NiCK@services.terra.es set hide off  
+  .MeMO
+  ..Enviar mensaje: mensaje MeMO send $$?="¿A qué nick/canal?(con #)" $$?="¿Qué mensaje?"
+  ..Cancelar ult. mensaje: mensaje memo cancel $$?="¿A quién?"
+  ..-
+  ..Lista mensajes(todos): mensaje MeMO list
+  ..Lista mensajes(nuevos): mensaje MeMO list new
+  ..-
+  ..Leer mensaje: mensaje MeMO read $$?="¿Numero de mensaje?"
+  ..Leer último mensaje: mensaje MeMO read last
+  ..-
+  ..Borrar mensaje: mensaje MeMO del $$?="¿Numero de mensaje(s)? $crlf Ejemplo: 1-3"
+  ..Borrar todos: mensaje MeMO del all
+  ..-
+  ..Notificar mensajes
+  ...Solo al ser enviado: mensaje MeMO set notify new
+  ...Al conectar y volver de away: mensaje MeMO set notify logon
+  ...Al ser enviado, conectar, volver away: mensaje MeMO set notify on
+  ...-
+  ...No notificar: mensaje MeMO set notify off
+  ..Cambiar Límite de mensajes: mensaje MeMO set limit $$?="¿Cuántos mensajes? 1-20"
+  ..-
+  ..Mensaje buzon lleno: mensaje MeMo set full $$?="¿Mensaje?"
+  .Cyber
+  ..¿Qué es Cyber?: mensaje cyber help
+  ..-
+  ..Mi informacion: mensaje cyber info
+  ..-
+  ..Contratar Clones: mensaje cyber contrata
+  ..Actualizar IP: mensaje cyber actualiza
+  ..-
+  ..Kill usuario del cyber: mensaje cyber kill $$?="¿Nick?" $$="¿Motivo?"
+  ..G-line usuario del cyber: mensaje cyber gline $$?="¿Nick?" $$="¿Motivo?"
+  ..-
+  ..Unbanear al cyber de un canal: mensaje cyber unban #$$?="¿Canal? (sin #)"
+  ..-
+  ..Mensaje global al cyber: mensaje cyber global $$?="¿Mensaje?"
+  .$iif(hispano isin $server,CReG)
+  ..Registrar Canal: mensaje CReG registra #$$?="¿Canal? (sin #)" $$?="¿Contraseña?" $$?="¿Descripción?"
+  ..-
+  ..Apoyar Canal : mensaje CReG apoya #$$?="¿Qué canal quieres apoyar? (sin #)"
+  ..-
+  ..Estado de un canal : mensaje CReG estado #$$?="¿De qué canal? (sin #)"
+  ..-
+  ..Apoyos a un #canal: mensaje CReG apoyos #$$?="¿A qué canal? (sin #)"
+  ..Apoyos de un nick: mensaje CReG apoyos $$?="¿De quién?"
+  .-
+  .Cambiar password fundador: cambiapass.fundador #$$?="¿Canal?(sin #)" $$?*="¿Nuevo password?"
+  .Identificarse (fundador)
+  ..Configurar
+  ...$gettok(%fundador,1,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",1,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",1,44)
+  ...$gettok(%fundador,2,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",2,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",2,44)
+  ...$gettok(%fundador,3,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",3,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",3,44)
+  ...$gettok(%fundador,4,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",4,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",4,44)
+  ...$gettok(%fundador,5,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",5,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",5,44)
+  ...$gettok(%fundador,6,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",6,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",6,44)
+  ...$gettok(%fundador,7,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",7,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",7,44)
+  ...$gettok(%fundador,8,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",8,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",8,44)
+  ...$gettok(%fundador,9,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",9,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",9,44)
+  ...$gettok(%fundador,10,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",10,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",10,44)
+  ..-
+  ..$gettok(%fundador,1,44): mensaje chan@services.terra.es identify $gettok(%fundador,1,44) $gettok(%fundador.pass,1,44)
+  ..$gettok(%fundador,2,44): mensaje chan@services.terra.es identify $gettok(%fundador,2,44) $gettok(%fundador.pass,2,44)
+  ..$gettok(%fundador,3,44): mensaje chan@services.terra.es identify $gettok(%fundador,3,44) $gettok(%fundador.pass,3,44)
+  ..$gettok(%fundador,4,44): mensaje chan@services.terra.es identify $gettok(%fundador,4,44) $gettok(%fundador.pass,4,44)
+  ..$gettok(%fundador,5,44): mensaje chan@services.terra.es identify $gettok(%fundador,5,44) $gettok(%fundador.pass,5,44)
+  ..$gettok(%fundador,6,44): mensaje chan@services.terra.es identify $gettok(%fundador,6,44) $gettok(%fundador.pass,6,44)
+  ..$gettok(%fundador,7,44): mensaje chan@services.terra.es identify $gettok(%fundador,7,44) $gettok(%fundador.pass,7,44)
+  ..$gettok(%fundador,8,44): mensaje chan@services.terra.es identify $gettok(%fundador,8,44) $gettok(%fundador.pass,8,44)
+  ..$gettok(%fundador,9,44): mensaje chan@services.terra.es identify $gettok(%fundador,9,44) $gettok(%fundador.pass,9,44)
+  ..$gettok(%fundador,10,44): mensaje chan@services.terra.es identify $gettok(%fundador,10,44) $gettok(%fundador.pass,10,44)
+  .-
+  .Registrar nick: mensaje NiCK@services.terra.es register $$?="¿Tu direccion de email?(no valen gratis)"
+  .Identificarse ahora ( $me ):{
+    if $findtok(%nickregi,$me,1,44) == $null { echo -s 2***No tienes registrado ese nick o no lo has configurado en en menu "Bots de Servicio"->"Passwords nicks" }
+    else { mensaje NiCK@services.terra.es identify $gettok(%nickregi.pass,$findtok(%nickregi,$me,1,44),44) }
+  }
+  .Configurar Passwords nicks
+  ..$gettok(%nickregi,1,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",1,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",1,44)
+  ..$gettok(%nickregi,2,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",2,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",2,44)
+  ..$gettok(%nickregi,3,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",3,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",3,44)
+  ..$gettok(%nickregi,4,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",4,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",4,44)
+  ..$gettok(%nickregi,5,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",5,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",5,44)
+  ..$gettok(%nickregi,6,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",6,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",6,44)
+  ..$gettok(%nickregi,7,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",7,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",7,44)
+  ..$gettok(%nickregi,8,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",8,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",8,44)
+  ..$gettok(%nickregi,9,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",9,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",9,44)
+  ..$gettok(%nickregi,10,44): %nickregi = $puttok(%nickregi,$$?="¿Nick?",10,44) | %nickregi.pass = $puttok(%nickregi.pass,$$?*="¿Password?",10,44)
+
+  .Auto-identificarse ( %auto.idenick ): if (%auto.idenick == on) %auto.idenick = off | else %auto.idenick = on
+  .Cambiar password $me: cambiapass.nick $$?*="¿Nuevo password?"
+  .-
+  .Enviar mensaje: mensaje MeMO send $$?="¿A qué nick/canal?(con #)" $$?="¿Qué mensaje?"
+  .Leer ultimo mensaje: mensaje MeMO read last
+}

@@ -1,0 +1,10 @@
+irc.terra.com.ar
+irc.terra.cl
+irc.terra.es
+irc.terra.com
+tpi1.anillo.adm
+tpi2.anillo.adm
+tpi3.anillo.adm
+tpi4.anillo.adm
+tpi5.anillo.adm
+tpi6.anillo.adm

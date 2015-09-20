@@ -1,0 +1,28 @@
+v2.075 - 12.03.2003
+
+bugfixes:
+ - user-list handling, rewritten
+ - several minor bugs in watching mode (wrong time running,
+   wrong turn-indicator under certain circumstances)
+ - black background now also if the standard background isnt black
+ 
+news:
+ - now possible to run a server
+ - in addition to the server, the new alias /ichessjoin [host] [port]
+ - host can invite/kick/ban IP-masks and set the board to "mute"
+ - option to open all windows as desktop window
+ - option to strip colorcodes from the chat (if needed)
+ - option to turn beeping on/off for moves and events
+ - option to disable sorting of the captured pieces (then appearing in the
+   order they were captured
+ - finally the possibility to continue a game once a disconnected
+   player is back.. without saving and loading the game
+ - update-system now checks whether an update is needed before getting it
+ - check will no longer color the whole history-line red, only the half-move
+   which caused it
+ - added a cpu-opponent (thanks to m0rph^/m0rpheus for the idea to use
+   the online service found at <a href=http://www.danmarinescu.com/>http://www.danmarinescu.com/, he also did
+   most of the PHP needed to retrieve the moves, i only changed the stuff
+   to add some functions i needed), the AI/engine used for this is not
+   mine (hence the url given above), but i will try to finish Chob and then
+   add him, too.

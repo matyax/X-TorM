@@ -1,0 +1,16 @@
+  Cambiar la apariencia del X-TorM
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  El X-TorM Script trae un sinfín de utilidades para que personalizes
+  su imágen: 
+€
+  FONDO DEL SCRIPT: En el panel de selección de fondos, podes 
+  cambiar los fondos de cualquier ventana, tanto por los que trae el
+  script como por otros que tengas. 
+  TEMAS DE TEXTO: El script cuenta con varos temas de texto con 
+  diferentes colores del texto, fuentes, mensajes, etc. Esto se cambia
+  desde el panel de selección de temas. 
+  SKINS: Esta es una opción más completa. Solo tenes que ir a la web del
+  X-TorM Script y bajarte las skins. Luego de instalarlas en la carpeta 
+  skins, vas a la sección apariencia (dentro de la configuración general)
+  y seleccionas la que quieras. Las skins cambian tanto los temas como los
+  colores de diálogos, ventanas, fondos, sonidos, etc.

@@ -1,0 +1,13 @@
+  Modo BUNKER (¿?)
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Este modo es una opción de protección total, la cual es muy dificil
+  que tengas que usar alguna vez, porque el script trae las
+  correspondientes protecciones contra cualquier ataque de flood.
+€
+  Lo que hace este modo es ignorar cualquier mensaje entrante durante 60 
+  segundos, lo que anularía cualquier ataque de flood.
+€
+  En realidad, esta opción no tiene mucha utilidad, ya que teniendo
+  activadas y bien calibradas las protecciones contra flood, estas, en caso
+  de detectar un ataque fuerte, lo frenan automáticamente. Pero quién
+  sabe... capaz que en algún momento te sirve.

@@ -1,0 +1,701 @@
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; MOTOR GRÁFICO v2.0Alpha ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Queda totalmete prohibida la copia total o parcial de este codigo - Copyrigth 2001/2002 MaTyAs666;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+prueba { ventana @Pruebað 300 300 | titulo @Pruebað Prueba de nuevos controles }
+;$%(rgb.texto) 14606046
+;$%(rgb.fondo) 6044966r
+;$%(rgb.edit) 6899753 
+;$%(rgb.oscuro) 4072467
+;$%(rgb.claro) 7821636
+;$%(rgb.normal) 5453345
+;$%(rgb.bordewin) 10724259
+;$%(rgb.caja) 16777215
+;$%(rgb.titulo) 16777215
+;$%(rgb.setuptxt) 14606046
+;$%(rgb.boxclaro) 7887172
+;$%(rgb.sombra) 
+;$%(rgb.textobot) 1
+;$%(rgb.botonu) 6440502
+;$%(rgb.botond) 10845812
+;$%(rgb.rstart) 109 134 205
+;$%(rgb.rend) 44 45 65
+;$%(rgb.sel) 13478555
+;$%(rgb.sombratxt) 0
+;//setv rgb.rend 19 36 62 | //setv rgb.rstart 68 89 119
+guidir return $mircdirskins\ $+ $%(guidir) $+ \ $+ GUI\ $+ $1-
+ventana { 
+  if ($1 == noc) { 
+    window -kpBhwzi +b $2- $2 
+    if (%gui.fast == si) drawrect -rf $2 $%(rgb.fondo) $4 0 0 $3 $4
+    else relleno $2 3 31 $calc($3 - 8) $calc($4 - 40)
+    drawrect -r $2 $%(rgb.bordewin) 2 0 30 $calc($3 - 2) $calc($4 - 35)
+    drawrect -r $2 1 1 2 30 $calc($3 - 6) $calc($4 - 37)
+    drawpic -s $2 0 $calc($4 - 7) $3 5 $guidir(abajo.bmp)
+    window -a $2
+    if ($%(gui.recorta) isnum) { 
+      winrgn wrSelectWindow $window($2).hwnd
+      winrgn wrSetMode rmRect
+      winrgn wrSetRegion 0 $%(gui.recorta) $3 $4
+    }
+  }
+  else {
+    var %tmp.x = $round($calc( ( $window(-3).w - $2) / 2 ),0)
+    var %tmp.y = $round($calc( ( $window(-3).h - $3) / 2 ),0)
+    window -kpBhwz $+ $iif($1 != @Awayð,i) +b $1 %tmp.x %tmp.y $2 $3 $1
+    if ((%gui.fast == si) || ($4)) drawrect -rf $1 $%(rgb.fondo) $3 0 0 $2 $3
+    else relleno $1 3 30 $calc($2 - 8) $calc($3 - 38)
+    drawrect -r $1 $%(rgb.bordewin) 2 0 30 $calc($2 - 2) $calc($3 - 35)
+    drawrect -r $1 1 1 2 30 $calc($2 - 6) $calc($3 - 37)
+    drawpic -s $1 0 $calc($3 - 7) $2 5 $guidir(abajo.bmp)
+    if ($%(gui.recorta) isnum) { 
+      winrgn wrSelectWindow $window($1).hwnd
+      winrgn wrSetMode rmRect
+      winrgn wrSetRegion 0 $%(gui.recorta) $2 $3
+    }
+  }
+  if ($hget(edit $+ $remove($1,ð))) hfree edit $+ $remove($1,ð)
+  hmake edit $+ $remove($1,ð)
+}
+titulo { 
+  drawpic -tns $1 16711935 40 0 $calc($window($1).w - 80) 30 90 0 30 30 $guidir(titulo.bmp)
+  if ($calc($window($1).w - 112) >= 85) var %tmpx = 90
+  else var %tmpx = 40
+  drawpic -snt $1 16711935 0 0 %tmpx 30 0 0 %tmpx 30 $guidir(titulo.bmp)
+  var %x = $calc( $window($1).w - 110)
+  drawpic -tns $1 16711935 %x 0 110 30 178 0 110 30 $guidir(titulo.bmp)
+  gui_x $1 | gui__ $1 
+  var %x = $calc(($window($1).w  - $width($2-,Tahoma,10)) / 2)
+  if ($2) drawtext -rno $1 $%(rgb.titulo) Tahoma 10 %x 14 $2-
+}
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Button X
+gtk.an { return $gettok($%(gui.animax),$1,32) }
+;gui.animax x-image / w-image / h-image / x-win / y-win
+;defecto gui.animax: 18 18 18 23 4
+win_x {
+  if ($window($1) == $null) return
+  if ($prop == norm) { var %das = 0 }
+  if ($prop == push) { var %das = $gtk.an(1) }
+  var %x = $round($calc($window($1).w - $gtk.an(4)),0)
+  drawpic -ts $1 16711935 %x $gtk.an(5) $gtk.an(2) $gtk.an(3) %das 0 $gtk.an(2) $gtk.an(3) $guidir(cerrar.bmp)
+}
+gui.animax {
+  var %x = $round($calc($window($1).w - $gtk.an(4)),0),%y = $calc($gtk.an(3) + $gtk.an(5))
+  if ($mouse.x > %x && $mouse.x < $calc(%x + $gtk.an(2)) && $mouse.y > $gtk.an(5) && $mouse.y < %y) {
+    $win_x($1).push  
+    .timer $+ $1 -m 1 200 gui_x $1 
+    .timerc $+ $1 -m 1 350 cierra_win $1 
+    if ($3) .timerc $+ $3 -m 1 350 cierra_win $3
+  }
+}
+gui_x { $win_x($1).norm }
+
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Button _
+gtk.an_ { return $gettok($%(gui.anima_),$1,32) }
+;gui.anima_ x-image / w-image / h-image / x-win / y-win
+;defecto gui.anima_: 18 18 18 45 4
+win__ {
+  if ($prop == norm) { var %das = 0 }
+  if ($prop == push) { var %das = $gtk.an_(1) }
+  var %x = $round($calc($window($1).w - $gtk.an_(4)),0)
+  drawpic -ts $1 16711935 %x $gtk.an_(5) $gtk.an_(2) $gtk.an_(3) %das 0 $gtk.an_(2) $gtk.an_(3) $guidir(minimizar.bmp)
+}
+gui.anima_ {
+  var %x = $round($calc($window($1).w - $gtk.an_(4)),0),%y = $calc($gtk.an(3) + $gtk.an(5))
+  if ($mouse.x > %x && $mouse.x < $calc(%x + $gtk.an(2)) && $mouse.y > $gtk.an(5) && $mouse.y < %y) {
+    $win__($1).push 
+    .timer $+ $1 -m 1 200 gui__ $1 
+    .timerm $+ $1 -m 1 300 window -n $1 
+    if ($3) .timerc $+ $3 -m 1 300 window -n $3
+  }
+}
+gui__ { $win__($1).norm }
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Buttons
+boton {
+  if ( $prop = norm) {
+    if (%gui.fast == no) { relleno boton $%(rgb.botonu) $%(rgb.botond) $1 $2 $$3 $4 $calc($5 - 2) }
+    else { drawrect -fdrn $1 $rgb($gettok($%(rgb.botond),1,32),$gettok($%(rgb.botond),2,32),$gettok($%(rgb.botond),3,32)) 1 $calc($2 - 1) $3 $calc($4 + 2) $5 16 16 | drawrect -drn $1 $%(rgb.claro) 1 $2 $calc($3 + 1) $calc($4 + 2) $5 16 16  }
+    drawrect -drn $1 $%(rgb.oscuro) 1 $calc($2 - 1) $3 $calc($4 + 2) $5 16 16
+  }
+  else if ( $prop == push) {
+    if (%gui.fast == no) {  relleno boton $replace($rgb($%(rgb.normal)) $rgb($%(rgb.oscuro)),$chr(44),$chr(32)) $1 $2 $$3 $4 $calc($5 - 2) }
+    else { drawrect -fdrn $1 $rgb($gettok($%(rgb.botonu),1,32),$gettok($%(rgb.botonu),2,32),$gettok($%(rgb.botonu),3,32)) 1 $calc($2 - 1) $3 $calc($4 + 2) $5 16 16 | drawrect -drn $1 $%(rgb.boxclaro) 1 $2 $calc($3 + 1) $calc($4 + 2) $5 16 16  }
+    drawrect -drn $1 $%(rgb.oscuro) 1 $calc($2 - 1) $3 $calc($4 + 2) $5 16 16
+  }
+  if ($6) {
+    var %x = $calc(((( $4 - $width($6-,$gettok($%(texto),1,32),$gettok($%(texto),2,32))) / 2) + $2) +1) | var %y = $calc((($5 - $height($6,$gettok($%(texto),1,32),$gettok($%(texto),2,32))) / 2) + ($3 - 1))
+    %x = $int(%x)
+    drawtext -nr $1 $%(rgb.sombra) $%(Texto) $calc(%x - 1) $calc(%y + 1) $6-
+    drawtext -nr $1 $%(rgb.textobot) $%(Texto) %x %y $6-
+  }
+
+}
+
+cuad {
+  if ($prop == list) {
+    drawrect -dnr $1 $%(rgb.oscuro) 1 $2 $3 $calc($4 +1) $calc($5 +0)
+    drawrect -dnrf $1 $%(rgb.claro) 1 $2 $3 $calc($4 -2) $calc($5 - 2)
+    drawrect -dnrf $1 $%(rgb.sombra) 1 $calc($2 +1) $calc($3 +1) $calc($4 -1) $calc($5 - 2)
+    drawline $1
+    return
+  }
+  if ($prop == norm) { var %color = $%(rgb.normal) }
+  if ($prop == push) { var %color = $%(rgb.oscuro) }
+  if ($prop == luz) { var %color = $%(rgb.fondo) }
+  drawrect -nr $1 $%(rgb.oscuro) 1 $2 $3 $calc($4 - 1) $calc($5 - 1)
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 2)) $3 1 $calc($5 - 1)
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + 1) $3 1 $calc($5 - 3)
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + 2) $3 $calc($4 - 4) 1
+  drawrect -nrf $1 %color 1 $calc($2 + 1) $calc($3 + 1) $calc($4 - 3) $calc($5 - 3)
+  if ($6) {
+    var %x = $calc((( $4 - $width($6-,$gettok($%(texto),1,32),$gettok($%(texto),2,32))) / 2) + $2) | var %y = $calc((($5 - $height($6,$gettok($%(texto),1,32),$gettok($%(texto),2,32))) / 2) + ($3 - 1))
+    drawtext -nr $1 $%(rgb.texto) $%(Texto) %x %y $6-
+  }
+  drawline $1
+}
+
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- check/radio
+chek {
+  if ($1 == d) {
+    drawpic -nts $2 16711935 $3 $4 13 13 0 0 13 13 $guidir(checks.bmp)
+    if ($5) { 
+      drawtext -nr $2 $%(rgb.oscuro) $%(Texto) $calc($3 + 14) $calc($4) $5-
+      drawtext -nr $2 $%(rgb.claro) $%(Texto) $calc($3 + 15) $calc($4 - 1) $5-
+    }
+  }
+  if ($1 == a) {
+    drawpic -nts $2 16711935 $3 $4 13 13 14 0 13 13 $guidir(checks.bmp)
+    if ($5) { 
+      drawtext -nr $2 $%(rgb.oscuro) $%(Texto) $calc($3 + 14) $calc($4) $5-
+      drawtext -nr $2 $%(rgb.texto) $%(Texto) $calc($3 + 15) $calc($4 - 1) $5-
+    }
+  }
+}
+radios {
+  if ($1 == d) {
+    drawpic -nts $2 16711935 $3 $4 13 13 0 0 13 13 $guidir(radios.bmp)
+    if ($5) { 
+      drawtext -nr $2 $%(rgb.oscuro) $%(Texto) $calc($3 + 14) $4 $5-
+      drawtext -nr $2 $%(rgb.claro) $%(Texto) $calc($3 + 15) $calc($4 - 1) $5-
+    }
+  }
+  if ($1 == a) {
+    drawpic -ts $2 16711935 $3 $4 13 13 14 0 13 13 $guidir(radios.bmp)
+    if ($5) { 
+      drawtext -r $2 $%(rgb.oscuro) $%(Texto) $calc($3 + 14) $4 $5-
+      drawtext -r $2 $%(rgb.texto) $%(Texto) $calc($3 + 15) $calc($4 - 1) $5-
+    }
+  }
+}
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Boxes
+bajor {
+  drawrect -rnd $1 $%(rgb.boxclaro) 1 $calc($2 + 1) $calc($3 + 1) $4 $5 25 25
+  drawrect -rnd $1 $%(rgb.oscuro) 1 $2 $3 $4 $5 25 25
+  drawrect -rndf $1 $%(rgb.sombra) 1 $calc($2 + 1) $calc($3 + 1) $calc($4 - 1) $calc($5 - 1) 25 25
+}
+altor {
+  drawrect -rnd $1 $%(rgb.oscuro) 1 $calc($2 + 1) $calc($3 + 1) $4 $5 25 25
+  drawrect -rnd $1 $%(rgb.boxclaro) 1 $2 $3 $4 $5 25 25
+  drawrect -rndf $1 $%(rgb.sombra) 1 $calc($2 + 1) $calc($3 + 1) $calc($4 - 1) $calc($5 - 1) 25 25
+}
+cuadro { 
+  if ($2 > 15) { drawrect -nrf $1 $2 1 $3 $4 $5 $6 }
+  else { drawrect -nf $1 $2 1 $3 $4 $5 $6 }
+}
+caja {
+  drawrect -rnd $1 $%(rgb.oscuro) 1 $2 $3 $4 $5 25 25
+  drawrect -rnd $1 $%(rgb.boxclaro) 1 $calc($2 + 1) $calc($3 + 1) $4 $5 25 25
+  if ($6) {
+    var %tex = • $6- •,%ancho = $width(%tex,$gettok($%(texto),1,32),$gettok($%(texto),2,32),1),%x = $calc($2 + (($4 -  %ancho ) /2))
+    %x = $calc($int(%x) - 0)
+    drawrect -ndrf $1 $%(rgb.oscuro) 1 $calc(%x - 4) $calc($3 - 6) $calc(%ancho + 8) 14
+    drawrect -ndr $1 $%(rgb.boxclaro) 1 $calc(%x - 4) $calc($3 - 6) $calc(%ancho + 8) 14
+    drawtext -nro $1 $%(rgb.oscuro) $%(Texto) $calc(%x - 1) $calc($3 - 5) %tex
+    drawtext -nro $1 $%(rgb.caja) $%(Texto) %x $calc($3 - 6) %tex
+  }
+}
+dotbox {
+  var %tmp = 3
+  drawdot -r $1 $6 1 $calc($2 + 1) $calc($3 + 1) | drawdot -r $1 $6 1 $calc($2 + $4) $calc($3 + 1)
+  while (%tmp <= $calc($4 - 2)) {
+    drawdot -r $1 $6 1 $calc($2 + %tmp) $3
+    inc %tmp 2
+  }
+  %tmp = 3
+  while (%tmp <= $calc($5 - 2)) {
+    drawdot -r $1 $6 1 $2 $calc($3 + %tmp)
+    inc %tmp 2
+  }
+  drawdot -r $1 $6 1 $calc($2 + 1) $calc($3 + $5 - 1) | drawdot -r $1 $6 1 $calc($2 + $4) $calc($3 + $5 - 1)
+  %tmp = 3
+  while (%tmp <= $calc($4 - 2)) {
+    drawdot -r $1 $6 1 $calc($2 + %tmp) $calc($3 + $5)
+    inc %tmp 2
+  }
+  %tmp = 3
+  while (%tmp <= $calc($5 - 2)) {
+    drawdot -r $1 $6 1 $calc($2 + $4 + 1) $calc($3 + %tmp)
+    inc %tmp 2
+  }
+}
+
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Txt tool
+picha { ;caja @conectað 91 164 120 28 | drawtext -ro @conectað $%(rgb.oscuro) Tahoma 20 95 163 // X-TorM | drawtext -ro @conectað $%(rgb.texto) Tahoma 20 95 167 // X-TorM }
+texto {
+  if ($1 == lim) { drawtext -rbc $2 $3 $%(rgb.caja) $%(Texto) $4 $5 $6 11 $7- | return }
+  elseif ($1 == cent) {
+    var %w = $calc( ( $window($2).w - $width($4-,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) ) / 2)
+    drawtext -rn $2 $%(rgb.sombratxt) $%(Texto) $calc(%w - 1) $calc($3 + 1) $4-
+    drawtext -rn $2 $%(rgb.texto) $%(Texto) %w $3 $4-
+  }
+  elseif ($1 == disable) {
+    var %w = $calc( ( $window($2).w - $width($4-,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) ) / 2)
+    drawtext -rn $2 $%(rgb.oscuro) $%(Texto) $calc(%w - 1) $calc($3 + 1) $4-
+    drawtext -rn $2 $%(rgb.claro) $%(Texto) %w $3 $4-
+  }
+  else { 
+    drawtext -rn $1 $%(rgb.sombratxt) $%(Texto) $calc($2 - 1) $calc($3 + 1) $4-
+    drawtext -rn $1 $%(rgb.texto) $%(Texto) $2 $3 $4- 
+  }
+}
+entra-text {
+  ;$1 win - $2 x - $3 y - $4 w - $5 h - $6 texto
+  var %tex = $6-,%tok = 1,%tmx,%y = $3,%x = $2,%tot-w = 0,%tot-y
+  if ($width(%tex,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) <= $4) { 
+    if ($prop) return %y
+    else { drawtext -rn $1 $%(rgb.oscuro) $%(Texto) $calc($2 - 1) $calc($3 + 1) $6- | drawtext -rn $1 $%(rgb.texto) $%(Texto) $2 $3 $6- | return }
+  }
+  %tmx = $gettok(%tex,%tok,32)
+  while (%tmx) {
+    %tot-w = %tot-w + $width(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32))
+    if (%tot-w <= $4) {
+      if (!$prop) { drawtext -rn $1 $%(rgb.oscuro) $%(Texto) $calc(%x - 1) $calc(%y + 1) %tmx | drawtext -rn $1 $%(rgb.texto) $%(Texto) %x %y %tmx }
+      inc %x $calc($width(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) + 2)
+    }
+    else { 
+      %y = $calc(%y + $height(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) + 1) | %tot-w = $width(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) | %x = $2
+      if (%tot-y > $5) $iif($prop,return %y,return)
+      inc %tot-y $height(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32))
+      if (!$prop) { drawtext -rn $1 $%(rgb.oscuro) $%(Texto) $calc(%x - 1) $calc(%y + 1) %tmx | drawtext -rn $1 $%(rgb.texto) $%(Texto) %x %y %tmx }
+      inc %x $calc($width(%tmx,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) + 2)
+    }
+    inc %tok | %tmx = $gettok(%tex,%tok,32)
+  }
+  if ($prop) return %y
+}
+varia.texto {
+  if ($width($6-,$gettok($%(texto),1,32),$gettok($%(texto),2,32),1,0) > $4) {
+    var %texto = $5-,%linea = $3
+    while (%texto != $null) {
+      if (%tmp.text) unset %tmp.text
+      var %tmp.text $left(%texto,1)
+      %texto = $right(%texto,$calc($len(%texto) -1 )) 
+      while (($width(%tmp.text,$gettok($%(texto),1,32),$gettok($%(texto),2,32),1,0) < $4 ) && (%texto)) {
+        %tmp.text = %tmp.text $+ $left(%texto,1) | %texto = $right(%texto,$calc($len(%texto) -1 )) 
+        if ($asc($left(%texto,1)) == 32) {
+          %tmp.text = %tmp.text $left(%texto,1)
+          %texto = $right(%texto,$calc($len(%texto) -1)) 
+        }
+        drawtext -ro $1 $%(rgb.texto) $%(Texto) $2 %linea %tmp.text
+      }
+      inc %linea 12
+    }
+  }
+  else { drawtext -o $1 0 $%(Texto) $2 $3 $5- }
+}
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Sel-edit texts
+edita {
+  drawrect -dnrf $1 $%(rgb.edit) 1 $2 $3 $calc($4 + 1) 17 10 10
+  drawrect -dnr $1 $%(rgb.oscuro) 1 $2 $3 $calc($4 + 2) 17 10 10
+  if ($6) { 
+    var %w $calc($2 + 5) 
+    drawtext -rnc $1 $%(rgb.texto) Tahoma 9 %w $calc($3 + 3) $calc($4 - 8) $height($5-,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) $6- 
+    hadd edit $+ $remove($1,ð) $5 $replace($6-,$chr(32),$chr(188))
+  }
+  ;¼
+}
+edid { var %tabla = edit $+ $1 | return $replace($hget(%tabla,$2),$chr(188),$chr(32)) }
+lst-scr {
+  drawcopy -nm $1 $calc($2 + $4 - 17) $calc($3 + 20) 1 $calc($5 - 40) $1 $calc($2 + $4 - 16) $calc($3 + 20) 15 $calc($5 - 40)
+  drawrect -nfr $1 $%(rgb.edit) 1 $calc($2 + ($4 - 12)) $calc($3 + 20) 5 $calc($5 - 40)
+  drawrect -nfr $1 $%(rgb.normal) 1 $calc($2 + ($4 - 9)) $calc($3 + 20) 1 $calc($5 - 40)
+  drawrect -nfr $1 $%(rgb.normal) 1 $calc($2 + ($4 - 12)) $calc($3 + 20) 1 $calc($5 - 40)
+}
+lista {
+  ;;;;;;;;;;;;;;;;;;;;;;;; LISTA ;;;;;;;;;;;;;;;;;;;;;;;;
+  ;arriba negra
+  drawrect -rn $1 $%(rgb.oscuro) 1 $2 $3 $calc($4 - 20) 1;
+  ;izquierda negra
+  drawrect -nr $1 $%(rgb.oscuro) 1 $2 $3 1 $calc($5 - 1)
+  ;derecha blanca
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 20)) $3 1 $calc($5 - 1)
+  ;abajo blanca
+  drawrect -nr $1 $%(rgb.claro) 1 $2 $calc($3 + ($5 - 2)) $calc($4 - 19) 1
+  ;relleno list
+  drawrect -rfn $1 $%(rgb.edit) 1 $calc($2 + 1) $calc($3 + 1) $calc($4 - 21) $calc($5 - 3)
+  ;;;;;;;;;;;;;;;;;;;;;;;; SCROLL ;;;;;;;;;;;;;;;;;;;;;;;;
+  drawrect -nfr $1 $%(rgb.edit) 1 $calc($2 + ($4 - 12)) $calc($3 + 20) 5 $calc($5 - 40)
+  drawrect -nfr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 9)) $calc($3 + 20) 1 $calc($5 - 40)
+  drawrect -nfr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 12)) $calc($3 + 20) 1 $calc($5 - 40)
+  ;negra derecha hasta abajo
+  ;drawrect -nr $1 $%(rgb.oscuro) 1 $calc($2 + ($4 - 19)) $3 1 $calc($5 - 2)
+  ;cuadrado boton arriba
+  drawrect -nr $1 $%(rgb.oscuro) 1 $calc($2 + ($4 - 18)) $3 18 20
+  ;relleno boton arriba
+  if (%gui.fast == no) relleno otro $%(rgb.botonu) $%(rgb.botond) $1 $calc($2 + ($4 - 18)) $3 17 19
+  else drawrect -nfr $1 $rgb($gettok($%(rgb.botonu),1,32),$gettok($%(rgb.botonu),2,32),$gettok($%(rgb.botonu),3,32)) 1 $calc($2 + ($4 - 18)) $3 17 19
+  ;blanca arriba boton arriba
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 18)) $3 17 1
+  ;blanca izquierda boton arriba
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 18)) $calc($3 + 1) 1 18
+  ;Flecha
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 14)) $calc($3 + 13) 10 1
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 12)) $calc($3 + 10) 6 1
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 10)) $calc($3 + 7) 2 1
+  ;-
+  ;cuadrado boton abajo
+  drawrect -nr $1 $%(rgb.oscuro) 1 $calc($2 + ($4 - 18)) $calc($3 + ($5 - 21)) 18 20
+  ;relleno boton abajo
+  if (%gui.fast == no) relleno otro $%(rgb.botond) $%(rgb.botonu) $1 $calc($2 + ($4 - 18)) $calc($3 + ($5 - 21)) 17 19
+  else drawrect -nfr $1 $rgb($gettok($%(rgb.botonu),1,32),$gettok($%(rgb.botonu),2,32),$gettok($%(rgb.botonu),3,32)) 1 $calc($2 + ($4 - 18)) $calc($3 + ($5 - 21)) 17 19
+  ;blanca arriba boton abajo
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 18)) $calc($3 + ($5 - 21)) 17 1
+  ;blanca izquierda boton abajo
+  drawrect -nr $1 $%(rgb.claro) 1 $calc($2 + ($4 - 18)) $calc($3 + ($5 - 20)) 1 19
+  ;Flecha
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 14)) $calc(($3 + $5) - 14) 10 1
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 12)) $calc(($3 + $5) - 11) 6 1
+  drawrect -nr $1 $%(rgb.texto) 1 $calc($2 + ($4 - 10)) $calc(($3 + $5) - 8) 2 1
+  drawline $1
+}
+did-lista {
+  var %win = $gettok($%($3),8,32),%var = $3
+  if ($1 == -a) {
+    aline %win $4-
+  }
+  if ($1 == firstf) {
+    ;tipo archivo variable
+    ;file Sistema\tmp.nombres.m3f tmp.@list
+    ;Variable -> @list 20 50 190 12 1 1 @lista list-alias
+    ;x y ancho entrantes empezar selec ventana alias
+    clear -l %win 
+    window -hl %win 
+    loadbuf -l %win $2
+  }
+  elseif ($1 == firstv) {
+    clear -l %win | window -hl %win
+    var %tmp = 1,%variable = % [ $+ [ $2 ] ]
+    while (%tmp <= $numtok(%variable,226)) {
+      aline %win $gettok(%variable,%tmp,226) | inc %tmp
+    }
+  }
+  tokenize 32 $%($3)
+  var %x = $calc($2 + 4),%y = $calc($3 + 3),%desde = $6,%w = $calc($4 - 25),%entrantes = $5,%i = 1,%sel = $7,%origx = $3
+  drawrect -nrf $1 $%(rgb.edit) 1 $calc($2 + 1) $calc($3 + 2) $calc($4 - 21) $calc($5 * 14 + 1)
+  if (%desde > $line(%win,0).ln) %desde = 1
+  if ($10) {
+    while (%i <= %entrantes) {
+      var %tex = $line(%win,%desde),%dis = $10,%tok = 1
+      drawrect -nr $1 $%(rgb.normal) 1 %x $calc(%y + 12) %w 1
+      if (!%tex) { goto fin }
+      while ($numtok(%tex,9) >= %tok) {
+        var %dx = $calc(%x + $gettok(%dis,%tok,44) + 5) | var %linea = $gettok(%tex,%tok,9)
+        if (%sel == 0) { 
+          drawtext -cnrbp $1 $%(rgb.texto) $%(rgb.edit) Verdana 9 %dx $calc(%y - 1) %w 13 %linea
+        }
+        elseif (%sel == %desde) {
+          drawrect -nrf $1 $%(rgb.sel) 1 %x $calc(%y - 1) %w 14
+          while ($numtok(%tex,9) >= %tok) {
+            var %dx = $calc(%x + $gettok(%dis,%tok,44) + 5) | %linea = $gettok(%tex,%tok,9)
+            drawtext -pbcnr $1 $%(rgb.texto) $%(rgb.sel) Verdana 9 %dx $calc(%y - 1) %w 13 %linea
+            inc %tok
+          }
+        }
+        else { 
+          drawtext -cnrbp $1 $%(rgb.texto) $%(rgb.edit) Verdana 9 %dx $calc(%y - 1) %w 13 %linea
+        }
+        drawrect -nr $1 $%(rgb.normal) 1 %x $calc(%y + 12) %w 1
+        inc %tok
+      }
+      :fin
+      inc %i | inc %y 14 | inc %desde
+    }
+    %tok = 1
+    while ($numtok(%dis,44) >= %tok) {
+      %dx = $gettok(%dis,%tok,44)
+      if (%dx != 0) drawrect -r $1 $%(rgb.normal) 1 $calc(%x + %dx) %origx 1 $calc(%entrantes * 14 + 1)
+      inc %tok
+    }
+  }
+  else {
+    while (%i <= %entrantes) {
+      var %tex = $line(%win,%desde) | if (%tex == $null) goto fin 
+      if (%tex == $chr(128)) goto fin
+      ;espacio en blanco = €
+      if (%sel == 0) { drawtext -cnrbp $1 $%(rgb.texto) $%(rgb.edit) Verdana 9 %x %y %w 13 %tex }
+      elseif (%sel == %desde) {
+        drawrect -nrf $1 $%(rgb.sel) 1 $calc(%x - 1) $calc(%y - 1) %w  15
+        drawtext -pbcnr $1 $%(rgb.texto) $%(rgb.sel) Verdana 9 %x %y %w 14 %tex | goto fin
+      }
+      else { drawtext -cnrbp $1 $%(rgb.texto) $%(rgb.edit) Verdana 9 %x %y %w 13 %tex }
+      :fin
+      inc %i | inc %y 14 | inc %desde
+    }
+  }
+  :end
+  if (%sel != 0) sline %win %sel
+  ;$1 @list $2 20 $3 50 $4 190 $5 12 $6 1 $7 1 $8 @Lista $9 alias
+  if (%desde < 1) %desde = 1
+  if (%sel == %desde) goto draw
+  var %alto = $calc($5 * 14 + 4) 
+  lst-scr $1 $2 $3 $4 %alto
+  var %longue = $calc(($5 * 14 - 34) - 3),%y = $calc($3 + 17)
+  var %lk = $calc($line($8,0) / $5),%fds = $calc((%longue / $line($8,0)) * ($6 - 1))
+  var %sdf = $calc(%longue / %lk)
+  if (%lk < 1) { drawline $1 | return }
+  $cuad($1,$calc(($2 + $4) - 14),$calc(%y + %fds + 4),9,$calc(%sdf + 2)).list
+  :draw
+  drawline $1
+}
+refresco-lista {
+  var %dat = $2-
+  tokenize 32 $%($3)
+  ;@list 20 50 190 12 1 1 @lista list-alias
+  ;   1    2   3    4     5  6 7  8          9
+  var %alto = $calc($5 * 14 + 4)
+  if ( ($mouse.x > $calc( ($2 + $4) - 19)) && ($mouse.x < $calc($2 + $4)) && ($mouse.y > $calc( ($3 + %alto) - 18)) && ($mouse.y < $calc($3 + %alto)) ) {
+    if ($calc($6 + $5) > $line($8,0).ln) { return }
+    setv $gettok(%dat,2,32) $1 $2 $3 $4 $5 $calc($6 + 1) $7-
+    did-lista nath %dat
+  }
+  elseif ($mouse.x > $calc(($2 + $4) - 19) && $mouse.x < $calc($2 + $4) && $mouse.y > $3 && $mouse.y < $calc($3 + 18)) {
+    if ($6 == 1) return
+    setv $gettok(%dat,2,32) $1 $2 $3 $4 $5 $calc($6 - 1) $7-
+    did-lista nath %dat
+  }
+  elseif ( $mouse.x > $2 && $mouse.x < $calc(($2 + $4) - 21) && $mouse.y > $3  && $mouse.y < $calc($3 +%alto) ) {
+    var %s = $int($calc(($mouse.y - $3) / 14)) 
+    var %seleccionado = $calc($6 + %s)
+    setv $gettok(%dat,2,32) $1 $2 $3 $4 $5 $6 %seleccionado $8-
+    sline $8 %seleccionado
+    did-lista nath %dat
+    if ($gettok(%dat,3,32) == dclick) { $9 dclick %seleccionado $line($8,%seleccionado) | return }
+    if ($9 != not) $9 %seleccionado $line($8,%seleccionado)
+  }
+  elseif ( $mouse.x > $calc(($2 + $4) - 21) && $mouse.x < $calc($2 + $4) && $mouse.y > $calc($3 + 21) && $mouse.y < $calc(($3 +%alto) - 21) ) {
+    var %longue = $calc($5 * 14 - 34),%gad = $calc($mouse.y - $3 - 16)
+    var %desde = $int($calc($line($8,0) / %longue * %gad))
+    if ($calc( %desde + $5 - 1 ) > $line($8,0)) { %desde = $calc( $line($8,0) - $5 + 1) } 
+    if (%desde < 1) var %desde = 1
+    setv $gettok(%dat,2,32) $1 $2 $3 $4 $5 %desde $7-
+    did-lista nath %dat
+  }
+}
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Win tools/controlers
+cierra_win {
+  if (%anima.win == no) { goto winsevent }
+  var %xo = $window($1).x,%y = $window($1).y,%w = $window($1).w,%h = $window($1).h
+  while (%h > 0) {
+    dec %h 25 | inc %y 10
+    window -a $1 %xo %y %w %h
+  }
+  :winsevent
+  window -c $1
+}
+
+movewin {
+  if ($mouse.key != 1) { .timermovewin $+ $$1 off | unset %trip.* | return }
+  if (!$window($$1)) { .timermovewin $+ $$1 off | if ($2) window -c $2 | unset %trip.* | return }
+  if (%trip.x == $null) { %trip.x = $mouse.x | %trip.y = $mouse.y }
+  window $$1 $calc($mouse.mx - %trip.x) $calc($mouse.my - %trip.y)
+  if ($2) window $2 $calc($window($1).x - $window($2).w) $calc($mouse.my - %trip.y)
+  if ($1 == @X-AMPð) { setv mp3.x $window(@X-AMPð).x | setv mp3.y $window(@X-AMPð).y }
+  if ($1 == @Playlistð) { setv playlist.x $window(@Playlistð).x | setv playlist.y $window(@Playlistð).y }
+}
+editar {
+  unsetv alias tmp.toset | var %dll = $dll($-dll(cursor.dll),RestoreCursor,.)
+  set %var-color $colour($colour(Editbox)) | colour 9 $%(rgb.edit) | colour editbox 9
+  window -Be +d @editbox $calc( ( $window($1).x + $2 ) + 5) $calc( ( $window($1).y + $3 ) + 3 ) $calc($4 - 5) 13 Tahoma 9
+  setv edid $5
+  if ($6 == $chr(37)) { editbox @editbox % [ $+ [ $7 ] ] | setv tmp.toset $chr(37) $7 }
+  elseif ($6 == $chr(36)) { editbox @editbox $%($7) | setv tmp.toset $ $7 }
+  elseif ($6 == id) { editbox @Editbox $ [ $+ [ $7 ] ] }
+  elseif ($6 == edid) { editbox @Editbox $edid($remove($1,ð),$5) }
+  else { editbox @editbox $7 }
+  setv coordenadas $1 $2 $3 $4
+  if ($8) { setv alias $8- }
+  .timeredita -m 0 50 edi
+}
+edi {
+  if ($active != @editbox) { 
+    .timeredita off | var %texto = $editbox(@editbox)
+    colour 9 %var-color | colour editbox 9 | unset %var-color 
+    if ($gettok($%(tmp.toset),1,32) == $chr(37)) { 
+      esc-edit $%(coordenadas) %texto | if ($%(alias)) $%(alias) %texto
+    }
+    elseif ($gettok($%(tmp.toset),1,32) == $chr(36)) { 
+      esc-edit $%(coordenadas) %texto | if ($%(alias)) $%(alias) %texto
+    }
+    else { esc-edit $%(coordenadas) %texto | if ($%(alias)) $%(alias) %texto }
+    hadd edit $+ $remove($gettok($%(coordenadas),1,32),ð) $%(edid) $replace(%texto,$chr(32),$chr(188))
+    window -c @editbox | return
+  }
+  if ($gettok($%(tmp.toset),1,32) == $chr(37)) { set % [ $+ [ $gettok($%(tmp.toset),2,32) ] ] $editbox(@editbox)  }
+  elseif ($gettok($%(tmp.toset),1,32) == $chr(36)) { setv $gettok($%(tmp.toset),2,32) $editbox(@editbox) }
+  hadd edit $+ $remove($gettok($%(coordenadas),1,32),ð) $%(edid) $replace(%texto,$chr(32),$chr(188))
+}
+esc-edit {
+  drawrect -rfn $1 $%(rgb.edit) 1 $calc($2 + 5) $calc($3 + 2) $calc($4 - 5) 12
+  if ($5) drawtext -nrc $1 $%(rgb.texto) Tahoma 9 $calc($2 + 5) $calc($3 + 3) $calc($4 - 7) 11 $5-
+  drawline $1
+}
+cgui {
+  if ($1 == draw) {
+    drawrect -nr $2 $%(rgb.oscuro) 1 $calc($3 + $5) $4 18 19
+    if (%gui.fast == no) relleno otro $%(rgb.botond) $%(rgb.botonu) $2 $calc($3 + $5 + 1) $4 16 18
+    else drawrect -nfr $2 $rgb($gettok($%(rgb.botonu),1,32),$gettok($%(rgb.botonu),2,32),$gettok($%(rgb.botonu),3,32)) 1 $calc($3 + $5 + 1) $4 16 18
+    drawrect -nr $2 $%(rgb.claro) 1 $calc($3 + $5) $4 17 1
+    drawrect -nr $2 $%(rgb.claro) 1 $calc($3 + $5) $4 1 17
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 4) $calc($4 + 6) 10 1
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 6) $calc($4 + 9) 6 1
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 8) $calc($4 + 12) 2 1
+    drawline $2
+  }
+  if ($1 == push) {
+    drawrect -nr $2 $%(rgb.oscuro) 1 $calc($3 + $5) $4 18 19
+    if (%gui.fast == no) relleno otro $%(rgb.botonu) $%(rgb.botond) $2 $calc($3 + $5) $4 16 18
+    else drawrect -nfr $2 $rgb($gettok($%(rgb.botonu),1,32),$gettok($%(rgb.botonu),2,32),$gettok($%(rgb.botonu),3,32)) 1 $calc($3 + $5) $4 16 18
+    drawrect -nr $2 $%(rgb.claro) 1 $calc($3 + $5) $4 17 1
+    drawrect -nr $2 $%(rgb.claro) 1 $calc($3 + $5) $calc($4 + 1) 1 17
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 8) $calc($4 + 5) 2 1
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 6) $calc($4 + 8) 6 1
+    drawrect -nr $2 $%(rgb.texto) 1 $calc($3 + $5 + 4) $calc($4 + 11) 10 1
+    drawline $2
+  }
+}
+combo {
+  if ($1 == draw) {
+    drawrect -rf $2 $%(rgb.edit) 2 $3 $4 $calc($5 - 1) 19
+    drawrect -r $2 $%(rgb.oscuro) 1 $3 $4 $calc($5 - 1) 19
+    if ($6) drawtext -rc $2 $%(rgb.texto) $%(Texto) $calc($3 + 5) $calc($4 + 2) $calc($5 - 8) $height($6-,$gettok($%(texto),1,32),$gettok($%(texto),2,32)) $6-
+    cgui draw $2-
+  }
+  if ($1 == push) {
+    if ($window(@combo)) { 
+      if ( ($window(@combo).x == $calc($window($2).x + $3 + 1)) && ($window(@Combo).y == $calc( ( $window($2).y + $4 ) + 19))) {
+        cgui draw $2- | window -c @Combo | .timercombo off | return
+      }
+    }
+    cgui push $2-
+    setv coordenadas $2 $3 $4 $5
+    window -Bphl +bd @combo $calc( $window($2).x + $3 + 1)  $calc( ( $window($2).y + $4 ) + 19) $5 $6
+    window -a @Combo
+    setv alias $9-
+    carga-combo $7 $8
+    .timercombo -m 0 50 combi
+  }
+}
+carga-combo {
+  if ($1 == var) {
+    var %tsa = 1
+    ;
+    while ($gettok(% [ $+ [ $2 ] ] ,%tsa,16) != $null) {
+      aline -l @combo $gettok(% [ $+ [ $2 ] ] ,%tsa,16)
+      inc %tsa
+    }
+  }
+  elseif ($1 == file) { loadbuf -l @combo $2  }
+  elseif ($1 == tset) {
+    var %tsa = 1
+    ;
+    while ($gettok(% [ $+ [ $2 ] ] ,%tsa,16) != $null) {
+      aline -l @combo $gettok(% [ $+ [ $2 ] ] ,%tsa,16)
+      inc %tsa
+    }
+    unset % [ $+ [ $2 ] ]
+  }
+}
+combi { 
+  if ($active != @Combo) {
+    .timercombo off 
+    cgui draw $gettok($%(coordenadas),1,32) $calc($gettok($%(coordenadas),2,32) + $gettok($%(coordenadas),4,32)) $gettok($%(coordenadas),3,32)
+    window -c @Combo
+    return 
+  } 
+}
+;---
+relleno {
+  if ($1 == otro) || ($1 == boton) {
+    var %r = $2,%g = $3,%b = $4,%tmp-r,%tmp-g,%tmp-b,%tmp = 1, %x, %w
+    %tmp-r = $calc(( %r - $5) / $12) | %tmp-g = $calc(( %g - $6) / $12) | %tmp-b = $calc(( %b - $7) / $12)
+    if ($1 == boton) {
+      tokenize 32 $8-
+      while (%tmp <= $5) {
+        if (%tmp == 1) { %x = $calc($2 + 5) | %w = $calc($4 - 10) }
+        if (%tmp == 2) { %x = $calc($2 + 3) | %w = $calc($4 - 6) }
+        if (%tmp == 3) { %x = $calc($2 + 2) | %w = $calc($4 - 4) }
+        if (%tmp == 4) { %x = $calc($2 + 1) | %w = $calc($4 - 2) }
+        if (%tmp > 4) && (%tmp < $calc($5 - 4)) { %x = $2 | %w = $4 }
+        if (%tmp = $calc($5 - 3)) { %x = $calc($2 + 1) | %w = $calc($4 - 2) }
+        if (%tmp = $calc($5 - 2)) { %x = $calc($2 + 2) | %w = $calc($4 - 4) }
+        if (%tmp = $calc($5 - 1)) { %x = $calc($2 + 3) | %w = $calc($4 - 6) }
+        if (%tmp = $5) { %x = $calc($2 + 5) | %w = $calc($4 - 10) }
+        drawrect -rn $1 $rgb(%r,%g,%b) 1 %x $calc($3 + %tmp) %w 1
+        inc %tmp
+        dec %r %tmp-r | dec %g %tmp-g | dec %b %tmp-b
+      }
+      return
+    }
+    tokenize 32 $8-
+  }
+  else {
+    var %r = $gettok($%(rgb.rstart),1,32),%g = $gettok($%(rgb.rstart),2,32),%b = $gettok($%(rgb.rstart),3,32),%tmp-r,%tmp-g,%tmp-b,%tmp = 0
+    %tmp-r = $calc(( %r - $gettok($%(rgb.rend),1,32)) / $5) | %tmp-g = $calc(( %g - $gettok($%(rgb.rend),2,32)) / $5) | %tmp-b = $calc(( %b - $gettok($%(rgb.rend),3,32)) / $5)
+  }
+  while (%tmp < $5) {
+    drawrect -rn $1 $rgb(%r,%g,%b) 1 $2 $calc($3 + %tmp) $4 1
+    inc %tmp
+    dec %r %tmp-r | dec %g %tmp-g | dec %b %tmp-b
+  }
+}
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Barz
+seekbar {
+
+}
+
+;----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- Menu
+menu {
+  var %x = $mouse.mx,%y = $mouse.my,%h = $calc($numtok($2-,226) * 19 +20),%w = $1,%tmp = 20,%count = 1
+  setv gui.menu $2-
+  window -Bphi +d @Menu %x %y %w %h @Menu
+  :13816530
+  cuadro @Menu $%(rgb.fondo) 0 0 %w %h
+  drawrect -nrd @Menu $%(rgb.oscuro) 2 0 0 %w %h 25 25
+  dll $-dll(WinRgn.dll) wrSelectWindow $window(@Menu).hwnd
+  dll $-dll(WinRgn.dll) wrSetMode rmRoundRect
+  dll $-dll(WinRgn.dll) wrSetRegion 1 1 %w %h 24 24
+  texto cent @Menu 5 $strip($_m) X-Menu $strip($_m)
+  while (%count <= $numtok($2-,226)) {
+    drawrect -nfrd @Menu $%(rgb.claro) 1 3 %tmp $calc(%w - 5) 16 24 24
+    drawrect -nrd @Menu $%(rgb.normal) 1 3 %tmp $calc(%w - 5) 15 24 24
+    drawrect -nrd @Menu $%(rgb.oscuro) 1 3 %tmp $calc(%w - 5) 16 24 24
+    texto cent @Menu $calc(%tmp + 1) $gettok($gettok($2-,%count,226),1,95)
+    inc %tmp 19 | inc %count
+  }
+  window -a @Menu | .timerMENU -m 0 0 menu.active
+}
+menu.active {
+  if ($active != @Menu) { window -c @Menu | .timerMENU off }
+}
+f112 {
+  window -c @Menu
+  window -Bphi +d @Menu 600 300 100 150 @Menu
+  dll $-dll(WinRgn.dll) wrSelectWindow $window(@Menu).hwnd
+  dll $-dll(WinRgn.dll) wrSetMode rmRoundRect
+  dll $-dll(WinRgn.dll) wrSetRegion 1 1 100 150 24 24
+  dll $-dll(WinRgn.dll) wrDeleteRegion 1 20 50 90 24 24
+  relleno otro $%(rgb.botond) $%(rgb.botonu) @Menu 0 0 100 10 | relleno otro $%(rgb.botonu) $%(rgb.botond) @Menu 0 9 100 10
+  window -wa @Menu
+}

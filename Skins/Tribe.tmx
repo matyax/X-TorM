@@ -1,0 +1,108 @@
+;Info
+15»08» 10parts 15Hexodo 10(BlindScript@Kd98.virtual)
+15»08» 10joins 15Kronos 10(BlindScript@Kd98.virtual) - Entro antes como:12 Hexodo
+12>15 Ke embole!
+11[15Yo11]15 Si, posta!
+15»08» 11quits15 Kronos 11(BlindScript@Kd98.virtual)
+15»08» 8nick change 15[15 Your nick is now 8»15 $me 15]
+12>15Byez! Falto el cambio de topic!
+;Fin info
+;TEMA TRIBE PARA X-TORM
+on 1:load: {
+  fuentes 10 Verdana
+  set.colores pone 16777215,0,10485760,8388608,255,127,1048800,34816,16287904,64512,15773896,16744576,13172624,12105983,8355711,13816530
+  clear -s
+  colour action 10 
+  colour ctcp 4 
+  colour highlight 15 
+  colour info 0 
+  colour info2 0 
+  colour invite 14 
+  colour join 0
+  colour kick 0 
+  colour mode 0 
+  colour nick 15 
+  colour normal 0 
+  colour notice 15 
+  colour notify 15 
+  colour other 0 
+  colour own 0 
+  colour part 0 
+  colour quit 0 
+  colour topic 15 
+  colour wallops 0 
+  colour whois 10 
+  colour listbox 1 
+  colour editbox 1 
+  colour background 1 
+  colour editbox text 0 
+  colour listbox text 8
+  credit
+  .timer -m 1 500 fuente
+  background -sc $scriptdirt-fondo.png
+}
+alias nresalt return 15
+alias resalt return 12
+alias logo return 7,7|10,3 3 0-[10X-TorM0]-10 3 7,7| Script
+alias alerta { echo -es 4[Alerta] $1- }
+alias info { echo -es 12[Info] $1- }
+alias marc return 0»08»
+alias _m return 0»
+alias _ctcp { echo -es 4[CTCP]  $+ $1 $+ : $2- }
+alias _notice { echo -es 8[Notice] $1 $+ : $2- }
+alias bnotice { echo -es 12[ $+ $1 $+ ] $2- }
+alias _join { echo $1 $marc 10joins $2 10( $+ $3 $+ ) $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc 10joins $2 10( $+ $3 $+ ) - Clones: 10 $4- | return }
+alias _part { echo $1 $marc 10parts $2 10( $+ $3 $+ ) }
+alias _quit { 
+  if ($1 == -split) { return $marc 11quits $2 11( $+ $3 $+ ) ( $4- ) - Split }
+  if ($3 == $null) { return $marc 11quits $1 11( $+ $2 $+ ) }
+  else { return $marc 11quits $1 11( $+ $2 $+ ) ( $3- ) }
+}
+alias _nick { return $marc 8nick change 15[0 $1 8»0 $2 15] }
+alias _mNick { return $marc 8nick change 15[0 Your nick is now 8»0 $1 15] }
+alias _text { echo $1 11[ $+ $2 $+ 11] $3- }
+alias _mtext { echo $1 12> $2- | .msg $1 $2- }
+alias _discon { echo -es $_m Not connected to server }
+alias _mode { echo $1 $marc 15[ 11Mode - $1 15] 15[11 $2 $4- 15] by 11 $+ $3 }
+alias _kick { echo $1 $marc  $+ $3 11kicked by $2 ( $+ $4- $+ ) }
+alias _topic { echo $1 $_m 9Topic: $2- }
+alias _ptopic { echo $1 $_m Puesto por12 $2 el12 $3 a las12 $4- horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 15[08 topic changed15 [00 by $2 15[16 $3- 15] }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo 7,7|10,3 3 0-[10X-TorM0]-10 Script 3 7,7| By -[4,4|]- MaTyAs666 -[4,4|]-
+  eblanco -s
+  echo -s •¯¯¯¯¯¯¯ $+ $chr(91) Http://www.xtorm-script.cjb.net - Http://www.x-torm.com.ar ]
+  eblanco -s
+  echo -s 10Power for mIRC
+  echo -s 11Version: $xversion
+  echo -s 11mIRC: $version
+  echo -s 11Theme: %tema.actual
+
+  eblanco -s | eblanco -s
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 9,1 -[12 $1 Info 9]-
+  echo $1 $_m 12Usuarios: $nick($1,0)
+  echo $1 $_m 12Ops: $nick($1,0,o)
+  echo $1 $_m 12Voz: $nick($1,0,v)
+  echo $1 
+  eblanco $1
+}
+[info]
+autor=MaTyAs666
+comentarios=Tema caracterizado por sus escalas de azules y grises. Basado en el Tribe IRC Textos en inglés.
+back=1
+fuente=Verdana 10
+colores=pone 16777215,0,10485760,8388608,255,127,1048800,34816,16287904,64512,15773896,16744576,13172624,12105983,8355711,13816530	

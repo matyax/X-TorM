@@ -1,0 +1,17 @@
+  Comandos útiles para mIRC
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Los comandos más comunes son: 
+€
+  /Join #canal -> Para entrar en un canal 
+  /Quit mensaje -> Para desconectarte del IRC con un mensaje 
+  /Kick canal nick -> Para patear a alguien de un canal 
+  /Ban canal nick -> Suspende a alguien de un canal 
+  /Nick nuevonick -> Cambia tu nick en el IRC
+€
+  Podría seguir detallandote comandos, pero para eso está el diálogo de
+  ayuda dedicado a los comandos del script, el que podés abrir desde el
+  menú principal, sección ayuda, comandos. 
+€
+  Por otra parte, muchos de los comandos de operador de canal están 
+  resumidos en el menú de las listas de nicks de los canales. Este menú
+  se activa automáticamente cuando obtenés @p.

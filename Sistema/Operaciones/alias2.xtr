@@ -1,0 +1,103 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                    alias1.xtr - Ventanas de imagen
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@inicio {
+  var %logo.long = $pic($skindir(logo.jpg)).width,%logo.alt = $pic($skindir(logo.jpg)).height
+  var %x = $round($calc(($window(-3).w - %logo.long) / 2),0),%y = $round($calc(($window(-2).h - %logo.alt) / 2),0)
+  ;300 250
+  window -Badkoph +d @inicio %x %y %logo.long %logo.alt
+  window -a @inicio
+  drawpic @inicio 0 0 $skindir(logo.jpg)
+  drawrect -r @inicio 13132900 2 0 0 %logo.long %logo.alt
+  escribe.inicio Iniciando...
+}
+escribe.inicio { borra.inicio | drawtext @inicio 0 Tahoma 11 30 103 $1- }
+borra.inicio { drawpic @inicio 0 0 $skindir(logo.jpg) | drawrect -r @inicio $rgb( 100, 100,200 ) 2 0 0 222 122 }
+;-----------------------------------------------------------------------------------------------
+escribir {
+  inc %distancia5 15 | if ($1 == $null) return
+  drawtext -r @creditos 15890688 Verdana 9 11 $calc(%distancia5 + 1) $1-
+  drawtext -r @creditos 16777215 Verdana 9 10 %distancia5 $1-
+}
+escribir- { inc %distancia5 10 }
+final { drawtext -c @creditos 4 Arial 9 10 490 999 17 $1- }
+@creditos {
+  set %distancia5 50
+  window -Badkop +d @creditos 130 30 510 510
+  window -phB +bd @creditos
+  drawrect -f @creditos 1 800 0 0 800 550
+  drawtext @creditos 12 Arial 27 172 18 X-ToRm Script
+  drawtext @creditos 0 Arial 27 170 15 X-ToRm Script
+  drawrect -r @creditos $rgb( 100, 100,200 ) 2 0 0 510 510
+  drawrect -r @creditos $rgb(216,54,65 ) 2 4 4 502 502
+  escribir X-Torm script es un nuevo proyecto que estoy llevando adelante paralelamente a mi otro script,
+  escribir el Frecuencia Infinita.
+  escribir-
+  escribir La diferencia más grande que existe entre el Frecuencia Infinita y el X-ToRm es que éste script
+  escribir lo he empezado cuando ya tengo bastante experiencia como scripter y me manejo mejor en el
+  escribir tema, a diferencia del F-Infinita que lo empece cuando no sabía casi nada.
+  escribir Otra diferencia es que este script esta orientado a las protecciones, utilidades y entretenimiento,
+  escribir dejando el viejo y obsoleto concepto de War Script. Es un script hecho a conciencia.
+  escribir-
+  escribir-
+  escribir CREDITOS y AGRADECIMIENTOS
+  escribir-
+  escribir-
+  escribir Primero quiero agradecer a mis grandes amigos del irc y del colegio MaNSoN, Kronos, Z3R0IRboT
+  escribir y Mengu por estar siempre ahí, acompañandome y apoyandome en todo, gracias por hacerme
+  escribir el aguante.
+  escribir-
+  escribir Tambien quiero saludar a mi ex gente chébere del AMEN...
+  escribir-
+  escribir Tambien quiero agradecer a un nuevo pero gran colaborador con mis proyectos, Xoumphonp, 
+  escribir sin el cual, la web del X-TorM seguiría siendo la misma primitiva de hace tiempo, y junto con el
+  escribir a la gente de #Escripting de Undernet (MijT, Antr0, etc) que me han tirado varias ideas para
+  escribir mejorar.
+  escribir-
+  escribir-
+  escribir El último y mas grande agradecimiento que tengo que dar es a VOS por usar el X-ToRm.
+  escribir Bueno, eso es todo, si me olvidé de alguien, pls que me lo recuerde!
+  Final CERRAR
+  window -a @creditos
+}
+;-----------------------------------------------------------------------------------------------
+logs {
+  window -c @logs
+  window -kSl18 +el @Logs 100 100 650 350 @logs
+  aline @logs 3,1[ 9Lector de Logs 3 ]
+  eblanco @logs
+  if ($1 != $null) var %trig = * $+ $1 $+ *
+  else var %trig = *.log
+  var %cantidad.parcial = 1
+  var %tmp.k = $findfile($logdir,%trig,0)
+  while (%cantidad.parcial <= %tmp.k) {
+    titlebar @Logs Buscando $iif( 2 // %cantidad.parcial ,/,\) ( $+ %cantidad.parcial $+ )
+    aline -l @logs $nopath($findfile($logdir,%trig,%cantidad.parcial)) 
+    inc %cantidad.parcial
+  }
+  var %cantidad.parcial = $calc(%cantidad.parcial - 1)
+  titlebar @Logs encontrados: %cantidad.parcial
+  aline @logs -
+  aline @logs Se encontraron $+ $resalt %cantidad.parcial logs en $+ $resalt $logdir
+  aline @logs -
+  if (%cantidad.parcial > 0) aline @logs $resalt $+ Hace doble-click sobre uno de los logs para verlo
+  unset %trig
+}
+carga.log {
+  if ($$1 == $null) { halt }
+  cls @logs
+  aline @logs -
+  aline @logs $marc Log Actual: $+ $resalt $$1
+  aline @logs ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+  var %log.lineas = $lines($$1) | loadbuf %log.lineas -p @logs $$1 
+  aline @logs ___________________________________________________
+  aline @logs Fin del log $+ $resalt $$1
+  aline @logs Tamaño: $+ $resalt $round($calc($lof($$1)/1024),2) Kb
+  aline @logs Número de lineas: $+ $resalt %log.lineas
+  unset %ll 
+}
+;-----------------------------------------------------------------------------------------------

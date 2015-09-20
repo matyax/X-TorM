@@ -1,0 +1,119 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                          dialogos.xtr - Dialogos
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+alias menubar {
+  if ($1 == $null) { menu 150 Panel de control_cpanel/âProtección en canales_cprotect/â $iif(%bunker.state == 0,Activar,Desactivar) modo Bunker_bunker/âOpciones de esta barra_sub menubar 2/âUtilidades y herramientas_sub menubar 3/â }
+  if ($1 == 2) { menu 150 Cerrar barra_window -c @barra/window -c @monitor/â $iif($window(@monitor),Desactivar,Activar) barra de información_window -c @monitor/â }
+  if ($1 == 3) { menu 150 F-Version_f-version/âNick completion_completion/âTemas_temas/âSonidos_sonidos/âCanales_canales/âFondos_fondos/âAntivirus_antivirus/âAntispam_antispam/âProtección en canales_cprotect/âBuscador_buscador/âEncriptación_encripta/â }
+}
+
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+menu @conectağ {
+  mouse {
+    if ($mouse.x > 81 && $mouse.x < 259 && $mouse.y > 215 && $mouse.y < 230) { cursor edit }
+    elseif ($mouse.x > 81 && $mouse.x < 139 && $mouse.y > 234 && $mouse.y < 249) { cursor edit }
+    elseif ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 56 && $mouse.y < 70) { cursor edit }
+    elseif ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 75 && $mouse.y < 89) { cursor edit }
+    elseif ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 92 && $mouse.y < 108) { cursor edit }
+    elseif ($mouse.x > 114 && $mouse.x < 260 && $mouse.y > 114 && $mouse.y < 127) { cursor edit }
+    elseif ($mouse.x > 114 && $mouse.x < 260 && $mouse.y > 131 && $mouse.y < 146) { cursor edit }
+    else { cursor normal }
+    if ($mouse.key == 1) { refresco-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ }
+  }
+  sclick { 
+    refresco-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ
+    if ($mouse.x > 81 && $mouse.x < 259 && $mouse.y > 215 && $mouse.y < 230) { editar @conectağ 80 213 180 6 $ last.server }
+    if ($mouse.x > 81 && $mouse.x < 139 && $mouse.y > 234 && $mouse.y < 249) { editar @conectağ 80 232 60 7 $ puerto.defecto }
+    if ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 56 && $mouse.y < 70) { editar @conectağ 112 54 100 1 id me .nick }
+    if ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 75 && $mouse.y < 89) { editar @conectağ 112 73 100 2 id anick .anick }
+    if ($mouse.x > 114 && $mouse.x < 210 && $mouse.y > 92 && $mouse.y < 108) { editar @conectağ 112 92 100 3 $ laidentd .identd on }
+    if ($mouse.x > 114 && $mouse.x < 260 && $mouse.y > 114 && $mouse.y < 127) { editar @conectağ 112 111 150 4 id fullname .fullname }
+    if ($mouse.x > 114 && $mouse.x < 260 && $mouse.y > 131 && $mouse.y < 146) { editar @conectağ 112 130 150 5 id emailaddr .emailaddr }
+    if ($mouse.x > 310 && $mouse.x < 473 && $mouse.y > 61 && $mouse.y < 79) { combo push @conectağ 310 61 145 120 var tmp.servers select-red }
+  }
+}
+alias conecta.items {
+  if ($1 == 1) { write $mircdirsistema\servidores\ $+ $%(red) $$?="¿Dirección del servidor?" | did-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ }
+  if ($1 == 2) {
+    if (!$sline(@Servidores,1)) return
+    write -dl $+ $sline(@Servidores,1).ln $mircdirsistema\servidores\ $+ $%(red)
+    setv tmp.@conectağ @conectağ 310 120 220 9 1 $%(select.last) @Servidores sel-server
+    did-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ
+  }
+  if ($1 == 3) {
+    write -c $mircdirsistema\servidores\ $+ $$?="¿Nombre del grupo (Sin espacios)?" $+ .txt
+    setv red $! $+ .txt | load-servers
+    did-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ
+    combo draw @conectağ 310 51 145 $remove($%(red),.txt)
+  }
+  if ($1 == 4) {
+    if ($$?!="Estas seguro de queres borrar la red $remove($%(red),.txt) $+ ?" == $true) {
+      .remove $mircdirsistema\servidores\ $+ $%(red)
+      setv red $gettok(%tmp.servers,1,16) $+ .txt
+      load-servers | combo draw @conectağ 310 51 145 $gettok(%tmp.servers,1,16)
+      did-lista firstf $mircdirsistema\servidores\ $+ $gettok(%tmp.servers,1,16) $+ .txt tmp.@Conectağ
+    }
+  }
+  if ($1 == 5) {
+    if ($%(last.server) != $null) {
+      .timer -m 1 300 window -c @conectağ | server $%(last.server) $%(puerto.defecto)
+    }
+    else { avisar No seleccionaeste ningún servidor! }
+  }
+  if ($1 == 6) {
+    if ($%(last.server) != $null) {
+      .timer -m 1 300 window -c @conectağ | server -n
+    }
+    else { avisar No seleccionaeste ningún servidor! }
+  }
+}
+alias conecta {
+  if ($window(@conectağ)) { window -a @conectağ | return }
+  ventana @conectağ 550 310
+  titulo @conectağ Diálogo de conexion - /conecta
+  caja @conectağ 300 40 180 45 | altor @conectağ 480 52 18 2 | altor @conectağ 480 72 18 2 | altor @conectağ 497 40 35 45
+  caja @conectağ 300 95 235 165 | bajor @conectağ 367 259 2 10 | bajor @conectağ 477 259 2 10 | altor @conectağ 315 268 204 25
+  ;
+  caja @conectağ 15 40 270 120 Información personal
+  texto @conectağ 40 55 Nick: | edita @conectağ 112 54 100 1 $me
+  texto @conectağ 40 75 Alternativo: | edita @conectağ 112 73 100 2 $anick
+  texto @conectağ 40 95 Identd: | edita @conectağ 112 92 100 3 $%(laidentd)
+  texto @conectağ 40 113 Nombre real: | edita @conectağ 112 111 150 4 $fullname
+  texto @conectağ 40 130 E-Mail: | edita @conectağ 112 130 150 5 $emailaddr 
+  ;
+  caja @conectağ 15 200 270 60 Servidor
+  bajor @conectağ 82 259 2 10 | bajor @conectağ 222 259 2 10 | altor @conectağ 35 268 235 25 
+  texto @conectağ 35 215 Servidor: | edita @conectağ 80 213 180 6 $gettok($%(last.server),1,32)
+  texto @conectağ 35 235 Puerto: | edita @conectağ 80 232 60 7 $%(puerto.defecto)
+
+  $cuad(@conectağ,310,47,147,15,Grupos).norm
+  combo draw @conectağ 310 61 145 $remove($%(red),.txt)
+  $cuad(@conectağ,310,106,202,15,Servidores).norm
+  lista @conectağ 310 120 220 132
+  setv tmp.@conectağ @conectağ 310 120 220 9 1 $%(select.last) @Servidores sel-server
+  load-servers
+  did-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ
+  setv but.@conectağ 325 273 70 18 Agregar_conecta.items 1/â440 273 70 18 Borrar_conecta.items 2/â45 273 135 18 Conectar_conecta.items 5/â190 273 70 18 Multiservidor_conecta.items 6/â505 45 20 17 +_conecta.items 3/â505 65 20 17 -_conecta.items 4/â 
+  do_but @conectağ but.@conectağ
+  window -wa @Conectağ
+}
+alias sel-server { esc-edit @conectağ 80 213 180 $2 | setv last.server $2 | setv select.last $1 }
+alias select-red {
+  setv red $1 $+ .txt
+  did-lista firstf $mircdirsistema\servidores\ $+ $%(red) tmp.@Conectağ
+}
+alias load-servers {
+  unset %tmp.servers
+  var %tmp.0 = 1,%das = $findfile($mircdirsistema\servidores\,*.txt,0)
+  while (%tmp.0 <= %das) {
+    %tmp.servers = %tmp.servers $+ $remove($nopath($findfile($mircdirsistema\servidores\,*.txt,%tmp.0)),.txt) $+ 
+    inc %tmp.0
+  }
+}

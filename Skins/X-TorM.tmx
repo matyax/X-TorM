@@ -1,0 +1,79 @@
+;Info
+join
+part
+mtext
+text
+quit
+mnick
+topic
+;Fin info
+;TEMA X-TORM
+on 1:load: {
+  fuentes 12 Terminal
+  set.colores pone 16777215,0,8323072,37632,5329407,127,10223772,32764,65535,64512,9671424,16759739,12226181,16711935,10847856,13816530,16777215,0,8323072,37632,5329407,127,10223772,32764,65535,64512,9671424,16759739,12226181,16711935,10847856,13816530
+  cls -s
+  colour editbox text 0 | colour editbox 2 | colour background 1 | colour listbox 2 | colour listbox text 0 | colour action 15 | colour ctcp text 7 | colour highlight text 0 | colour info text 7 | colour info2 text 0 | colour invite text 7 | colour join text 7 | colour kick text 7 | colour mode text 15 | colour nick text 15 | colour normal text 0 | colour notice text 15 | colour notify text 7 | colour other text 0 | colour own text 15 | colour part text 4 | colour quit text 4 | colour topic text 15 | colour wallops text 7 | colour whois text 0
+  credit | .timer -m 1 500 fuente | background -sx
+}
+alias nresalt return 14
+alias resalt return 7
+alias logo return -[[4 X-ToRm Script12 ]]-
+alias alerta { echo -es 4[Alerta] $1- }
+alias info { echo -es 12[Info] $1- }
+alias marc return 12ş11ş0ş
+alias _m return 0ş
+alias _ctcp { echo -es 4[CTCP] $1 $+ : $2- }
+alias _notice { echo -es 7[Notice] $1 $+ : $2- }
+alias bnotice { echo -es 12[ $+ $1 $+ ] $2- }
+alias _join { echo $1 $marc $timestamp 12Entra $2 12(14 $3 12) $iif($4 != $null,- Entro antes como: $4) | return }
+alias cjoin { echo $1 $marc $timestamp 12Entra $2 12(14 $3 12) - Clones: $4- | return }
+alias _part { echo $1 $marc $timestamp 12Sale $2 12(14 $3 12) }
+alias _quit { 
+  if ($1 == -split) { return $marc $timestamp 4Se desconecta $2 4(14 $3 4) [ $4- 4] - Servidor en Split }
+  if ($3 == $null) { return $marc $timestamp 4Se desconecta $1 4(14 $2 4) }
+  else { return $marc $timestamp 4Se desconecta $1 4(14 $2 4) [ $3- 4] }
+}
+alias _nick { return $marc $timestamp 12Nick: $1 14es ahora $2 }
+alias _mNick { return $marc $timestamp 12Nick:14 Tu nick es ahora $1 }
+alias _text { echo $1 14( $2 ) $3- }
+alias _mtext { echo $1 14> $2- | .msg $1 $2- }
+alias _discon { echo -es $_m [[ No estás conectado ]] }
+alias _mode { echo $1 $marc 14Modo/12 $+ $1 14(23 $2 $4- 14)14 por12 $3 }
+alias _kick { echo $1 $marc 4Kick/ $+ $+ $1 14( $2 patea a $3 14) $4- }
+alias _topic { echo $1 $_m 12Topic: $2- }
+alias _ptopic { echo $1 $_m 12Puesto por $2 12el $3 12a las $4- 12horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 12 $+ $2 cambia el topic a: $3- }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo -s ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ7Ú12ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ7¿
+  echo -s ÿÿÿÿÿ7Ú12ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´ 12 ÿ ÿÿÿ $logo ÿÿÿ ÿ12 ³ÿ
+  echo -s 12ÿÿÿÿÿ³ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ7À12ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ7Ù
+  echo -s ş12ÄÄÄÄ´
+  echo -s 12ÿÿÿÿÿ³
+  echo -s ÿÿÿÿÿ7À12ÄÄÄÄÄÄÄÄÄÄÄ7¿
+  echo -s ÿÿÿÿÿÿÿÿÿ ÿÿÿÿ 7Ú12ÄÁÄÄÄÄÄÄÄÄÄÄÄÄ7¿
+  echo -s ÿÿÿÿÿÿÿÿÿ ÿÿÿÿ 12³ By MaTyAs66612 ³
+  echo -s ÿÿÿÿÿÿÿÿÿ ÿÿÿÿ 7À12ÄÂÄÄÄÄÄÄÄÄÄÄÄÄ7Ù
+  echo -s ş12ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ7Ù 
+  eblanco -s
+  echo şÄÄÄÄÄ[ Http://www.xtorm-script.cjb.net - Http://www.x-torm.com.ar ]
+  eblanco -s | eblanco -s
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $1 $marc Modos:11 $chan($1).mode Usuarios:11 $nick($1,0) Ops:11 $nick($1,0,o) Voz:11 $nick($1,0,v)
+  eblanco $1
+}
+[info]
+autor=MaTyAs666
+web=www.x-torm.cjb.net
+comentarios=Otro tema del X-TorM :P

@@ -1,0 +1,95 @@
+;TEMA Xoumphonp DEL X-TORM
+on 1:load: {
+  fuentes 11 Tahoma
+  set.colores xtorm
+  cls -s
+  colour editbox text 0
+  colour editbox 14
+  colour background 1
+  colour listbox 13
+  colour listbox text 0
+  colour action 11
+  colour ctcp text 4
+  colour highlight text 0
+  colour info text 11
+  colour info2 text 0
+  colour invite text 9
+  colour join text 10
+  colour kick text 4
+  colour mode text 11
+  colour nick text 15
+  colour normal text 0
+  colour notice text 11
+  colour notify text 7
+  colour other text 0
+  colour own text 15
+  colour part text 3
+  colour quit text 4
+  colour topic text 11
+  colour wallops text 4
+  colour whois text 0
+  credit
+  .timer -m 1 500 fuente
+  background -sc $scriptdirmatyas.jpg
+}
+alias nresalt return 15
+alias resalt return 11
+alias logo return 0[ 11[ 12[0 X-ToRm Script 12] 11] 0]
+alias alerta { echo -es 4[Alerta] $1- }
+alias info { echo -es 0[Info] $1- }
+alias marc return 0•11•10•0
+alias _m return 0•
+alias _ctcp { echo -es 4[CTCP] $1 $+ : $2- }
+alias _notice { echo -es 9[Notice] $1 $+ : $2- }
+alias bnotice { echo -es 11[ $+ $1 $+ ] $2- }
+alias _join { echo $1 $marc $timestamp 11Entra0 $2 11(15 $3 11) $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc $timestamp 11Entra0 $2 11(15 $3 11) - Clones: 15 $4- | return }
+alias _part { echo $1 $marc $timestamp 15Sale0 $2 15(15 $3 15) }
+alias _quit { 
+  if ($1 == -split) { return $marc $timestamp 4Se desconecta $2 4(15 $3 4) [15 $4- 4] - Servidor en Split }
+  if ($3 == $null) { return $marc $timestamp 4Se desconecta $1 4(15 $2 4) }
+  else { return $marc $timestamp 4Se desconecta $1 4(15 $2 4) [15 $3- 4] }
+}
+alias _nick { return $marc $timestamp 11Nick:0 $1 15es ahora0 $2 }
+alias _mNick { return $marc $timestamp 11Nick:15 Tu nick es ahora0 $1 }
+alias _text { echo $1 15( $2 )0 $3- }
+alias _mtext { echo $1 15> $2- | .msg $1 $2- }
+alias _discon { echo -es $_m [[ No estás conectado ]] }
+alias _mode { echo $1 $marc 15Modo/0 $+ $1 15(0 $2 $4- 15)15 por0 $3 }
+alias _kick { echo $1 $marc 4Kick/0 $+ $+ $1 15(0 $2 patea a $3 15)0 $4- }
+alias _topic { echo $1 $_m 11Topic: $2- }
+alias _ptopic { echo $1 $_m 11Puesto por0 $2 11el0 $3 11a las0 $4- 11horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 0 $+ $2 15cambia el topic a: $3- }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo -s 4,4|2,7-[X-TorM]-Script4,4| 0,1By 0,1[]MaTyAs666[]
+  eblanco -s
+  echo -s 10Http://www.xtorm-script.cjb.net - Http://www.x-torm.cjb.net
+  echo -s 10Http://www.x-torm.com.ar
+  eblanco -s
+  echo -s Poder para mIRC
+  echo -s Version: $xversion
+  echo -s mIRC: $version
+  echo -s Tema: %tema.actual
+  eblanco -s | eblanco -s | eblanco -s 
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $marc Resúmen de $+ $resalt $1
+  echo $1 $_m Usuarios: $nick($1,0)
+  echo $1 $_m Ops: $nick($1,0,o)
+  echo $1 $_m Voz: $nick($1,0,v)
+  eblanco $1
+}
+[info]
+autor=Xoumphonp
+comentarios=No tengo nada para decir, MaTyAs necesitaba un skin y se lo hice.

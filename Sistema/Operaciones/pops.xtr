@@ -1,0 +1,154 @@
+<[ &X-TorM 3.0.1 Pro ]>
+&Publicidad: if ($active != @barra) say $spam
+&Reiniciar: if ($$?!="Seguro que querés reiniciar el script?" == $true) { set %reinicio si | .timer -m 1 200 exit }
+&Ayuda
+.Ayuda: ayuda
+.Comandos: comandos
+.-
+.Acerca de: @creditos
+.Introducción: .load -rs sistema/operaciones/first.xtr | .timer -m 1 200 primer
+.Leame: run leame.txt
+-
+&Modos usuario
+.Invisible ( +i )
+..on: set %inv i | if ($server) .mode $me +i 
+..off:  unset %inv | if ($server) .mode $me -i
+.Noticias del server ( +s )
+..on:  set %ser s | if ($server) .mode $me +s
+..off: unset %ser | if ($server) .mode $me -s
+.Recibir Wallops ( +w )
+..on: set %wall w | if ($server) .mode $me +w 
+..off: unset %wall | if ($server) .mode $me -w 
+.Host enmascarado ( +x )
+..on: set %mask x | if ($server) .mode $me +x
+..off: unset %mask | if ($server) .mode $me -x 
+.Otro
+..on: if ($server) .mode $me + $+ $$?="¿Letra identificadora del modo? $crlf Sin símbolo +" | else avisar No estas conectado
+..off: if ($server) .mode $me - $+ $$?="¿Letra identificadora del modo? $crlf Sin símbolo -" | else avisar No estas conectado
+.-
+.Mostrar Modos Actuales: vermodos
+.Quitar Todos: unset %inv %ser %wall | mode $me -iswx
+$iif($server,&IRCop)
+.Identificarse: oper $$?="Nick?" $$?="Contraseña?"
+.-
+.Conf. stats
+..C-Lines: stats c
+..D-Lines: stats d
+..H-Lines: stats h
+..i-Lines: stats i
+..K/Z-Lines: stats k
+..N-Lines: stats n
+..O-Lines: stats o
+..Q-Lines: stats Q
+..U-Lines: stats U
+..Y-Lines: stats y
+.Cambiar modos
+..+
+...+s: mode $me +s
+...+w: mode $me +w
+...+g: mode $me +g
+...+c: mode $me +c
+...+k: mode $me +k
+...+f : mode $me +f
+...+h: mode $me +h
+...+a: mode $me +a
+...+A: mode $me +A
+...+b: mode $me +b
+...+e: mode $me +e
+...+C: mode $me +C
+..$chr(45)
+...-o: mode $me -o
+...-s: mode $me -s
+...-w: mode $me -w
+...-g: mode $me -g
+...-c: mode $me -c
+...-k: mode $me -k
+...-f: mode $me -f
+...-h: mode $me -h
+...-a: mode $me -a
+...-A: mode $me -A
+...-b: mode $me -b
+...-e: mode $me -e
+...-C: mode $me -C.Hablar..Globops: globops $$?="Mensaje?"
+..Wallops: wallops $$?="Mensaje?"
+..Locops: locops $$?="Mensaje?"
+..Chatops: chatops : $+ $$?="Mensaje?"
+.Acciones
+..Restart: restart
+..Rehash: rehash
+..Cerrar: raw close
+..Kill: kill $$?="Usuario?" $$?="Razón?"
+..-
+..Kline: kline $$?="Nick o máscara?" : $+ $?="Razón?"
+..Unkline: unkline $$?="Nick o máscara?"
+..-
+..Zline: zline $$?="Dirección de ip?"
+..Unzline: unzline $$?="Dirección de lP?"
+.Otros
+..Lusers:lusers
+..Links: links
+..Motd: motd
+..Version: version $$?="Servidor?"
+..Trace: trace $$?="Servidor o nick?"
+..Ayuda: raw help
+-
+&Conectarse: conecta
+Ca&nales: canales
+P&anel de control: cpanel
+-
+C&onfiguración
+.Guardar/Cargar: gconfiguracion
+.-
+.General: configuracion
+.Protecciones: configuracion 2
+.Skins: configuracion 3
+.-
+.Versions falsos: f-version
+.Nick completion: completion
+.Away: dialogaway
+.Sonidos: sonidos
+.Antivirus: antivirus
+.Antispam: antispam
+.Prot. Canales: cprotect
+.Escritura: escrituras
+.Encriptador: encripta
+.-
+.Temas: temas
+.Fondos: fondos
+&Utilidades
+.$iif($window(@barra) == $null,Activar Gui-Barra): @barra
+.-
+.DOS
+..NetStat: run sistema/x-netstat.bat
+..Ping: run sistema/x-ping.bat $$?="IP?" $$?="Número de pings?"
+.TelNet
+..Servidor: t-server
+..Hacer: run telnet
+.-
+.Cambiar fuentes: fuentes $$?="¿Tamaño de la fuente? $crlf $+ Ejemplo: 10" $$?="¿Nombre de la fuente? $crlf $+ Verdana"
+.-
+.Tips: tips
+.FireXtorM: firextorm
+.Downloads: downloads
+.Leer logs: logs
+.Reproductor sonidos: X-AMP
+.Buscador: buscador
+.Gestor AddOns: addons
+.Trivial: trivial
+Bots
+.Nick IRC-Hispano: nick-
+.Nick2 IRC-Hispano: nick2
+.-
+.$iif(%cargar.bots == si,$style(1)) Autocarga al conectar: %cargar.bots = $iif(%cargar.bots == si,no,si)
+.-
+.Cargar menús de ChatNet K9: sube.bot .load k9 | echo -es $marc Cargado menú de Chatnet... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de UnderNet: sube.bot .load xw | echo -es $marc Cargado menú de Undernet... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de CHaN,NiCK,MeMO: sube.bot .load Chan | echo -es $marc Cargado menú de CHaN,NiCK,MeMO... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de TERRA: sube.bot .load terra | echo -es $marc Cargado menú de Terra... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de Scytale: sube.bot .load Scytale | echo -es $marc Cargado menú de Scytale... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de Univers:  sube.bot .load C | echo -es $marc Cargado menú de Univers... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de RedLatina: sube.bot .load redlatina | echo -es $marc Cargado menú de RedLatina... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.Cargar menús de DALNet: sube.bot .load chanserv | echo -es $marc Cargado menú de DALNet... El menú se habilitará cuando tengas activa cualquier ventana de este servidor...
+.-
+.Descargar todos: baja.bot | echo -es $marc Descargados todos los controles de bots...
+-

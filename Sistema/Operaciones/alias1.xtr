@@ -1,0 +1,464 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                    alias1.xtr - Aliases básicos
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+;X-Variables
+gui-hash {
+  hmake guivars 20 | hmake guicontrols 1000
+  hadd guivars rgb.texto $%(rgb.texto).carga
+  hadd guivars rgb.fondo $%(rgb.fondo).carga
+  hadd guivars rgb.edit $%(rgb.edit).carga
+  hadd guivars rgb.oscuro $%(rgb.oscuro).carga
+  hadd guivars rgb.claro $%(rgb.claro).carga
+  hadd guivars rgb.normal $%(rgb.normal).carga
+  hadd guivars rgb.bordewin $%(rgb.bordewin).carga
+  hadd guivars rgb.caja $%(rgb.caja).carga
+  hadd guivars rgb.titulo $%(rgb.titulo).carga
+  hadd guivars rgb.setuptxt $%(rgb.setuptxt).carga
+  hadd guivars rgb.boxclaro $%(rgb.boxclaro).carga
+  hadd guivars rgb.sombra $%(rgb.sombra).carga
+  hadd guivars rgb.textobot $%(rgb.textobot).carga
+  hadd guivars rgb.rstart $%(rgb.rstart).carga
+  hadd guivars rgb.rend $%(rgb.rend).carga
+  hadd guivars rgb.botonu $%(rgb.botonu).carga
+  hadd guivars rgb.botond $%(rgb.botond).carga
+  hadd guivars rgb.sel $%(rgb.sel).carga
+  hadd guivars rgb.sombratxt $%(rgb.sombratxt).carga
+}
+% {
+  if (($gettok($1,1,46) == rgb) && (!$prop)) { return $hget(guivars,$1) }
+  elseif (($gettok($1,1,46) == check) || ($gettok($1,1,46) == radio) || ($gettok($1,1,46) == but) || (tmp.@* iswm $1)) {
+    return $hget(guicontrols,$1)
+  }
+  return $readini($mircdirsistema\x-vars.xtr,Variables,$$1)
+}
+incv { if ($%($1) isnum) setv $1 $calc($%($1) + $2) }
+decv { if ($%($1) isnum) setv $1 $calc($%($1) - $2) }
+setv { 
+  if ($gettok($1,1,46) == rgb) { hadd guivars $1 $2- }
+  elseif (($gettok($1,1,46) == check) || ($gettok($1,1,46) == radio) || ($gettok($1,1,46) == but) || (tmp.@* iswm $1)) {
+    hadd guicontrols $1 $2-
+  }
+  writeini $mircdirsistema\x-vars.xtr Variables $$1 $iif($2 != $null,$2-,$chr(160))
+}
+unsetv { 
+  var %tmp.varz = $numtok($1-,32)
+  var %tmp.s = 1
+  while (%tmp.s <= %tmp.varz) {
+    remini $mircdirsistema\x-vars.xtr Variables $ [ $+ [ %tmp.s ] ] | inc %tmp.s
+  }
+}
+xini return $mircdirsistema\x-vars.xtr
+;Fin X-Variables
+;Aliases básicos...
+v.modochan {
+  if ($2 isin $chan($1).mode) return Si
+  else return No
+}
+j join #$$1
+p part #$$1
+op mode $active +ooooo $$1-
+deop mode $active -ooooo $$1-
+voz mode $active +vvvvv $$1-
+devoz mode $active -vvvvv $$1-
+whois { 
+  if ($1 != xwhois) { .enable #whois | .disable #xwhois | whois $1- }
+  else whois $2
+}
+send /dcc send $1 $2
+chat /dcc chat $1
+ping /ctcp $$1 ping
+query {
+  query $1
+  cargar-buffer $1
+  halt
+}
+ask { 
+  if ($1 == ?) return $input($2-,129,X-TorM - Petición de datos)
+  if ($1 == !) return $input($2-,256,X-TorM - Advertencia)
+}
+show return $input($1-,68, X-TorM Información)
+
+;fin aliases básicos
+
+identifica-connect {
+  if ((irc-hispano.org isin $server) && (%estoy.identificando != si))  {
+    if ((%iden.nick2 == si) && ($nick2.pass($me) != $null)) { nick $me $+ : $+ $nick2.pass($me) | set -u4 %estoy.identificando si }
+    if ((%iden.nick == si) && ($nick.pass($me) != $null)) { .msg nick@deep.space identify $nick.pass($me) | set -u4 %estoy.identificando si }
+  }
+}
+vermodos {
+  if ((%inv == $null ) && ( %ser == $null ) && ( %wall == $null )) { info No hay ningún modo de usuario activado }
+  else { 
+    if ($server == $null) { info Tus modos actuales son $resalt $+ + $+ %inv $+ %ser $+ %wall }
+    else { info Tus modos actuales son $resalt $+ $usermode }
+  }
+}
+showme { 
+  if ($1 != $null) { 
+    if ($2 != $null) { .play -s-c-t $+ $$1 $2 1 }
+    else { .play -s-c-t $+ $1 $mircdirsistema\titlebar.txt 3 }
+  }
+  else { .play -sctIniciando $mircdirsistema\titlebar.txt 3 }
+}
+mensaje { .msg $1- }
+;Parte de este codigo de bots y los archivos de bot son propiedad de TeMpEst
+;www.relativo.com
+gestion.bots {
+  if (dal.net isin $2) { sube.bot $1 Chanserv | return }
+  if (undernet.org isin $2) { sube.bot $1 XW | return }
+  if (irc-hispano.org isin $2) || (globalchat isin $2) { sube.bot $1 CHaN | return }
+  if (irc-hispano.net isin $2) { sube.bot $1 Scytale | return }
+  if (univers.org isin $2) { sube.bot $1 C | return }
+  if (red-latina.org isin $2) { sube.bot $1 redlatina | return }
+  if (terra.es isin $2) || (anillo.adm isin $2) { sube.bot $1 terra | return }
+  if (chatnet.org isin $2) { sube.bot $1 k9 | return }
+}
+sube.bot {
+  if ($$2 = Scytale) { $1 -rs sistema\bots\scy.xtr | $1 -rs sistema\bots\scy2.xtr | %bot = Scytale | return }
+  if ($$2 = C) { $1 -rs sistema\bots\univers.xtr | %bot = C | return }
+  if ($$2 = CHaN) { $1 -rs sistema\bots\chan.xtr | $1 -rs sistema\bots\chan2.xtr | %bot = CHaN | return }
+  if ($$2 = terra) { $1 -rs sistema\bots\chan-terra.xtr | $1 -rs sistema\bots\chan2-terra.xtr | %bot = CHaN | return }
+  if ($$2 = Chanserv) { $1 -rs sistema\bots\dalnet.xtr | $1 -rs sistema\bots\dalnet2.xtr | %bot = Chanserv | return }
+  if ($$2 = k9) { $1 -rs sistema\bots\k9chatnet.xtr | %bot = K9 | return }
+  if ($$2 = XW) { $1 -rs sistema\bots\undernet.xtr | %bot = X | return }
+  if ($$2 = redlatina) { $1 -rs sistema\bots\redlatina.xtr | .$1 -rs sistema\bots\redlatina2.xtr | %bot = Ns | return }
+}
+baja.bot {
+  return
+  .unload -rs sistema\bots\k9chatnet.xtr
+  .unload -rs sistema\bots\univers.xtr
+  .unload -rs sistema\bots\scy.xtr | .unload -rs sistema\bots\scy2.xtr
+  .unload -rs sistema\bots\chan.xtr | .unload -rs sistema\bots\chan2.xtr
+  .unload -rs sistema\bots\chan-terra.xtr | .unload -rs sistema\bots\chan2-terra.xtr
+  .unload -rs sistema\bots\Undernet.xtr
+  .unload -rs sistema\bots\dalnet.xtr | .unload -rs sistema\bots\dalnet2.xtr
+  .unload -rs sistema\bots\redlatina.xtr | .unload -rs sistema\bots\redlatina2.xtr
+  unset %bot
+}
+pongo.modos {
+  if ($server == $null) return
+  if (%inv != $null) .mode $me +i
+  if (%ser != $null) .mode $me +s
+  if (%wall != $null) .mode $me +w
+  if (%mask != $null) .mode $me +x
+}
+borravarz {
+  unset %abuso.* %flood.ctcp %flood.dcc %flood.notice %flood.query %flood.invite %antitext.* %lastline-n.* %lastline.* %pagina %RGB-color %presionado %destino-rgb %split %crfi %crft %vfdd %resultado %dns %whogente %se.encontro %estoy.identificando %away.tiempo-t %resultados %cript %distancia5 %tipo-download %archivo-update %upload-tamaño %colours %tmpgui.* %select-enc %tmp.encripters %tmp.pass %but.* %tmpgui.* %tmp.*  %x %y %icon.* %pulsado %busc-.* %trivial* %t.control %ac.frst %lastlag.* %mp3.*
+  unsetv tmp.msgaway tmp.sounddir check.@Sonidos c.active
+}
+kickrevenge {
+  if ($me isop $1) {
+    if ((%last.kick ison $1) && (%kick.revenge == si)) {
+      var %anti-abuso rev- $+ $nick
+      if ($flod(%anti-abuso,5,3) != $null) { error | e.mon Frenando el kick revenge - Posible 12flood de kicks | unset %last.kick | return }
+      if (%kres == 1) { kick $1 %last.kick %kres.texto $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+      if (%kres == 2) { mode $1 -o %last.kick | mode $1 +b %last.kick | .notice %last.kick %kres.texto }
+      if (%kres == 3) { mode $1 -o %last.kick | mode $1 +b %last.kick | kick $1 %last.kick %kres.texto $iif($%(kcontador.act) == si, - [ Nº: $%(cant.kicks) ],) | if ($%(kcontador.act) == si) incv cant.kicks 1 }
+      unset %last.kick
+    }
+  }
+}
+unsetall { info El comando $resalt $+ /unsetall está desactivado ya que arruinaría el script | halt }
+fuente {
+  if ($1 == $null) { echo -s $_m Usa $resalt $+ /Fuente +/- para agrandar o achicar las fuentes. | return }
+  font -ad $calc($window($active).fontsize $1 1) $window($active).font 
+  echo -s $marc Tamaño de fuente ( $active ) : $window($active).fontsize
+}
+;efes
+f1 ayuda
+f2 { .timerjoin* off | e.mon Reentrada cancelada }
+f3 configuracion
+f4 cpanel
+f5 downloads
+f6 {
+  if (ð == $Right($active,1)) { return }
+  if (($1 != @barra) && ($1 != @exp) && ($1 != @monitor)) { clear $active }
+
+}
+f7 Info Tecla de acceso libre...
+f8 $iif($chr(35) isin $active,onotice $$ask(?,¿Mensaje a enviar a los @ps de $active $+ ?),avisar No se puede enviar notices a los @ps de $active)
+;
+rv_pt {
+  var %rv_pt = $readini sistema\puertos.xtr puertos $$1
+  if (%rv_pt == $null) return Desconocido
+  else return %rv_pt
+}
+cargar-buffer {
+  var %tmp.log = $logdir $+ $replace($remove($1,=),|,_,^,_,/,_,\,_) $+ .log
+  if ($file(%tmp.log).size > 0) {
+    if ($query($$1) == $null) return
+    loadbuf 90 -pc $+ $remove($nresalt,) $1 %tmp.log
+  }
+  else {
+    var %tmp.log = $remove($nopath(%tmp.log),.log) $+ *.log
+    var %find.log = $findfile($logdir,%tmp.log,1)
+    if (%find.log != $null) {
+      if ($query($$1) == $null) return
+      loadbuf 90 -pc $+ $remove($nresalt,) $1 %find.log
+    }
+  }
+}
+cls clear $1
+say {
+  if ($server == $null) { echo -es $marc No estas conectado | halt }
+  elseif ($active == @barra) { return }
+  elseif ($active) { _mtext $active $1- }
+}
+icono return sistema\iconos\ $+ $1
+eblanco {
+  if ($1 != $null) { echo $1 15 }
+  else echo -s 15
+}
+e.mon { 
+  if ($window(@monitor)) { 
+    if ($window(@monitor).state == hidden) h.mon d
+    borramon
+    var %w = $calc( ( ( 732 - $width($mid($strip($1-),1,155),Tahoma,9) ) / 2 ))
+    drawtext @monitor 0 Tahoma 9 %w 3 $left($strip($1-),155)
+    .timermon-b 1 100 borramon | if (%h.monitor == si) .timermon-h 1 150 h.mon u
+  }
+  else info $1- 
+}
+borramon { if ($window(@barra)) drawrect -rf @monitor $%(borramon) 1 5 4 720 10 }
+h.mon {
+  if (%anima.win == si) { if ($1 == d) window -a @monitor | .timerud -m 0 0 h.mon-a $$1 | return }
+  if ($1 == u) window -h @monitor
+  if ($1 == d) window -a @monitor $iif($window(@monitor).h < 20, $window(@monitor).x $window(@monitor).y $window(@monitor).w 20,)
+}
+h.mon-a {
+  if ($1 == u) {
+    if ($window(@monitor).h > 1) { window @monitor $window(@monitor).x $window(@monitor).y $window(@monitor).w $calc($window(@monitor).h - 1) | return }
+    .timerud off | window -h @monitor
+  }
+  if ($1 == d) {
+    if ($window(@monitor).h < 20) { window @monitor $window(@monitor).x $window(@monitor).y $window(@monitor).w $calc($window(@monitor).h + 1) | return }
+    .timerud off
+  }
+}
+;
+error sonido $%(error)
+sonido if ($inmp3 != $true) { if (($1 != $null) && (%son.act == si)) { .timersnd -m 1 50 .splay $1- } }
+;
+setwindir { 
+  if (c:\ !isin $mircdir) return
+  if (($exists(%windir $+ win.com) == $null) || (%windir == $null)) { set %windir $nofile($findfile(c:\,win.com,1))
+  }
+}
+medirlag { 
+  if ($server != $null) { 
+    if (%medir.lag == si) {
+      if ($window(@barra)) { .NOTICE $me :PING $ctime $cid } 
+    }
+  }
+  else .timerlag $+ $cid off
+}
+vecanal {
+  var %nc = 1
+  while ($chan(%nc)) {
+    if ($$1 ison $chan(%nc)) { echo $chan(%nc) $2- }
+    inc %nc
+  }
+}
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+connect.grupos {
+  .disable #buscador #busca.host #xwhois
+  .enable #who #whois
+}
+test-inicio {
+  if (($exists($mircdirskins\ $+ $gettok($%(skindir),1,32) $+ \logo.jpg) == $false) || (!$%(skindir))) {
+    setv skindir Base 1 | info Se ha detectado un error en la skin... reseteando valores... Por favor vaya al panel de configuración y vuelva a cargar su skin preferida...
+  }
+  if ($exists($mircdirsistema\x-vars.xtr) != $true) { error | alerta Error: El archivo de configuraciones internas del X-TorM no fue encontrado... Reseteando... | write -c $mircdirsistema\x-vars.xtr }
+  if ($version < 6.12) { error | avisar El X-TorM fue diseñado para funcionar con la versión 6.12+ del mIRC. Actualmente estas usando la version $version $+ . Para un correcto funcionamiento del script reemplaza tu mIRC por uno más reciente }
+  if ($chr(32) isin $mircdir) { error | avisar El X-TorM está instalado en una carpeta con espacios: $mircdir - Para un correcto funcionamiento del script, tiene que estar instalado en carpetas sin espacios: $replace($mircdir,$chr(32),$chr(95)) }
+}
+if.connect {
+  if (%canales.al.conectar == si) .timerchan 1 1 canales
+  if (%fireon == si) .timer 1 2 firextorm
+  if (%corr_escribe == si) .timercorr $+ $cid 0 2 corr_editbox
+  if (%bunker.state == 1) %bunker.state = 0
+  if (%medir.lag == si) .timerLAG $+ $cid 0 10 medirlag
+}
+
+x-inicio {
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  escribe.inicio Iniciando carga...
+  borravarz | mrk.corrector | baja.bot
+  edll-carga | fake-dll | credit
+  if (%dialog.conex.i == si) conecta
+  if (%startips == si) tips
+  sonido $%(inicio)
+  .enable #imp-conect
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  escribe.inicio Cargando interfaz..
+  if (%barra.utiles == si) { @barra }
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  escribe.inicio Terminando secuencia de inicio 
+  dll $edll Titlebar -w $window(Status Window).hwnd Ventana de estado
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  escribe.inicio Secuencia de inicio finalizada
+  .timer 1 2 window -c @inicio
+}
+primer.inicio {
+  escribe.inicio Realizando ajustes iniciales...
+  .load -rs sistema/operaciones/first.xtr
+  cargafondos | window "Status Window" 0 $calc($window(-3).h - 262) 449 252
+  setv mp3.x $round($calc(($window(-3).w - 301) / 2),0) | setv mp3.y $round($calc(($window(-3).h - 250) / 2),0)
+  setv playlist.x $%(mp3.x) | setv playlist.y $calc($%(mp3.y) + 125)
+  .timer -m 1 50 sonido.skin base
+  .nick X-TorM $+ $rand(1,100)
+  .identd on xtorm | .emailaddr xtorm@x-torm.com.ar
+  %dia.cfg = $asctime(d)
+  if ($exists(Sistema\Cfg\backup.conf) == $true) { if ($$?!="Se ha encontrado un archivo de configuración anterior. $crlf $+ ¿Deseas cargarlo?" == $true) carga.configuracion -b }
+  setwindir
+  if ($input(¿Querés que el script cree accesos directos en el escritorio y el menú inicio?,128,X-TorM Ask) == $true) c-links
+  .timer -m 1 200 primer
+  unset %arranque
+}
+cargafondos {
+  write -c Sistema\Cfg\fondos.lst
+  var %tmp = $findfile($mircdirimg\fondos\,*.*,0)
+  while (%tmp > 0) {
+    write Sistema\Cfg\fondos.lst $findfile($mircdirimg\fondos\,*.*,%tmp)
+    dec %tmp
+  }
+}
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+;dialogos
+cprotect { if ($dialog(cprotect) == $null) dialog -md cprotect cprotect | else dialog -v cprotect }
+xwhois { if ($dialog(xwhois) == $null) dialog -m xwhois xwhois }
+addons { if ($dialog(addons) == $null) { dialog -m addons addons } }
+;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+;mIRC On The Fly Version Changer v3.05
+;   Copyright ©2000-2002 BBas.
+;   danielson@olynet.com
+fake-dll {
+  var %ld = $dll($qte($-dll(mOTFv.dll)),motfv,Load)
+  if ($gettok(%ld,1,32) == ERR) { 
+    .timer 1 1 info Se ha encontrado un error con una dll. Desactivando Fake Version 
+    %fakever = no
+  }
+  else { %fakever = si  }
+}
+qte { return " $+ $1- $+ " }
+set-version { dll $-dll(mOTFv.dll) motfv Sync }
+;-------------------------------------------------------------------------------
+cursor {
+  if (%pulsado != $null) { return }
+  if ($1 == edit) { dll $-dll(cursor.dll) SetStdMouseCursor ibeam }
+  if ($1 == normal) { dll $-dll(cursor.dll) RestoreCursor . }
+}
+winrgn {
+  var %result = $dll($_winrgn, $1, $iif($len($2-), $2-, NOT_USED))
+  if (E_* iswm %result) {
+    echo -a * Error: %result ( $+ $script $+ , line $scriptline $+ )
+    halt
+  }
+}
+;------------------------------ DLL SYS --------------------------------
+edll return $mircdirSistema\DLL\edll.dll
+_winrgn return $mircdirSistema\DLL\WinRgn.dll
+-dll return $mircdirSistema\DLL\ $+ $1
+;---------------------------- Iconos ------------------------------------
+v-icon return Sistema\Iconos\Ventanas\ $+ $1
+edll-carga {
+  var %dll = dll $edll
+  %dll SetIcon -m sistema\X-torm.ico
+  var %w = 1
+  while $window(*,%w) {
+    var %ventana = $window(*,%w) | var %fc = $left(%ventana,1) | var %fw = $gettok(%ventana,1,32)
+    %dll SetIcon -w $window(*,%w).hwnd $v-icon(normal.ico)
+    if (%ventana == Status Window) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f1.ico)
+    if ($query(%ventana) != $null) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f4.ico)
+    if (%fc == $chr(35)) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f2.ico)
+    if (%fw == Send) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f10.ico)
+    if (%fw == Get) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f11.ico)
+    if (%fc == $chr(61)) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f12.ico)
+    if (%fw == URL) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f6.ico)
+    if (%fw == Notify) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f5.ico)
+    if (%fc == @) %dll SetIcon -w $window(*,%w).hwnd $v-icon(f9.ico)
+    inc %w
+  }
+}
+; ------------------------- Accesos directos ----------------------------------
+c-links {
+  dll $-dll(nLINKn.dll) set path $mircexe
+  dll $-dll(nLINKn.dll) set dir $mircdir
+  dll $-dll(nLINKn.dll) set arguments /p /h
+  dll $-dll(nLINKn.dll) set show 0
+  dll $-dll(nLINKn.dll) set icon $mircdirSistema\x-torm.ico
+  dll $-dll(nLINKn.dll) save $dll($-dll(nLINKn.dll),specdir,0) $+ \X-TorM.lnk
+  dll $-dll(nLINKn.dll) set path $mircexe
+  dll $-dll(nLINKn.dll) set dir $mircdir
+  dll $-dll(nLINKn.dll) set arguments /p /h
+  dll $-dll(nLINKn.dll) set show 0
+  dll $-dll(nLINKn.dll) set icon $mircdirSistema\x-torm.ico
+  dll $-dll(nLINKn.dll) save $dll($-dll(nLINKn.dll),specdir,11) $+ \X-TorM.lnk
+  echo -s  $marc Creados los accesos directos del script
+}
+-----------------------------------------------------
+;para dialog
+cheka {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -c $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+uncheka {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -u $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+habilita {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -e $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+deshabilita {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -b $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+hide {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -h $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+unhide {
+  var %mpt = 1
+  var %x = $2
+  while ($gettok(%x,%mpt,44) != $null) {
+    did -v $1 $gettok(%x,%mpt,44)
+    inc %mpt
+  }
+}
+
+select {
+  var %did = $2
+  var %dname = $3
+  var %lineas = $did(%dname,%did).lines
+  while (%lineas > 0) {
+    if ($did(%dname,%did,%lineas).text == $1) { did -c %dname %did %lineas | goto fin }
+    dec %lineas
+  }
+  :fin
+}

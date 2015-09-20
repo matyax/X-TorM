@@ -1,0 +1,45 @@
+Todas las utilidades que tiene X-TorM pueden abrirse desde la barra, ya sea desde el menú (+ opciones) o los botones.
+Para seleccionar un servidor y configurar tu información personal tenes que ir al diálogo de conexión del script.
+Para entrar a cualquier utilidad o configuración del X-TorM tenes que ir al menú principal o a la barra.
+Es importante que configures el script según tus necesidades. Para esto contás con el panel de control y la ventana de configuración general.
+Tenés un canal de ayuda sobre el X-TorM Script llamado #Infinita en el servidor IRC-Hispano o #Neuquen en Undernet.
+Podes cambiar los colores de los mensajes y las fuentes desde el selector de temas.
+Podes configurar fácilmente cualquier opción del script desde el panel de control incluido en el X-TorM.
+Es importante que visites seguido la web del X-TorM Script para enterarte de las actualizaciones o noticias.
+Podes entrar fácilmente a cualquier página desde el Inet X-plorer.
+Todas las conversaciones que realizas en privados y canales quedan grabadas y las podes leer desde el lector de logs.
+El lag es el tiempo que tardan en llegar tus mensajes al servidor y viceversa.
+Podes cambiar los fondos de las ventanas y  del script desde el selector de fondos.
+Para ingresar un texto en una caja de edición en cualquier ventana con la nueva interface, debes apretar ENTER al terminar de escribir.
+Es importante que entres a todos los menús del script para ver las utilidades que tiene.
+Podes personalizar el nick completion. Busca esta opción en el panel de control.
+MaTyAs666, programador del X-TorM, ha programado otro script más viejo llamado Frecuencia Infinita.
+Este script es programado y distribuido sin recibir otro beneficio que el de hacerle la vida más fácil y segura a los usuarios del mIRC.
+Podés colaborar para que se mantengan la web y el script haciendo click en los banners cuando visites la página del X-TorM.
+Podés configurar tus nicks registrados en el IRC-Hispano. Para hacerlo tenés que ir al menú principal/Bots.
+Se le llama menú principal del script al que dice <[ &X-Torm x.x.x ]> .
+X-TorM también es el nombre de un grupo de scripters al que pertenece MaTyAs666.
+Apretando la tecla F6 podés limpiar la ventana activa.
+Apretando la tecla F4 podés acceder al panel de control del script.
+Apretando la tecla F3 podés acceder a la configuración del script.
+Apretando la tecla F2 podés cancelar la reentrada al canal del que te han pateado.
+Apretando la tecla F5 podés abrir fácilmente los archivos que recibiste.
+El X-TorM Script es constantemente probado y testeado en busca de errores. Si encontras algún error o queres comentar algo, hacelo a matyas_666@hotmail.com
+Cada nueva versión del X-TorM pasa por un control de calidad.
+¿Sabías que el X-TorM fue creado en Neuquen, Argentina?
+Podes acceder a este diálogo desde el menú principal o escribiendo /tips.
+Para entrar a un canal tenés que poner /j canal .
+Para cambiarte el nick tenes que poner /nick nuevonick .
+Podés desconectarte con mensajes falsos desde el menú de la ventana de estado.
+Al menú + opciones lo podés abrir haciendo clic derecho en la barra del script.
+Podés configurar tus canales favoritos desde el diálogo de canales. Podes abrirlo desde el menú principal o desde la barra del script.
+El código del script de ha optimizado para que se ejecute más rápido.
+Para ingresar un texto en una caja de edición en cualquier ventana con la nueva interface, debes apretar ENTER al terminar de escribir.
+La barra de ajusta automáticamente según tu resolución de pantalla.
+El X-TorM es uno de los pocos scripts que pude correr bien en casi cualquier resolución.
+Escribiendo /fuente + o /fuente - se puede achicar o agrandar el tamaño de las fuentes.
+Cualquier sugerencia, pedido o lo que sea sobre el script podés hacerlo por mail a matyas_666@hotmail.com .
+Todas las utilidades y opciones que se describen en esta sección se abren desde el menú principal o desde la barra.
+En la barra, desde el boton + opciones, se pueden abrir el resto de las utilidades del  script que no están en lo botones.
+El script tiene una opción llamada autojoin que sirve para entrar a determinados canales, que vos configures, al conectar.
+Para ingresar un texto en una caja de edición en cualquier ventana con la nueva interface, debes apretar ENTER al terminar de escribir.

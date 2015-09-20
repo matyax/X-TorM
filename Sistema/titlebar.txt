@@ -1,0 +1,172 @@
+[iniciando]
+titlebar < _
+titlebar <[ _
+titlebar <[  _
+titlebar <[ X _
+titlebar <[ X- _
+titlebar <[ X-T _
+titlebar <[ X-To _
+titlebar <[ X-Tor _
+titlebar <[ X-Torm _
+titlebar <[ X-Torm  _
+titlebar <[ X-Torm $left($xversion,1) _
+titlebar <[ X-Torm $left($xversion,2) _
+titlebar <[ X-Torm $left($xversion,3) _
+titlebar <[ X-Torm $left($xversion,4) _
+titlebar <[ X-Torm $xversion _
+titlebar <[ X-Torm $xversion _
+titlebar <[ X-Torm $xversion  _
+titlebar <[ X-Torm $xversion ] _
+titlebar <[ X-Torm $xversion ]> _
+titlebar <[ X-Torm $xversion ]> P _
+titlebar <[ X-Torm $xversion ]> Po _
+titlebar <[ X-Torm $xversion ]> Pod _
+titlebar <[ X-Torm $xversion ]> Pode _
+titlebar <[ X-Torm $xversion ]> Poder _
+titlebar <[ X-Torm $xversion ]> Poder  _
+titlebar <[ X-Torm $xversion ]> Poder p _
+titlebar <[ X-Torm $xversion ]> Poder pa _
+titlebar <[ X-Torm $xversion ]> Poder par _
+titlebar <[ X-Torm $xversion ]> Poder para _
+titlebar <[ X-Torm $xversion ]> Poder para  _
+titlebar <[ X-Torm $xversion ]> Poder para m _
+titlebar <[ X-Torm $xversion ]> Poder para mI _
+titlebar <[ X-Torm $xversion ]> Poder para mIR _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC  _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC -  _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - H _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Ht _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Htt _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http: _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http:/ _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http:// _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://w _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://ww _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.x _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xt _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xto _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtor _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm- _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-s _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-sc _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scr _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scri _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scrip _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.c _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cj _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.n _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.ne _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.net _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.ne _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb.n _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cjb _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.cj _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script.c _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-script _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scrip _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scri _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-scr _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-sc _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm-s _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm- _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtorm _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xtor _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xto _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.xt _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www.x _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www. _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://www _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://ww _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http://w _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http:// _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http:/ _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http: _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Http _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Htt _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - Ht _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - H _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC -  _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC -_
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC -  _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - b _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by  _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by Ma _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaT _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTy _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyA _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs6 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs66 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar <[ X-Torm $xversion ]> Poder para mIRC - by MaTyAs666 _
+titlebar $chr(160)
+titlebar y X-TorM Script - Poder para mIRC - Esperando conexión...

@@ -1,0 +1,138 @@
+Menús para undernet para X-TorM (c) MaTyAs666
+
+menu nicklist {
+  Undernet
+  .$$1
+  ..Info: msgx info $$1
+  ..Verify: msgx verify $$1
+  ..Ver accesos: msgx access $chan $$1
+  ..Cambiar accesos: msgx modinfo $chan access $$1 $$?="¿Nuevo nivel?"
+  ..-
+  ..Agregar a $$1: msgx adduser $chan $1 $$?="Nivel ?"
+  ..Sacar a $$1: msgx remuser $chan $1
+  ..-
+  ..Auto
+  ...Auto op: msgx modinfo $chan automode $$1 op
+  ...Auto voz: msgx modinfo $chan automode $$1 voice
+  ...Nada: msgx modinfo $chan automode $$1 none
+  ..-
+  ..Suspender: msgx suspend $chan $$1 $$?="¿Tiempo? (En horas)" H
+  ..De-suspender: msgx unsuspend $chan $$1
+  .-
+  .Dar @p: msgx op $chan $$1 
+  .Sacar @p: msgx deop $chan $$1
+  .Dar voz: msgx voice $chan $$1
+  .Sacar voz: msgx devoice $chan $$1
+  .-
+  .Patear: msgx kick $chan $$1
+  .Banear: msgx ban $chan $$1  $$?="Tiempo en horas ?" $$?="Nivel ?" $?="Razón ?"
+  .Sacar Ban: msgx unban $chan $$?="Nick ?"
+
+}
+
+menu query {
+  Undernet
+  .info: msgx info $$1
+  .verify: msgx verify $$1
+  .ver acceso: msgx access #$$?="Canal ?" $$1
+}
+
+menu channel {
+  Undernet
+  .info
+  ..info $chan: msgx chaninfo $chan
+  ..status: msgx status $chan
+  ..ver accesos: msgx access $chan * $?="Parámetros ?  [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]] "
+  ..ver ignores: msgx showignore $chan
+  ..ver comandos: msgx showcommands $chan
+  .control
+  ..topic: msgx topic $chan $$?="Topic ?"
+  ..limpiar modos: msgx clearmode $chan
+  ..lista baneados: msgx banlist $chan
+  ..lista baneados (X): msgx lbanlist $chan $$?="Buscar ? ( * para todos)"
+  ..-
+  ..X
+  ...traerlo: msgx join $chan
+  ...sacarlo: msgx $chan part $chan
+  .usuarios
+  ..cambiar acceso: msgx modinfo $chan access $$?="Usuario ?" $$?="Nivel ?"
+  ..-
+  ..ver accesos: msgx access $chan * $?="Parámetros ?  [-min n] [-max n] [-op] [-voice] [-none] [-modif [mask]] "
+  ..añadir nick: msgx adduser $chan $$?="Usuario ?" $$?="Nivel ?"
+  ..quitar nick: msgx remuser $chan $$?="Usuario ?"
+  ..-
+  ..auto...
+  ...auto op: msgx modinfo $chan automode $$?="Usuario ?" op
+  ...auto voz: msgx modinfo $chan automode $$?="Usuario ?" voice
+  ...ninguno: msgx modinfo $chan automode $$?="Usuario ?" none
+  ..-
+  ..suspender: msgx suspend $chan $$?="Usuario ?" $$?="Duración en horas ?" H
+  ..de-suspender: msgx unsuspend $chan $$?="Usuario ?"
+  ..-
+  ..invitar usuario: msgx invite $chan $$?="Nick ?"
+  .sets
+  ..descripción: msgx set $chan description $?="Descripción ?"
+  ..keywords: msgx set $chan keywords $?="Palabras clave usadas para buscar este canal ?"
+  ..url: msgx set $chan url $$?="URL del canal ?"
+  ..idioma: msgx set $chan lang $$?="EN (inglés), DE (alemán), FR (francés), NL (holandés) ?"
+  ..X permanece
+  ...on: msgx set $chan autojoin on
+  ...off: msgx set $chan autojoin off
+  ..-
+  ..protección flood: msgx set $chan floodpro $$?="0 (sin protección ) a 7 (máxima) ?"
+  ..protección mass deop: msgx set $chan massdeoppro $$?="0 (sin protección ) a 7 (máxima) ?"
+  ..no ops
+  ...on: msgx set $chan noop on
+  ...off: msgx set $chan noop off
+  ..strict op
+  ...on: msgx set $chan strictop on
+  ...off: msgx set $chan strictop off
+  ..auto topic
+  ...on: msgx set $chan autotopic on
+  ...off: msgx set $chan autotopic off
+  ..-
+  ..fijar modos actuales: msgx set $chan mode
+  ..modos de usuarios nuevos: msgx set $chan userflags $$?="0(no auto)  1(auto op)  2(auto voz) ?"
+}
+
+menu status {
+  login
+  .identificar $me: var %undc = $me | if $dapass(IDund,%undc) != $null msgx login %undc $dapass(IDund,%undc) | else msgx login %undc $$?*="pass ?"
+  .identificar otro: var %undc = $$?="Login ?" | if $dapass(IDund,%undc) != $null msgx login %undc $dapass(IDund,%undc) | else msgx login %undc $$?*="pass ?"
+  .-
+  .editar logins: loads idpass | idpass IDund Logins Undernet
+  .-
+  .auto-login ( $group($chanautologin) )
+  ..on: .enable $chanautologin
+  ..off: .disable $chanautologin
+  ..-
+  ..siempre identificar usando ( %under.login ): set %under.login $?="Nick ? ( en blanco para autoidentificar el nick actual en cada momento )"
+  .mostrar datos
+  ..on: msgx set invisible off
+  ..off: msgx set invisible on
+  .-
+  .registrar username: run http://cservice.undernet.org/live/
+  -
+  info
+  .info nick:msgx info $$?="Nick ?"
+  .ver acceso: msgx access $chan$$?="Canal ?" $$?="Nick ?"
+  .verificar nick:msgx verify $$?="Nick ?"
+  .-
+  .información canal: msgx chaninfo $chan$$?="Canal ?"
+  .status: msgx status $chan$$?="Canal ?"
+  .lista baneados: msgx banlist $chan$$?="Canal ?"
+  .-
+  .motd: msgx motd
+  .lista ignroes: msgx showignore
+  -
+  anti-ban ( $group($chanchanprot) ):if $group(#chanprot) != on .enable #chanprot | else .disable #chanprot
+  quitarte ban: msgx unban #$$?="Canal ?" $me
+  invitarte: msgx invite #$$?="Canal ?"
+  -
+  búsquedas: msgx search $$?="Claves de búsqueda ?"
+  -
+  ayuda: msgx help $$?="Comando ?"
+}
+
+
+alias msgx { .msg X@channels.undernet.org $$1- }

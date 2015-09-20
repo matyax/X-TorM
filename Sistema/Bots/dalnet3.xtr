@@ -1,0 +1,376 @@
+;------------------------------------------------------------------
+;      Menús de DaLNet  v1.0  -   X-CRiPt 
+;-----------------------------------------------------------------
+Menu Nicklist {
+  Servicios DALNet
+  .Chanserv
+  ..Register Channel
+  ...Current Chan:msg chanserv register $chan $$?="aop password" $$?="sop password"
+  ...Specify Chan:msg chanserv register #$$?="Name of chan without #" $$?="aop password" $$?="sop password"
+  ...Help:msg chanserv help register
+  ..Set ModeLock
+  ...Invite
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +i
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +i
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -i
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -i
+  ...Limit
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +l $$?="Limit Amount?"
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +l $$?="Limit Amount?"
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -l
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -l
+  ...Private
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +p
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +p
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -p
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -p
+  ...Secret
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +s
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +s
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -s
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -s
+  ...Key
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +k $$?="What's the key?"
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +k $$?="What's the key?"
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -k
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -k
+  ...Moderated
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +m
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +m
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -m
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -m
+  ...No Messages
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +n
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +n
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -n
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -n
+  ...Ops Topic
+  ....On
+  .....Current Chan:msg chanserv set $chan mlock +t
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock +t
+  ....Off
+  .....Current Chan:msg chanserv set $chan mlock -t
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock -t
+  ...Enter Modes
+  ....Current Chan:msg chanserv set $chan mlock $$?="Lock which modes on and off?"
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock $$?="Lock which modes on and off?"
+  ...All Modes Off
+  ....Current Chan:msg chanserv set $chan mlock *
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" mlock *
+  ...Help:msg chanserv help set mlock
+  ..Set TopicLock
+  ...Founder Only
+  ....Current Chan:msg chanserv set $chan topiclock founder
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" topiclock founder
+  ...Sop's Only
+  ....Current Chan:msg chanserv set $chan topiclock sop
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" topiclock sop
+  ...TopicLock Off
+  ....Current Chan:msg chanserv set $chan topiclock off
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" topiclock off
+  ...Help:msg chanserv help set topiclock
+  ..Other Settings
+  ...Set Founder
+  ....Current Chan:msg chanserv set $chan founder
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" founder
+  ....Help:msg chanserv help set founder
+  ...Set Password
+  ....Current Chan:msg chanserv set $chan passwd $$?="What's the password?"
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" passwd $$?="What's the password?"
+  ....Help:msg chanserv help set passwd
+  ...Set Description
+  ....Current Chan:msg chanserv set $chan desc $$?="What's the description?"
+  ....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" desc $$?="What's the description?"
+  ....Help:msg chanserv help set desc
+  ...Set Opguard
+  ....On
+  .....Current Chan:msg chanserv set $chan opguard on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" opguard on
+  ....Off
+  .....Current Chan:msg chanserv set $chan opguard off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" opguard off
+  ....Help:msg chanserv help set opguard
+  ...Set KeepTopic
+  ....On
+  .....Current Chan:msg chanserv set $chan keeptopic on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" keeptopic on
+  ....Off
+  .....Current Chan:msg chanserv set $chan keeptopic off
+  ....Help:msg chanserv help set keeptopic
+  ...Set URL
+  ....URL
+  .....Current Chan:msg chanserv set $chan url $$?="What's the URL?"
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" url $$?="What's the URL?"
+  ....No URL
+  .....Current Chan:msg chanserv set $chan url
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" url
+  ....Help:msg chanserv help set url
+  ...LeaveOps
+  ....On
+  .....Current Chan:msg chanserv set $chan leaveops on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" leaveops on
+  ....Off
+  .....Current Chan:msg chanserv set $chan leaveops off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" leaveops off
+  ....Help:msg chanserv help set leaveops
+  ...Set Unsecure
+  ....On
+  .....Current Chan:msg chanserv set $chan unsecure on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" unsecure on
+  ....Off
+  .....Current Chan:msg chanserv set $chan unsecure off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" unsecure off
+  ....Help:msg chanserv help set unsecure
+  ...Set Private
+  ....On
+  .....Current Chan:msg chanserv set $chan private on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" private on
+  ....Off
+  .....Current Chan:msg chanserv set $chan private off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" private off
+  ....Help:msg chanserv help set private
+  ...Set Ident
+  ....On
+  .....Current Chan:msg chanserv set $chan ident on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" ident on
+  ....Off
+  .....Current Chan:msg chanserv set $chan ident off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" ident off
+  ....Help:msg chanserv help set ident
+  ...Set Restrict
+  ....On
+  .....Current Chan:msg chanserv set $chan restrict on
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" restrict on
+  ....Off
+  .....Current Chan:msg chanserv set $chan restrict off
+  .....Specify Chan:msg chanserv set #$$?="What Channel?(without #)" restrict off
+  ...Help:msg chanserv help set restrict
+  ...Set Memo Level
+  ....Current Chan
+  .....None:msg chanserv set $chan memo none
+  .....Aop:msg chanserv set $chan memo aop
+  .....Sop:msg chanserv set $chan memo sop
+  .....Founder:msg chanserv set $chan memo founder
+  ....Specify Chan
+  .....None:msg chanserv set #$$?="What Channel?(without #)" memo none
+  .....Aop:msg chanserv set #$$?="What Channel?(without #)" memo aop
+  .....Sop:msg chanserv set #$$?="What Channel?(without #)" memo sop
+  .....Founder:msg chanserv set #$$?="What Channel?(without #)" memo founder
+  ..Sop Options
+  ...List
+  ....Current Chan:msg chanserv sop $chan list
+  ....Specify Chan:msg chanserv sop #$$?="What Channel?(without #)" list
+  ...Add
+  ....Mask
+  .....Current Chan:msg chanserv Sop $chan add $$?="example: *!email@*.anywhere.com"
+  .....Specify Chan:msg chanserv Sop #$$?="What Channel?(without #)" add $$?="example: *!email@*.anywhere.com"
+  ....Nick
+  .....Current Chan:msg chanserv Sop $chan add $$?="What Nick?"
+  .....Specify Chan:msg chanserv Sop #$$?="What Channel?(without #)" add $$?="What Nick?"
+  ...Remove
+  ....Current Chan:msg chanserv Sop $chan del $$?="Which number from list?"
+  ....Specify Chan:msg chanserv Sop #$$?="What Channel?(without #)" del $$?="Which number from list?"
+  ...Help:msg chanserv help sop
+  ..Aop Options
+  ...List
+  ....Current Chan:msg chanserv aop $chan list
+  ....Specify Chan:msg chanserv aop #$$?="What Channel?(without #)" list
+  ...Add
+  ....Mask
+  .....Current Chan:msg chanserv Aop $chan add $$?="example: *!email@*.anywhere.com"
+  .....Specify Chan:msg chanserv Aop #$$?="What Channel?(without #)" add $$?="example: *!email@*.anywhere.com"
+  ....Nick
+  .....Current Chan:msg chanserv Aop $chan add $$?="What Nick?"
+  .....Specify Chan:msg chanserv Aop #$$?="What Channel?(without #)" add $$?="What Nick?"
+  ...Remove
+  ....Current Chan:msg chanserv Aop $chan del $$?="Which number from list?"
+  ....Specify Chan:msg chanserv Aop #$$?="What Channel?(without #)" del $$?="Which number from list??"
+  ...Help:msg chanserv help aop
+  ..Akick Options
+  ...List
+  ....Current Chan:msg chanserv akick $chan list
+  ....Specify Chan:msg chanserv akick #$$?="What Channel?(without #)" list
+  ...Add
+  ....Mask
+  .....Current Chan:msg chanserv Akick $chan add $$?="example: *!email@*.anywhere.com"
+  .....Specify Chan:msg chanserv Akick #$$?="What Channel?(without #)" add $$?="example: *!email@*.anywhere.com"
+  ....Nick
+  .....Current Chan:msg chanserv Akick $chan add $$?="What Nick?"
+  .....Specify Chan:msg chanserv Akick #$$?="What Channel?(without #)" add $$?="What Nick?"
+  ...Remove
+  ....Current Chan:msg chanserv Akick $chan del $$?="Which number from list?"
+  ....Specify Chan:msg chanserv Akick #$$?="What Channel?(without #)" del $$?="Which number from list?"
+  ...Help:msg chanserv help akick
+  ..Drop a Channel
+  ...Current Chan:msg chanserv drop $chan
+  ...Specify Chan:msg chanserv drop #$$?="What Channel?(without #)"
+  ...Help:msg chanserv help drop
+  ..Identify
+  ...Current Chan:msg chanserv identify $chan $$?="What's the Password?"
+  ...Specify Chan:msg chanserv identify #$$?="What Channel?(without #)" $$?="What's the Password?"
+  ...Help:msg chanserv help identify
+  ..Access Level
+  ...Current Chan:msg chanserv access $chan $$?="What Nick?"
+  ...Specify Chan:msg chanserv access #$$?="What Channel?(without #)" $$?="What Nick?"
+  ...Help:msg chanserv help access
+  ..Chanserv Ops
+  ...Op
+  ....Current Chan:msg chanserv op $chan $$?="What Nick?"
+  ....Specify Chan:msg chanserv op #$$?="What Channel?(without #)" $$?="What Nick?"
+  ...Deop
+  ....Current Chan:msg chanserv op $chan - $+ $$?="What Nick?"
+  ....Specify Chan:msg chanserv op #$$?="What Channel?(without #)" - $+ $$?="WhatNick?"
+  ...Help:msg chanserv help op
+  ..Unban
+  ...Me
+  ....Current Chan:msg chanserv unban $chan me
+  ....Specify Chan:msg chanserv unban #$$?="What Channel?(without #)" me
+  ...All
+  ....Current Chan:msg chanserv unban $chan all
+  ....Specify Chan:msg chanserv unban #$$?="What Channel?(without #)" all
+  ...Help:msg chanserv help unban
+  ..Info
+  ...Current Chan:msg chanserv info $chan
+  ...Specify Chan:msg chanserv info #$$?="What Channel?(without #)"
+  ...Help:msg chanserv help info
+  ..Invite
+  ...Current Chan:msg chanserv invite $chan $$?="What Nick?"
+  ...Specify Chan:msg chanserv invite #$$?="What Channel?(without #)" $$?="What Nick?"
+  ...Help:msg chanserv help invite
+  ..List
+  ...Search Pattern:msg chanserv list $$?="Search pattern. eg: *wav*"
+  ...Help:msg chanserv help list
+  ..MassDeop
+  ...Current Chan:msg chanserv mdeop $chan
+  ...Specify Chan:msg chanserv mdeop #$$?="What Channel?(without #)"
+  ...Help:msg chanserv help mdeop
+  ..MassKick
+  ...Current Chan:msg chanserv mkick $chan
+  ...Specify Chan:msg chanserv mkick #$$?="What channel?(without #)"
+  ...Help:msg chanserv help mkick
+  ..Main Help:msg chanserv help
+  .Nickserv
+  ..Register a nick
+  ...Register:msg nickserv register $$?="Make up a password"
+  ...Help:msg nickserv help register
+  ..Set Options
+  ...Password
+  ....Set Password:msg nickserv set passwd $$?="What's the password?"
+  ....Help:msg nickserv help set passwd
+  ...Nick Kill
+  ....On:msg nickserv set kill on
+  ....Off:msg nickserv set kill off
+  ....Help:msg nickserv help set kill
+  ...URL
+  ....Enter URL:msg nickserv set URL $$?="What's the URL?"
+  ....Help:msg nickserv help set url
+  ...NoMemo
+  ....On:msg nickserv set nomemo on
+  ....Off:msg nickserv set nomemo off
+  ....Help:msg nickserv help set nomemo
+  ..Access
+  ...List:msg nickserv access list $me
+  ...Add:msg nickserv access add $$?="eg: email@*.anywhere.com"
+  ...Remove:msg nickserv access del $$?="eg: email@*.anywhere.com"
+  ...Help:msg nickserv help set access
+  ..Identify
+  ...Password:msg nickserv identify $$?="What's the password?"
+  ...Help:msg nickserv help identify
+  ..Recover
+  ...Recover Nick:msg nickserv recover $$?="What Nick?" $$?="What's the password?"
+  ...Help:msg nickserv help recover
+  ..Ghost
+  ...Use Ghost Cmd:msg nickserv ghost $$?="What Nick?" $$?="What's the password?"
+  ...Help:msg nickserv help ghost
+  ..Drop a nick
+  ...Drop who?:msg nickserv drop $$?="What Nick?"
+  ...Help:msg nickserv help drop
+  ..Enforcer Release
+  ...Release:msg nickserv release $$?="What Nick?" $$?="What's the password?"
+  ...Help:msg nickserv help release
+  ..Nick Info
+  ...Info:msg nickserv info $$?="What Nick?"
+  ...Help:msg nickserv help info
+  ..Access Level
+  ...Get Level:msg nickserv acc $$?="What Nick?"
+  ...Help:msg nickserv help acc
+  ..List
+  ...List from search:msg nickserv list $$?="search pattern eg: *JohnDoe*"
+  ...Help:msg nickserv help list
+  ..Identifier
+  ...Client ID of Nick:msg nickserv id $$?="What Nick?"
+  ...Help:msg nickserv help id
+  ..Main Help:msg nickserv help
+  .Memoserv
+  ..Memoserv Send
+  ...Send to nick:msg memoserv send $$?="Send to what nick?" $$?="What's the message?"
+  ...Send to chan ops:msg memoserv send $$?="What chan's ops?" $$?="What's the message?"
+  ...Send to chans Sop+:msg memoserv send $$?="What chan's sop's and founder only?" $$?="What's the message?"
+  ..List:msg memoserv list
+  ..Msg 1
+  ...Read 1:msg memoserv read 1
+  ...Delete 1:msg memoserv del 1
+  ...Undelete 1:msg memoserv undel 1
+  ..Msg 2
+  ...Read 2:msg memoserv read 2
+  ...Delete 2:msg memoserv del 2
+  ...Undelete 2:msg memoserv undel 2
+  ..Msg 3
+  ...Read 3:msg memoserv read 3
+  ...Delete 3:msg memoserv del 3
+  ...Undelete 3:msg memoserv undel 3
+  ..Msg 4
+  ...Read 4:msg memoserv read 4
+  ...Delete 4:msg memoserv del 4
+  ...Undelete 4:msg memoserv undel 4
+  ..Msg 5
+  ...Read 5:msg memoserv read 5
+  ...Delete 5:msg memoserv del 5
+  ...Undelete 5:msg memoserv undel 5
+  ..Enter # of Memo
+  ...Read ?:msg memoserv read $$?="Enter number of memo"
+  ...Delete ?:msg memoserv delete $$?="Enter number of memo"
+  ...Undelete ?:msg memoserv undelete $$?="Enter number of memo"
+  ..Forward Options
+  ...Forward Status:msg memoserv forward
+  ...Forward Off:msg memoserv forward-
+  ...Foward to:msg memoserv forward $$?="Forward to what nick?" $$?="What's that nicks password?"
+  ..Purge:msg memoserv purge
+  ..Memoserv help
+  ...Main Help:msg memoserv help
+  ...Send:msg memoserv help send
+  ...List:msg memoserv help list
+  ...Read:msg memoserv help read
+  ...Delete:msg memoserv help del
+  ...Undelete:msg memoserv help undel
+  ...Purge:msg memoserv help purge
+  ...Forward:msg memoserv help forward
+  .StatServ
+  ..Ver mapa de servers: msg statserv map
+  ..Listar comandos: msg statserv help
+  ..Ver lista de servers linkados: msg statserv servers
+  ..-
+  ..Estadísticas de un server
+  ...Del server actual: msg statserv server $server
+  ...De otro server: msg statserv server $$?="¿Server?"
+  ..Información sobre dominio: msg statserv domain $$?="¿Dominio?"
+  ..Información sobre host: msg statserv host $$?="¿Host?"
+  ..Estadísticas de... : msg statserv stats $$?="Escribe un server de IRC, o un dominio, o un host"
+  ..-
+  ..Log in: msg statserv login $$?="¿Nombre de usuario?" $$?="¿Password?"
+  ..Estadísticas de la red: msg statserv netstats
+}

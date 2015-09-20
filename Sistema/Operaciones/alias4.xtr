@@ -1,0 +1,212 @@
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+;
+;                                                alias4.xtr - Colores, interfaz, mensajes
+;                                                      Copyrigth 2000 - 2002 - MaTyAs666
+;
+;----------------------------------------------------------------------------------------------------------------------------------------------------------
+fakeversion { 
+  if (%fake.alea == si) return $read sistema/versions.txt
+  else return $gettok(%fakeversion,2-,32)
+}
+spam return $logo Script (v. $+ $xversion $+ ) - 3Http://www.x-torm.com.ar
+xversion return 3.0.1 Pro
+set.colores {
+  var %colorz = $2-
+  if ($1 == mirc) { %colorz = 16777215,0,8323072,37632,255,127,10223772,32764,65535,64512,9671424,16776960,16515072,16711935,8355711,13816530 }
+  if ($1 == xtorm) { %colorz = 16777215,0,8323072,37632,255,127,10223772,27607,65535,64512,7960832,15890688,11152695,16711935,8355711,13816530 }
+  var %c = 0 
+  while (%c < 16) { 
+    colour %c $gettok(%colorz,$calc(%c + 1),44)
+    inc %c
+  }
+}
+var.colores {
+  var %tripi 0 | unset %colours
+  while (%tripi < 16) {
+    if (!%colours) set %colours $colour(%tripi)
+    else %colours = %colours $+ , $+ $colour(%tripi) 
+    inc %tripi
+  }
+}
+sml_ri {
+  var %tex = $1- | var %tex1 = $gettok(%tex,1,32)
+  if (%color.risas == si) {
+    if (jaj isin %tex1) { %tex = $puttok(%tex,  $+ $replace(%tex1,j,j $+ $rand(1,12),a,a $+ $rand(1,12)) $+  ,1,32) }
+    if (jej isin %tex1) { %tex = $puttok(%tex,  $+ $replace(%tex1,j,j $+ $rand(1,12),e,e $+ $rand(1,12)) $+  ,1,32)   }
+    if (jij isin %tex1) { %tex = $puttok(%tex,  $+ $replace(%tex1,j,j $+ $rand(1,12),i,i $+ $rand(1,12)) $+  ,1,32)  }
+    if (joj isin %tex1) { %tex = $puttok(%tex,  $+ $replace(%tex1,j,j $+ $rand(1,12),o,o $+ $rand(1,12)) $+  ,1,32)  }
+    if (juaj isin %tex1) { %tex = $puttok(%tex,  $+ $replace(%tex1 ,j,j $+ $rand(1,12),u,u $+ $rand(1,12),a,a $+ $rand(1,12)) $+  ,1,32)  }
+    if (xd isin %tex1) { %tex = $puttok(%tex, $+ $replace(%tex1,x,12x,d,4D) $+  ,1,32)  }
+  }
+  if (%color.sml == si) {
+    if ($istok(%tex,xd,32)) { %tex = $reptok(%tex,xD,12x4D,32)  }
+    if ($istok(%tex, : $+ $chr(41) ,32)) { %tex = $reptok(%tex, : $+ $chr(41) , 12:4 $+ $chr(41) $+  ,32)  }
+    if ($istok(%tex, = $+ $chr(41) ,32)) { %tex = $reptok(%tex, = $+ $chr(41) , 12=4 $+ $chr(41) $+  ,32) }
+    if ($istok(%tex, :- $+ $chr(41) ,32)) { %tex = $reptok(%tex, :- $+ $chr(41) , 12:-4 $+ $chr(41) $+  ,32)  }
+    if ($istok(%tex, :- $+ $chr(40) ,32)) { %tex = $reptok(%tex, :- $+ $chr(40) , 12:-4 $+ $chr(40) $+  ,32)  }
+    if ($istok(%tex, : $+ $chr(40) ,32)) { %tex = $reptok(%tex, : $+ $chr(40) , 12:4 $+ $chr(40) $+  ,32)  }
+    if ($istok(%tex, = $+ $chr(40) ,32)) { %tex = $reptok(%tex, = $+ $chr(40) , 12=4 $+ $chr(40) $+  ,32)  }
+    if ($istok(%tex,:p,32)) { %tex = $reptok(%tex,:p, 12:4P ,32)  }
+    if ($istok(%tex,:-p,32)) { %tex = $reptok(%tex,:-p, 12:4-P ,32)  }
+    if ($istok(%tex,=P,32)) { %tex = $reptok(%tex,=P, 12=4P ,32)  }
+    ;
+    if ($istok(%tex, ; $+ $chr(40) ,32)) { %tex = $reptok(%tex, ; $+ $chr(40) , 12;4 $+ $chr(40) $+  ,32)  }
+    if ($istok(%tex, ;- $+ $chr(40) ,32)) { %tex = $reptok(%tex, ;- $+ $chr(40) , 12;-4 $+ $chr(40) $+  ,32)  }
+    if ($istok(%tex, ;- $+ $chr(41) ,32)) { %tex = $reptok(%tex, ;- $+ $chr(41) , 12;-4 $+ $chr(41) $+  ,32)  }
+    if ($istok(%tex, ; $+ $chr(41) ,32)) { %tex = $reptok(%tex, ; $+ $chr(41) , 12;4 $+ $chr(41) $+  ,32)  }
+    ;
+    if ($istok(%tex, ]:- $+ $chr(41) ,32)) { %tex = $reptok(%tex, ]:- $+ $chr(41) , 12]:-4 $+ $chr(41) $+  ,32) }
+    if ($istok(%tex, ]:- $+ $chr(40) ,32)) { %tex = $reptok(%tex, ]:- $+ $chr(40) , 12]:-4 $+ $chr(40) $+  ,32) }
+    ;
+    if ($istok(%tex,:-D,32)) { %tex = $reptok(%tex,:-D, 12:4-D ,32) }
+    if ($istok(%tex,:D,32)) { %tex = $reptok(%tex,:D, 12:4D ,32) }
+    if ($istok(%tex, :-/,32)) { %tex = $reptok(%tex, :-/, 12:-4/ ,32) }
+  }
+  return %tex
+}
+c_completion {
+  if (%com-pers == si) {
+    if (%com-tipo == aleatorio) return %completion.i $aleatorio($$1) $+  %completion.d
+    elseif (%com-tipo == maymin) return  %completion.i $maymin($$1) $+  %completion.d
+    elseif (%com-tipo == multi) return  %completion.i $multicolor($$1) $+  %completion.d
+    elseif (%com-tipo == relieve) return %completion.i $relieve($$1) $+  %completion.d
+    elseif (%com-tipo == ninguno) return  %completion.i $$1 %completion.d
+  }
+  else {
+    if (%com-personal == eco) { return $ecco($1) $+  }
+    elseif (%com-personal == x-torm) { return 0[ 11[ 12[  $1 12] 11] 0] }
+    elseif (%com-personal == ninguno) { return $1 }
+  }
+}
+ecco { return 15 $+ $left($1,1) $+ 14 $+ $left($1,1) $+ 2 $+ $1 $+ 14 $+ $right($1,1) $+ 15 $+ $right($1,1) }
+
+;Completador de urls y de ortografía
+orto_url {
+  var %tex = $1-
+  var %i = 1
+  if ($exists(sistema\cfg\corrector.lst) != $true) { write -c sistema\cfg\corrector.lst }
+  if ((%color risas == no) && (%color.sml == no) && (%corrector == no) && (%subraya.url == no)) return %tex
+  if (%color.risas == si) || (%color.sml == si) { %tex = $sml_ri(%tex) | tokenize 32 %tex }
+  while (%i <= $numtok(%tex,32)) {
+    var %tmp.error = $hget(corrector,  $ [ $+ [ %i ] ] )
+
+    if ( ($iswww( $ [ $+ [ %i ] ] ) ) && (%subraya.url == si)) { %tex = $replace(%tex, $ [ $+ [ %i ] ] ,  $+ $ [ $+ [ %i ] ] $+  ) }
+
+    if ((%tmp.error) && (%corrector == si)) { %tex = $replace(%tex, $ [ $+ [ %i ] ] ,%tmp.error) }
+    inc %i
+  }
+  unset %tmp.errores | return %tex
+}
+
+mrk.corrector {
+  if $hget(corrector,0).item > 0 hfree corrector
+  hmake corrector
+  hload corrector sistema\cfg\corrector.lst
+}
+corr_editbox {
+  if ($left($edibox($active),1) == /) return 
+  if (status window isin $active) return
+  var %Text = $editbox($active)
+  var %tripa = $numtok($editbox($active),32)
+  var %trip = 1
+  while (%trip <= %tripa) {
+    var %t1 = $gettok(%text,%trip,32)
+    var %t2 = $orto_url(%t1)
+    if (%t1 != %t2) { editbox -a $reptok(%text,%t1,%t2,32) }
+    inc %trip
+  }
+}
+iswww {
+  if ( isin $1) return
+  if (http:// isin $1) return $true
+  if (www. isin $1) return $true
+  if (go.to isin $1) return $true
+  if (come.to isin $1) return $true
+  if (.cjb.net isin $1) return $true
+}
+
+;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| Escritura & miscelaneos ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+aleatorio {
+  set %txt $1- | unset %t | set %cl $len(%txt) | set %le 1
+  :inicio
+  if ( $mid(%txt,%le,1) == $chr(32) ) { set %t %t $+  $+ 1, $+ 0 $+ $rand(1,5) $+ $chr(160) $+ $chr(160) | goto L2 }
+  set %lco $rand(1,15) | if (%lco < 10) { set %lco 0 $+ %lco } | set %lcol 0
+  if ( %lco == 08 ) || ( %lco == 09 ) || ( %lco == 11 ) || ( %lco == 15 ) set %lcol 1
+  set %t %t $+  $+ %lcol $+ , $+ %lco $+  $mid(%txt,%le,1)
+  :L2
+  inc %le 1 | if ( %le <= %cl ) goto inicio  
+  var %texto %t $+ 15,15·
+  unset %t %txt %cl %le %lco %lcol | return %texto
+}
+maymin {
+  var %tx = $upper($strip($1-))
+  %tx = $replace(%tx,a,a)
+  %tx = $replace(%tx,e,e)
+  %tx = $replace(%tx,i,i)
+  %tx = $replace(%tx,o,o)
+  %tx = $replace(%tx,u,u)
+  return %tx
+}
+multicolor {
+  var %tx = $1-
+  %tx = $replace(%tx,u,4u) | %tx = $replace(%tx,v,V) | %tx = $replace(%tx,w,12W) | %tx = $replace(%tx,x,7X) 
+  %tx = $replace(%tx,y,Y) | %tx = $replace(%tx,z,6z) | %tx = $replace(%tx,?,12?) | %tx = $replace(%tx,!,12!)
+  %tx = $replace(%tx,a,4a) | %tx = $replace(%tx,b,3B) | %tx = $replace(%tx,c,6C) | %tx = $replace(%tx,d,7D)
+  %tx = $replace(%tx,e,4e) | %tx = $replace(%tx,f,12f) | %tx = $replace(%tx,g,13G) | %tx = $replace(%tx,h,6H) 
+  %tx = $replace(%tx,i,4i) | %tx = $replace(%tx,j,J) | %tx = $replace(%tx,k,3K) | %tx = $replace(%tx,l,L) 
+  %tx = $replace(%tx,m,4M) | %tx = $replace(%tx,n,6N) | %tx = $replace(%tx,o,4o) | %tx = $replace(%tx,p,12P) 
+  %tx = $replace(%tx,q,Q) | %tx = $replace(%tx,r,13r) | %tx = $replace(%tx,s,7S) | %tx = $replace(%tx,t,T) 
+  return %tx
+}
+letra { return 0,15(1 $+ $$1 $+ 14) }
+relieve {
+  var %let = $$1-
+  %let = $replace(%let,a,$letra(a) )
+  %let = $replace(%let,b,$letra(b) )
+  %let = $replace(%let,c,$letra(c) )
+  %let = $replace(%let,d,$letra(d) )
+  %let = $replace(%let,e,$letra(e) )
+  %let = $replace(%let,f,$letra(f) )
+  %let = $replace(%let,g,$letra(g) )
+  %let = $replace(%let,h,$letra(h) )
+  %let = $replace(%let,i,$letra(i) )
+  %let = $replace(%let,j,$letra(j) )
+  %let = $replace(%let,k,$letra(k) )
+  %let = $replace(%let,l,$letra(l) )
+  %let = $replace(%let,m,$letra(m) )
+  %let = $replace(%let,n,$letra(n) )
+  %let = $replace(%let,ñ,$letra(ñ) )
+  %let = $replace(%let,o,$letra(o) )
+  %let = $replace(%let,p,$letra(p) )
+  %let = $replace(%let,q,$letra(q) )
+  %let = $replace(%let,r,$letra(r) )
+  %let = $replace(%let,s,$letra(s) )
+  %let = $replace(%let,t,$letra(t) )
+  %let = $replace(%let,u,$letra(u) )
+  %let = $replace(%let,v,$letra(v) )
+  %let = $replace(%let,w,$letra(w) )
+  %let = $replace(%let,x,$letra(x) )
+  %let = $replace(%let,y,$letra(y) )
+  %let = $replace(%let,z,$letra(z) )
+  return  %let
+}
+enc_clave {
+  var %file = Sistema\Cfg\Encripta\ $+ $1 $+ .ini
+  if ($exists(%file) == $true) return $readini(%file,canal,clave)
+}
+escritura {
+  orto_url $1-
+  var %tx = $result
+  if (%esc.actual == predefinido) {
+    if (%escritura == ninguna) return %negrita $+ %subrayado %tx
+    if (%escritura == relieve) return %negrita $+ %subrayado $+ $relieve(%tx) $+ 
+    if (%escritura == colores aleatorios) return %negrita $+ %subrayado $+ $aleatorio(%tx) $+ 
+    if (%escritura == Mayus/Minus) return %negrita $+ %subrayado $+ $maymin(%tx) $+ 
+    if (%escritura == Multicolor) return %negrita $+ %subrayado $+ $multicolor(%tx) $+ 
+  }
+  elseif (%esc.actual == personalizado) { 
+    if (%esc.fondo != $null) { return %negrita $+ %subrayado $+  $+ %esc.color $+ , $+ %esc.fondo %tx $+  }
+    else return %negrita $+ %subrayado $+  $+ %esc.color %tx $+ 
+  }
+  else { return %tx }
+}

@@ -1,0 +1,242 @@
+; ******************************************************
+; chan.xcr
+;
+; (c) 1998-2001 TeMpEsT. Prohibida la copia total o 
+; parcial de este archivo.
+;
+; v3. Menubar & Status CHaN IRCHispano menus.
+; ******************************************************
+alias hispaglob { if (irc-hispano.org isin $server) || (globalchat isin $server) return CHaN, NiCK, MeMO }
+menu MenuBar,Status {
+  $hispaglob
+  .CHaN
+  ..Identificarte como fundador
+  ...Configurar
+  ....$gettok(%fundador,1,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",1,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",1,44)
+  ....$gettok(%fundador,2,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",2,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",2,44)
+  ....$gettok(%fundador,3,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",3,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",3,44)
+  ....$gettok(%fundador,4,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",4,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",4,44)
+  ....$gettok(%fundador,5,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",5,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",5,44)
+  ....$gettok(%fundador,6,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",6,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",6,44)
+  ....$gettok(%fundador,7,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",7,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",7,44)
+  ....$gettok(%fundador,8,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",8,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",8,44)
+  ....$gettok(%fundador,9,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",9,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",9,44)
+  ....$gettok(%fundador,10,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",10,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",10,44)
+  ...-
+  ...$gettok(%fundador,1,44): mensaje chan@deep.space identify $gettok(%fundador,1,44) $gettok(%fundador.pass,1,44)
+  ...$gettok(%fundador,2,44): mensaje chan@deep.space identify $gettok(%fundador,2,44) $gettok(%fundador.pass,2,44)
+  ...$gettok(%fundador,3,44): mensaje chan@deep.space identify $gettok(%fundador,3,44) $gettok(%fundador.pass,3,44)
+  ...$gettok(%fundador,4,44): mensaje chan@deep.space identify $gettok(%fundador,4,44) $gettok(%fundador.pass,4,44)
+  ...$gettok(%fundador,5,44): mensaje chan@deep.space identify $gettok(%fundador,5,44) $gettok(%fundador.pass,5,44)
+  ...$gettok(%fundador,6,44): mensaje chan@deep.space identify $gettok(%fundador,6,44) $gettok(%fundador.pass,6,44)
+  ...$gettok(%fundador,7,44): mensaje chan@deep.space identify $gettok(%fundador,7,44) $gettok(%fundador.pass,7,44)
+  ...$gettok(%fundador,8,44): mensaje chan@deep.space identify $gettok(%fundador,8,44) $gettok(%fundador.pass,8,44)
+  ...$gettok(%fundador,9,44): mensaje chan@deep.space identify $gettok(%fundador,9,44) $gettok(%fundador.pass,9,44)
+  ...$gettok(%fundador,10,44): mensaje chan@deep.space identify $gettok(%fundador,10,44) $gettok(%fundador.pass,10,44)
+  ..-
+  ..Dar op (+o): mensaje chan@deep.space op #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Quitar op (-o): mensaje chan@deep.space deop #$$?="¿Canal?(sin #)" $$?="¿Nick?"
+  ..Accesos al canal
+  ...Registrar Usuario: mensaje chan@deep.space access #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Nivel? 0-500"
+  ...Cambiar nivel: mensaje chan@deep.space access #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Nuevo Nivel? 0-500"
+  ...Borrar Usuario: mensaje chan@deep.space access #$$?="¿Canal?(sin #)" del $$?="¿Nick?" 
+  ...Lista de registros:mensaje chan@deep.space access #$$?="¿Canal?(sin #)" list
+  ..Lista de Auto-kick
+  ...Añadir Usuario: mensaje chan@deep.space akick #$$?="¿Canal?(sin #)" add $$?="¿Nick?" $$?="¿Motivo?"
+  ...Borrar Usuario: mensaje chan@deep.space akick #$$?="¿Canal?(sin #)" del $$?="¿Nick?"
+  ...Listar Usuarios: mensaje chan@deep.space akick #$$?="¿Canal?(sin #)" list
+  ..-
+  ..Información de canal: mensaje chan@deep.space info #$$?="¿Canal?(sin #)"
+  ..Listar canales registrados: mensaje chan@deep.space list
+  ..Invitarse uno mismo: mensaje chan@deep.space invite #$$?="¿Canal?(sin #)"
+  ..Limpiar lista bans: mensaje chan@deep.space unban #$$?="¿Canal?(sin #)"
+  ..Lista de IRCops conectados: mensaje chan@deep.space ircops
+  ..-
+  ..Niveles 
+  ...Ver lista:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" list
+  ...Resetear niveles: mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" reset
+  ...-
+  ...Auto-op(@) 
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set autoop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis autoop 
+  ...Auto-voz(+v) 
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set autovoice $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis autovoice
+  ...Auto-deop  
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set autodeop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis autodeop
+  ...Requerir nivel para entrar
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set nojoin $$?="¿Qué nivel requiere Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis nojoin 
+  ...Nivel para invite
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set invite $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis invite
+  ...Auto kick baneados
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set akick $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis akick
+  ...Cambiar Opciones
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set set $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis set
+  ...Limpiar canal
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set clear $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis clear   
+  ...Desbanear
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set unban $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis unban
+  ...Dar/Quitar @p 
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set opdeop $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis opdeop
+  ...Ver lista de accesos
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set acc-list $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis acc-list
+  ...Registrar/Borrar usuarios
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set acc-change $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis acc-change
+  ...Leer mensajes del canal
+  ....Cambiar nivel:mensaje chan@deep.space levels #$$?="¿Canal?(sin #)" set memo $$?="¿Nivel?"
+  ....Desabilitar: mensaje chan@deep.space levels #$$?="¿Canal?" dis memo
+  ..Opciones del canal
+  ...Cambiar fundador: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" founder $$?="¿Nick?"
+  ...Cambiar password fundador: cambiapass.fundador #$$?="¿Canal?(sin #)" $$?*="¿Nuevo password?"
+  ...Cambiar Descripción:  mensaje chan@deep.space set #$$?="¿Canal?(sin #)" desc $$?="¿Nueva Descripción?"
+  ...Cambiar URL: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" url $$?="¿Nueva URL?"
+  ...Mensaje de bienvenida: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" entrymsg $$?="¿Nuevo mensaje?"
+  ...Cambiar Topic: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" topic $$?="¿Nuevo topic?"
+  ...Proteger Topic
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" keeptopic on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" keeptopic off
+  ...Solo registrados cambian topic
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" topiclock on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" topiclock off
+  ...Proteger modos
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" mlock on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" mlock off
+  ...Canal privado
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" private on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" private off
+  ...Solo registrados entran
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" restricted on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" restricted off
+  ...Solo registrados tienen @p
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" secureops on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" secureops off
+  ...Chivato (DEBUG)
+  ....on:mensaje chan@deep.space set #$$?="¿Canal?(sin #)" debug on
+  ....off: mensaje chan@deep.space set #$$?="¿Canal?(sin #)" debug off
+  ..Limpiar canal
+  ...Limpiar modos: mensaje chan@deep.space clear #$$?="¿Canal?(sin #)" modes
+  ...Borrar lista bans: mensaje chan@deep.space clear #$$?="¿Canal?(sin #)" bans
+  ...Deop masivo: mensaje chan@deep.space clear #$$?="¿Canal?(sin #)" ops
+  ...De-voice masivo: mensaje chan@deep.space clear #$$?="¿Canal?(sin #)" voices
+  ...Kick masivo: mensaje chan@deep.space clear #$$?="¿Canal?(sin #)" users
+  .NiCK
+  ..Identificarse ahora ( $me ):{
+    if (($nick.pass($me) == $null) || ($nick2.pass($me) == $null)) { error | escribe.monitor Tu nick no esta configurado para autoregistrarse. Para hacerlo, tenés que ir a 12Bots/Nick en IRC-Hispano | return }
+    if ($nick.pass($me) != $null) mensaje NiCK@deep.space $nick.pass($me)
+    if ($nick2.pass($me) != $null) nick $me $+ : $+ $nick.pass($me)
+  }
+  ..-
+  ..Registrar nick:mensaje NiCK@deep.space register $$?="¿Tu direccion de email?"
+  ..Borrar nick: mensaje NiCK@deep.space drop
+  ..-
+  ..Añadir máscara: mensaje NiCK@deep.space access add $$?="¿Qué máscara?"
+  ..Borrar máscara: mensaje NiCK@deep.space access del $$?="¿Qué máscara?"
+  ..Lista de máscaras: mensaje NiCK@deep.space access list
+  ..Unir con nick: mensaje NiCK@deep.space link $$?="¿Con qué nick?" $$?*="¿Password del otro nick?"
+  ..Recuperar nick: mensaje NiCK@deep.space recover $$?="¿Qué nick quieres recuperar?" $$?*="¿Password para ese nick?"
+  ..Hacer caer a tu clon: mensaje NiCK@deep.space ghost $$?="¿Qué nick lleva?" $$?*="¿Password para ese nick?"
+  ..Estado del nick: mensaje NiCK@deep.space status $$?="¿De qué nick?"
+  ..Información del nick: mensaje nick info $$?="¿De qué nick?"
+  ..Listar nicks registrados: mensaje NiCK@deep.space list $$?="¿Con qué patron? $crlf ejemplo: *@*.arrakis.es"
+  ..-
+  ..Opciones del nick
+  ...Cambiar password: cambiapass.nick $$?*="¿Nuevo password?"
+  ;  ...Cambiar idioma
+  ;  ....Inglés: mensaje NiCK@deep.space set language 1
+  ;  ....Japonés (EUC): mensaje NiCK@deep.space set language 2
+  ;  ....Japonés (JIS): mensaje NiCK@deep.space set language 3
+  ;  ....Japonés (SJIS): mensaje NiCK@deep.space set language 4
+  ;  ....Portugués: mensaje NiCK@deep.space set language 5
+  ;  ....Castellano: mensaje NiCK@deep.space set language 6
+  ;  ....Turco: mensaje NiCK@deep.space set language 7
+  ...Cambiar URL asociada: mensaje NiCK@deep.space set URL $$?="¿Nueva URL?"
+  ...Cambiar email asociado: mensaje NiCK@deep.space set email $$?="¿Nuevo email?"
+  ...Proteccion de KILL
+  ....on: mensaje NiCK@deep.space set kill on
+  ....off: mensaje NiCK@deep.space set kill off
+  ...Modo Secure
+  ....on: mensaje NiCK@deep.space set secure on
+  ....off: mensaje NiCK@deep.space set secure off
+  ...Modo privado
+  ....on: mensaje NiCK@deep.space set private on
+  ....off: mensaje NiCK@deep.space set private off
+  ...Esconder informacion
+  ....on: mensaje NiCK@deep.space set hide on
+  ....off: mensaje NiCK@deep.space set hide off  
+  .MeMO
+  ..Enviar mensaje: mensaje MeMO send $$?="¿A qué nick/canal?(con #)" $$?="¿Qué mensaje?"
+  ..-
+  ..Lista mensajes(todos): mensaje MeMO list
+  ..Lista mensajes(nuevos): mensaje MeMO list new
+  ..-
+  ..Leer mensaje: mensaje MeMO read $$?="¿Numero de mensaje?"
+  ..Leer último mensaje: mensaje MeMO read last
+  ..-
+  ..Borrar mensaje: mensaje MeMO del $$?="¿Numero de mensaje(s)? $crlf Ejemplo: 1-3"
+  ..Borrar todos: mensaje MeMO del all
+  ..-
+  ..Notificar mensajes
+  ...Solo al ser enviado: mensaje MeMO set notify new
+  ...Al conectar y volver de away: mensaje MeMO set notify logon
+  ...Al ser enviado, conectar, volver away: mensaje MeMO set notify on
+  ...-
+  ...No notificar: mensaje MeMO set notify off
+  ..Cambiar Límite de mensajes: mensaje MeMO set limit $$?="¿Cuántos mensajes? 1-20"
+  .$iif(hispano isin $server,CReG)
+  ..Registrar Canal: mensaje CReG registra #$$?="¿Canal? (sin #)" $$?="¿Contraseña?" $$?="¿Descripción?"
+  ..-
+  ..Apoyar Canal : mensaje CReG apoya #$$?="¿Qué canal quieres apoyar? (sin #)"
+  ..-
+  ..Estado de un canal : mensaje CReG estado #$$?="¿De qué canal? (sin #)"
+  ..-
+  ..Apoyos a un #canal: mensaje CReG apoyos #$$?="¿A qué canal? (sin #)"
+  ..Apoyos de un nick: mensaje CReG apoyos $$?="¿De quién?"
+  .-
+  .Cambiar password fundador: cambiapass.fundador #$$?="¿Canal?(sin #)" $$?*="¿Nuevo password?"
+  .Identificarse (fundador)
+  ..Configurar
+  ...$gettok(%fundador,1,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",1,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",1,44)
+  ...$gettok(%fundador,2,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",2,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",2,44)
+  ...$gettok(%fundador,3,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",3,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",3,44)
+  ...$gettok(%fundador,4,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",4,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",4,44)
+  ...$gettok(%fundador,5,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",5,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",5,44)
+  ...$gettok(%fundador,6,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",6,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",6,44)
+  ...$gettok(%fundador,7,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",7,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",7,44)
+  ...$gettok(%fundador,8,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",8,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",8,44)
+  ...$gettok(%fundador,9,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",9,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",9,44)
+  ...$gettok(%fundador,10,44): %fundador = $puttok(%fundador,#$$?="¿Canal?(sin #)",10,44) | %fundador.pass = $puttok(%fundador.pass,$$?*="¿Password?",10,44)
+  ..-
+  ..$gettok(%fundador,1,44): mensaje chan@deep.space identify $gettok(%fundador,1,44) $gettok(%fundador.pass,1,44)
+  ..$gettok(%fundador,2,44): mensaje chan@deep.space identify $gettok(%fundador,2,44) $gettok(%fundador.pass,2,44)
+  ..$gettok(%fundador,3,44): mensaje chan@deep.space identify $gettok(%fundador,3,44) $gettok(%fundador.pass,3,44)
+  ..$gettok(%fundador,4,44): mensaje chan@deep.space identify $gettok(%fundador,4,44) $gettok(%fundador.pass,4,44)
+  ..$gettok(%fundador,5,44): mensaje chan@deep.space identify $gettok(%fundador,5,44) $gettok(%fundador.pass,5,44)
+  ..$gettok(%fundador,6,44): mensaje chan@deep.space identify $gettok(%fundador,6,44) $gettok(%fundador.pass,6,44)
+  ..$gettok(%fundador,7,44): mensaje chan@deep.space identify $gettok(%fundador,7,44) $gettok(%fundador.pass,7,44)
+  ..$gettok(%fundador,8,44): mensaje chan@deep.space identify $gettok(%fundador,8,44) $gettok(%fundador.pass,8,44)
+  ..$gettok(%fundador,9,44): mensaje chan@deep.space identify $gettok(%fundador,9,44) $gettok(%fundador.pass,9,44)
+  ..$gettok(%fundador,10,44): mensaje chan@deep.space identify $gettok(%fundador,10,44) $gettok(%fundador.pass,10,44)
+  .-
+  .Registrar nick: mensaje NiCK@deep.space register $$?="¿Tu direccion de email?"
+  .Identificarse ahora ( $me ):{
+    if (($nick.pass($me) == $null) || ($nick2.pass($me) == $null)) { error | escribe.monitor Tu nick no esta configurado para autoregistrarse. Para hacerlo, tenés que ir a 12Bots/Nick en IRC-Hispano | return }
+    if ($nick.pass($me) != $null) mensaje NiCK@deep.space $nick.pass($me)
+    if ($nick2.pass($me) != $null) nick $me $+ : $+ $nick.pass($me)
+  }
+  .Configurar contraseña NiCK: nick_
+  .Configurar contraseña NiCK2: nick2
+  .Cambiar password $me: cambiapass.nick $$?*="¿Nuevo password?"
+  .-
+  .Enviar mensaje: mensaje MeMO send $$?="¿A qué nick/canal?(con #)" $$?="¿Qué mensaje?"
+  .Leer ultimo mensaje: mensaje MeMO read last
+}

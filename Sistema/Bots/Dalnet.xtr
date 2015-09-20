@@ -1,0 +1,181 @@
+;------------------------------------------------------------------
+;      Menús de DaLNet    -   X-CRiPt 
+;-----------------------------------------------------------------
+Menu Menubar,Status {
+  $iif(dal.net isin $server,Servicios dalNET)
+  .Registrar Canal: mensaje chanserv@services.dal.net register #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?" $$?="¿Descripción?"
+  .Dar Op:mensaje chanserv@services.dal.net op #$$?="¿Nombre del canal?(sin #)" $$?="¿A que Nick?"
+  .Quitar Op:mensaje chanserv@services.dal.net op #$$?="¿Nombre del canal?(sin #)" - $+ $$?="¿A qué Nick?"
+  .Deop masivo :mensaje chanserv@services.dal.net mdeop #$$?="¿Nombre del canal?(sin #)"
+  .Kick masivo :mensaje chanserv@services.dal.net mkick #$$?="¿Nombre del canal?(sin #)"
+  .-
+  .Registrar nick: mensaje nickserv@services.dal.net register $$?="¿Password?"
+  .Identificarte ( $me ) :mensaje nickserv@services.dal.net identify $$?="¿Password?"
+  .Recuperar nick: mensaje nickserv@services.dal.net recover $$?="¿Qué nick?" $$?="¿Password?"
+  .Borrar nick: mensaje nickserv@services.dal.net drop $$?="¿Qué Nick?"
+  .-
+  .Enviar mensaje:mensaje memoserv send $$?="¿A quien?" $$?="What's the message?"
+  .Leer último mensaje: mensaje memoserv read last
+  .-
+  .Chanserv
+  ..Registrar Canal: mensaje chanserv@services.dal.net register #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?" $$?="¿Descripcion?"
+  ..Borrar Canal: mensaje chanserv@services.dal.net drop #$$?="¿Nombre del canal?(sin #)"
+  ..Identificarse como fundador: mensaje chanserv@services.dal.net identify #$$?="¿Nombre del canal?(sin #)" $$?="¿Password?"
+  ..-
+  ..Super-op
+  ...Ver lista: mensaje chanserv@services.dal.net sop #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara :mensaje chanserv@services.dal.net Sop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje chanserv@services.dal.net Sop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara :mensaje chanserv@services.dal.net Sop #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  .. Auto-Op
+  ...Ver lista: mensaje chanserv@services.dal.net aop #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara: mensaje chanserv@services.dal.net Aop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick: mensaje chanserv@services.dal.net Aop #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué Nick quieres añadir?"
+  ...Borrar Nick/Máscara: mensaje chanserv@services.dal.net Aop #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  ..Auto-Kick
+  ...Ver lista: mensaje chanserv@services.dal.net akick #$$?="¿Nombre del canal?(sin #)" list
+  ...Añadir Máscara: mensaje chanserv@services.dal.net Akick #$$?="¿Nombre del canal?(sin #)" add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Añadir Nick :mensaje chanserv@services.dal.net Akick #$$?="¿Nombre del canal?(sin #)" add $$?="¿Qué nick quieres añadir?"
+  ...Borrar Nick/Máscara: mensaje chanserv@services.dal.net Akick #$$?="¿Nombre del canal?(sin #)" del $$?="¿Qué numero es en la lista?"
+  ..-
+  ..Bloquear modos
+  ...Invite only(+i)
+  ....On : mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +i
+  ....Off : mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -i
+  ...Limite de usuarios(+l)
+  ....On : mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +l $$?="¿Limite de Usuarios? Ej: 20"
+  ....Off : mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -l
+  ...Canal Privado(+p)
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +p
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -p
+  ...Canal Secreto(+s)
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +s
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -s
+  ...Password para entrar(+k)
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +k $$?="¿Password?"
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -k
+  ...Moderado (+m)
+  ....On:mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +m
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -m
+  ...No Mensajes Externos(+n)
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +n
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -n
+  ...Solo ops cambian topic(+t)
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock +t
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock -t
+  ...-
+  ...Especificar modos: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock $$?="¿Qué modos quieres bloquear?"
+  ...Quitar todos los modos: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" mlock *
+  ..Bloqueo de Topic
+  ...Solo el fundador: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" topiclock founder
+  ...Solo S-op's: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" topiclock sop
+  ...DesBloquear topic: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" topiclock off
+  ..Opciones del canal
+  ...Cambiar fundador: :mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" founder $$?="¿Nick del nuevo fundador?"
+  ...Cambiar Password: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" passwd $$?="¿Nuevo password?"
+  ...Cambiar descripcion: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" desc $$?="¿Nueva Descripcion?"
+  ...Cambiar URL del canal: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" url $$?="¿Nueva URL?"
+  ...-
+  ...Op solo a-ops,s-ops
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" opguard on
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" opguard off
+  ...Mantener Topic
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" keeptopic on
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" keeptopic on
+  ...Permitir ops
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" leaveops on
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" leaveops off
+  ...Canal Privado
+  ....On:mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" private on
+  ....Off :mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" private off
+  ...Solo op registrados
+  ....On: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" ident on
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" ident off
+  ...Solo a-op/s-op entran
+  ....On : mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" restrict on
+  ....Off: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" restrict off
+  ...Nivel para leer Memos
+  ....Ninguno:mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" memo none
+  ....-
+  ....A-op:mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" memo aop
+  ....S-op:mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" memo sop
+  ....Fundador: mensaje chanserv@services.dal.net set #$$?="¿Nombre del canal?(sin #)" memo founder
+  ..Acceso al canal: mensaje chanserv@services.dal.net access #$$?="¿A qué canal?" $$?="¿Qué nick?"
+  ..Quitar Ban
+  ...A mi! :mensaje chanserv@services.dal.net unban #$$?="¿Nombre del canal?(sin #)" me
+  ...A todos: mensaje chanserv@services.dal.net unban #$$?="¿Nombre del canal?(sin #)" all
+  ..Información de canal: mensaje chanserv@services.dal.net info #$$?="¿Nombre del canal?(sin #)"
+  ..Invitar al canal :mensaje chanserv@services.dal.net invite #$$?="¿Nombre del canal?(sin #)" $$?="¿A qué Nick?"
+  ..Listar canales:mensaje chanserv@services.dal.net list $$?="¿Con qué patrón? $crlf Ejemplo: *mp3* $crlf Para listar todos pon: *"
+  .Nickserv
+  ..Opciones de nick
+  ...Cambiar password :mensaje nickserv@services.dal.net set passwd $$?="¿Password?"
+  ...Protección Kill
+  ....On:mensaje nickserv@services.dal.net set kill on
+  ....Off:mensaje nickserv@services.dal.net set kill off
+  ...Cambiar URL asociada :mensaje nickserv@services.dal.net set URL $$?="Escribe la URL"
+  ...No recibir memos
+  ....No recibes:mensaje nickserv@services.dal.net set nomemo on
+  ....Sí recibes:mensaje nickserv@services.dal.net set nomemo off
+  ..Máscaras Acceso
+  ...Listar:mensaje nickserv@services.dal.net access list $me
+  ...Ver acceso de..:mensaje nickserv@services.dal.net acc $$?="¿Qué Nick?"
+  ...Añadir máscara:mensaje nickserv@services.dal.net access add $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ...Borrar máscara:mensaje nickserv@services.dal.net access del $$?="¿Máscara? $crlf Ej: tunick!*@*.es"
+  ..Identificarte ( $me ) :mensaje nickserv@services.dal.net identify $$?="¿Password?"
+  ..Tirar a tu clon: mensaje nickserv@services.dal.net ghost $$?="¿Qué nick?" $$?="¿Password?"
+  .. Release (soltar nick): mensaje nickserv@services.dal.net release $$?="¿Qué Nick?" $$?="¿Password?"
+  ..Informacion del nick: mensaje nickserv@services.dal.net info $$?="¿Qué Nick?"
+  ..Listar nicks :mensaje nickserv@services.dal.net list $$?="¿Patrón de búsqueda? $crlf Ejemplo: pedro* $crlf para buscar todos pon: *"
+  .Memoserv
+  ..Enviar mensajea nick:mensaje memoserv send $$?="¿A quien?" $$?="What's the message?"
+  ..Enviar mensaje a canal:mensaje memoserv send #$$?="¿A qué canal?(sin #)" $$?="¿Mensaje?"
+  ..- 
+  ..Ver Lista mensajes:mensaje memoserv list
+  ..Leer mensaje
+  ...Mensaje 1:mensaje memoserv read 1
+  ...Mensaje 2:mensaje memoserv read 2
+  ...Mensaje 3:mensaje memoserv read 3
+  ...Mensaje 4:mensaje memoserv read 4
+  ...Mensaje 5:mensaje memoserv read 5
+  ... Otro:mensaje memoserv read $$?="¿Que numero de mensaje?"
+  ..Borrar mensaje
+  ...Mensaje 1:mensaje memoserv del 1
+  ...Mensaje 2:mensaje memoserv del 2
+  ...Mensaje 3:mensaje memoserv del 3
+  ...Mensaje 4:mensaje memoserv del 4
+  ...Mensaje 5:mensaje memoserv del 5
+  ... Otro:mensaje memoserv del $$?="¿Que numero de mensaje?"
+  ..Recuperar mensaje
+  ...Mensaje 1:mensaje memoserv undel 1
+  ...Mensaje 2:mensaje memoserv undel 2
+  ...Mensaje 3:mensaje memoserv undel 3
+  ...Mensaje 4:mensaje memoserv undel 4
+  ...Mensaje 5:mensaje memoserv undel 5
+  ... Otro:mensaje memoserv del $$?="¿Que numero de mensaje?"
+  ..-
+  ..Leer Mensaje al canal: mensaje memoserv read $$?="¿Que numero de mensaje?"
+  ..Borrar Mensaje al canal: mensaje memoserv del $$?="¿Que numero de mensaje?"
+  ..Recuperar Mensaje al canal: mensaje memoserv undel $$?="¿Que numero de mensaje?"
+  ..-
+  ..Redirigir mensajes
+  ...Activar:mensaje memoserv forward $$?="¿Redirigir a qué nick?" $$?="¿Password para ese nick?"
+  ...Desactivar:mensaje memoserv forward -
+  ...Estado:mensaje memoserv forward
+  ..Vaciar papelera memos:mensaje memoserv purge
+  .StatServ
+  ..Ver mapa de servers: mensaje statserv map
+  ..Listar comandos: mensaje statserv help
+  ..Ver lista de servers linkados: mensaje statserv servers
+  ..-
+  ..Estadísticas de un server
+  ...Del server actual: mensaje statserv server $server
+  ...De otro server: mensaje statserv server $$?="¿Server?"
+  ..Información sobre dominio: mensaje statserv domain $$?="¿Dominio?"
+  ..Información sobre host: mensaje statserv host $$?="¿Host?"
+  ..Estadísticas de... : mensaje statserv stats $$?="Escribe un server de IRC, o un dominio, o un host"
+  ..-
+  ..Log in: mensaje statserv login $$?="¿Nombre de usuario?" $$?="¿Password?"
+  ..Estadísticas de la red: mensaje statserv netstats
+}
+;-------------------------------------------------------------------------------------------------------------------------------------------------

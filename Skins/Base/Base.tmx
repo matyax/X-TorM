@@ -1,0 +1,105 @@
+;Info
+11•12•2• [13:23] 10Entra1 MaTyAs666 10[1 xtorm@xtorm666.users.undernet.org 10]
+11•12•2• [13:24] 2Sale1 PabletE 2[1 Peru@neocarp.users.undernet.org 2]
+2>1 Jeiyyyyyyyyyy
+2( Somebody )1 Wazzup!!
+11•12•2• [13:25] 4Se desconecta GordetE 4[1 Salchichon@primavera.users.undernet.org 4] (2 Haciendo dieta... 4)
+11•12•2• [13:26] 2Nick: Tu nick es ahora12 MyPlague
+12• 12MyPulga 2cambia el topic a: Script oficial del canal #neuquen -> 12[X12]11-12[TorM12] Script (v.2.2.0) - 3Http://www.x-torm.com.ar
+;Fin info
+;TEMA BASE DEL X-TORM
+on 1:load: {
+  fuentes 11 Tahoma
+  set.colores xtorm
+  cls -s
+  colour editbox text 0 | colour editbox 12 | colour background 15
+  colour listbox 1
+  colour listbox text 0
+  colour action 7
+  colour ctcp text 4
+  colour highlight text 10
+  colour info text 2
+  colour info2 text 12
+  colour invite text 3
+  colour join text 3
+  colour kick text 4
+  colour mode text 12
+  colour nick text 10
+  colour normal text 1
+  colour notice text 7
+  colour notify text 7
+  colour other text 1
+  colour own text 2
+  colour part text 3
+  colour quit text 4
+  colour topic text 10
+  colour wallops text 5
+  colour whois text 1
+  credit
+  .timer -m 1 500 fuente
+  background -sx
+}
+alias nresalt return 12
+alias resalt return 11
+alias logo return 12[X12]11-12[TorM12]
+alias alerta { echo -es 5(Alerta) $1- }
+alias info { echo -es 2(Info) $1- }
+alias marc return 11•12•2•
+alias _m return 12•
+alias _ctcp { echo -es 4(CTCP) $1 $+ : $2- }
+alias _notice { echo -es 7(Notice) $1 $+ : $2- }
+alias bnotice { echo -es 12( $+ $1 $+ ) $2- }
+alias _join { echo $1 $marc $timestamp 10Entra1 $2 10[1 $3 10] $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc $timestamp 10Entra1 $2 10[1 $3 10] - Clones:12 $4- | return }
+alias _part { echo $1 $marc $timestamp 2Sale1 $2 2[1 $3 2] }
+alias _quit { 
+  if ($1 == -split) { return $marc $timestamp 4Se desconecta $2 4[1 $3 4] (2 $4- 4) - Servidor en Split }
+  if ($3 == $null) { return $marc $timestamp 4Se desconecta $1 4[1 $2 4] }
+  else { return $marc $timestamp 4Se desconecta $1 4[1 $2 4] (2 $3- 4) }
+}
+alias _nick { return $marc $timestamp 2Nick:12 $1 2es ahora1 $2 }
+alias _mNick { return $marc $timestamp 2Nick: Tu nick es ahora1 $1 }
+alias _text { echo $1 2( $2 )1 $3- }
+alias _mtext { echo $1 2> $2- | if ($server) .msg $1 $2- }
+alias _discon { echo -es $_m [[ No estás conectado ]] }
+alias _mode { echo $1 $marc 2Modo/12 $+ $1 2(12 $2 $4- 2)12 por1 $3 }
+alias _kick { echo $1 $marc 4Kick/ $+ $+ $1 12( $2 patea a $3 12) $4- }
+alias _topic { echo $1 $_m 2Topic: $2- }
+alias _ptopic { echo $1 $_m 2Puesto por12 $2 2el12 $3 2a las12 $4- 2horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 12 $+ $2 2cambia el topic a: $3- }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo -s 12[X12]11-12[TorM12] -script- 12( By MaTyAs666 12)
+  eblanco -s
+  echo -s 11Http://www.xtorm-script.cjb.net - Http://www.x-torm.com.ar
+  eblanco -s
+  echo -s P2oder para mIRC
+  echo -s V2ersion: $xversion
+  echo -s m2IRC: $version
+  echo -s T2ema: $%(tema.actual)
+  eblanco -s
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 $marc Resúmen de $+ $resalt $1
+  echo $1 $_m Usuarios: $nick($1,0)
+  echo $1 $_m Ops: $nick($1,0,o)
+  echo $1 $_m Voz: $nick($1,0,v)
+  eblanco $1
+}
+[info]
+autor=MaTyAs666
+web=www.x-torm.cjb.net
+comentarios=Tema base del X-TorM Script
+fuente=Tahoma 10
+back=13816530
+colores=xtorm

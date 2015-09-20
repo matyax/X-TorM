@@ -1,0 +1,8 @@
+  Cambiar los sonidos del script
+  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ 
+  Si queres cambiar los sonidos del script, podes hacerlo desde el
+  panel de selección de sonidos (menú principal, configuración o desde
+  el panel de control). 
+€
+  Si en cambio, no queres escuchar más ningún sonido en el script, 
+  desde el mismo diálogo, desactiva la opción "Sonidos activados".

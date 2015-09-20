@@ -1,0 +1,186 @@
+; Dibujitos base 1.0
+
+menu nicklist {
+  .[K]ieL[o]^[C]horr[A]S 
+  .holas
+  ..Ricotero: say 4,1 Hola Ricotero 0,0-1,4 Amigoooooo!!! 0,0-4,1 Hola Ricotero 0,0-4,1 Todo 1,4 Well????? 4,1 $snicks
+  ..Corazon: say  0,3 k c 0,5 LoKuRaS De Mi CoRaZoN???? 0,4 eeesSSSpperrooo 0,6 ToDo En OrDen 0,5 $snicks
+  ..Cara: say 0,2 K c 0,4 $snicks 9,10 Cara de Naipe 4,1 JiJiJiJi, 9,1Todo Bien??????
+  ..Bardero: say 5,15 $snicks 3,15 k c Pantera 4,15 loco turbina 5,15 Flash Gordon 7,15 Moe 6,15 Larry 2,15 Curly 12,15 TITANNNNN!!!
+  ..Chicas: say 13,1 Hola 4,1  $snicks 0,5 BomBom, 0,2 Diosa, 0,1 Potra, 0,3 Reina, 0,4 Hermosa, 0,5 MiSS CaChivaChe 2001 - 2002, 0,6 CoMo aNdaS????
+  ..Propag: { say 0,2 Hola Gente!!!
+    .timer1 1 3 say 0,3 Como andan????
+  .timer2 1 5 say 0,5 La Casa bien???0,2 El gato bien???0,3 La flia bien??? 0,4 El auto bien???0,6 La nona bien???....8,1 Te paso con 7,1 $snicks } 
+  .-
+  .despedidas
+  ..Descanses: say 13,1 »º^º» 1,9 Chau $snicks PeReJiLeeee!!! 4,1 QuE DeScanSeS 0,3 DuLCeS SueNioS!!!!! 13,1 »º^º» 
+  ..BomBon: say 4,1Chauuuu 13,1 BomBon, 0,5 Que DeScanSeS 0,6 Y 0,12 SueNieS ConmiGo 0,2=) 0,3=) 0,4=) 4,1 $snicks
+  ..Chau/Adios: say 3¯°º¤4øÅø3¤º°¯0,2 AdiooooSSEEEEEE0,3 $snicks 0,4 eSPeRo VoLVeR a VeRTe PRoNTo PoR AQui 3,1 ¯°º¤4øÅø3¤º°¯  
+  ..Bombon2: say 2SSSSShaaauuuu 5 $snicks  6 BomBoncito, 3 Que DeSCaNSeS.... 1 Lo Que DaRia PoR VeR eSa CaRiPeLa a La MaNiaNa 12JeJeJeJe
+  ..Noche: say 11,2* 8,2* 11,2* 8,2* 11,2* 8,2* 11,2* 8,2* 2,11 ^^---__Que TeNGaS BueNaS NoCHeS $snicks NoS VeMoS PRoNTiTo__----^^ 11,2* 8,2* 11,2* 8,2* 11,2* 8,2* 11,2* 8,2*
+  .-
+  .puteadas
+  .-
+  .dar cosas:
+  ..Curitas: say ofrecer a $$1 un par de curitas 0,7(::::[]::::)1,0 0,7(::::[]::::)1,0. 6Pe Pe Perrrrooooooooooo Que Caidaaaaaa, Te HiCisTe PeLoTa!!!!.
+  ..Sangre: say 2,0 $$1 , oTRa VeZ Te CaiSTe?? ToMa EsTa CuRiTa 0,4(::::[]::::)2,0, Opz, Se LLeNo De SaNGrE!!!! MeJoR ToMa DoS MaS0,7(::::[]::::) 0,7(::::[]::::)2,0 Bueh..PoR AhoRa VaS A EsTaR MeJoR :) 
+  ..Tranki: say 1 $$1 estas muy nervioso don niembro!!! tomate estas tres capsulas  (¯¯|¯¯) (¯¯|¯¯) (¯¯|¯¯) 14 CalManTeS ViTaminiCos
+  ..Ron: say 4un vaso de 7,1Ron 1,0[_] 7,0para mi amigo $$1
+  ..wisky: say 2,0 $$1 4 ToMaTe Un WisKaCho  12CriaDoreSSSss 7WiSkY NaCioNaL
+  ..Cigarro: say 8,1 $snicks 4,0 fumate un 0,4Lucky Strike 0,7()¯¯¯¯)1,0[¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯4,0)}}4,0 ~~~
+  ..tulipan: say 10le da a $snicks una cajita de 15,15.5,5.4,4.40,5 Tulipan ®4,44,4.5,5.15,15.10 pontelo ponselo. 
+  ..bombones: say le da a $snicks una caja de 14,1414,5 BOMBONES 14,14.14,14 que endulzarán su vida 
+  ..quilmes: say 4ofrece a12 $snicks 4una fria 15,15!1,1412,4>15,12Quilmes ® Cristal 12,4<15,15!10 nada mejor que el sabor del encuentro para matar la sed
+  ..capuchino: say 12ofrece a $snicks un capuchino 8,5[0,5~~8,5]5,0D para que no se duerma 
+  ..sidra: say ofrece a4 $snicks un vasito de sidra \14~/ 12para que se ponga a tono 
+  ..cafecito: say 12 $snicks tomate un cafecito 0,5"""5,0D 12 Despertateeeeee!!!!!! 
+  ..FaSiTo: say 0,3 $snicks EEEyyyyy LokuRaaaa 0,4FuMaTe Un FaSiTo, 1,8ConVidA eL Tio BoB MaRLeY -{¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯4)))14 ~~ 0,3 \|/ 0,5Y VolaTe La KBZA 0,3\|/
+  ..cocacola: say 4ofrece a12 $snicks 4una fría y refrescante 15,15!1,144,4>0Coca~Cola~®4,4<15,15!10 Siempre Habra en tu vida una Coca~Cola Siempre
+  ..chandon: say 12 saca la botella de 15,15:7,1ChANdON (Extra_Brut)15,15:4,0 empieza a agitarla y...9,1 Bum! 6,0 lluvia de espuma 5,0 sobre el canal # 7,0° . . · : ° · : 3,0. ° ° . . · : ° · 15,0: . °° . . · : °6,0° . . · : ° · . °
+  ..porrote: say 12 PeLa uNa SeDa 4 y Se ArMa Un FaSoTe 10 ToMá 9,9%|8,8%|4,4%| 4,0 $snicks 4,4%|8,8%|9,9%| 12,0 AcA TeNeS 4,0 Un BueN 10,0 FaSoTe 9,9%|8,8%|4,4%| 12 BoB MaRLeY 4,4%|8,8%|9,9%| 9,0_\|/_ 5,0-{¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯4)))14 ~~ 9 _\|/_
+  .-
+  .propaganda
+  ..KieLoCurrito: say 0,2 $snicks 4,1 AAAAHhhhhhh  0,4 Te GusTarOn LaS ChoRRaS PaRa   0,2 IR8cap 0,4 QuE EsTAs EsPeRanDo PaRa BaJaRLaS... 0,3 EnTra a:Http://kielo.cjb.net 8,1 KieLo Te Lo AgraDeCe. 0,6 AleGra El IrC coN mIs ChoRRaS.
+  .-
+  .cariños y besos
+  ..Balero: say 9,1 $$1.... 4,1 Que Te Parece Si Jugamos Al Balero.... 4,1 YO Pongo El Palo... 4,1 Y VOS EL AGUJERO!!!!!...JEJEJEJEJEJE...
+  ..hielo pesones: say 11,12deja caer un 11,12cubito de hielo por la camisa de $$1....Para que se le marquen los timbres!!!...JEJEJEJEJEJE
+  ..inolvidable: say 9,1 le da a $$1 un rico, delicioso, explosivo,caliente, humedo, acaramelado, rompe corazones, fantastico e  4inolvidable... beso en la mejilla.
+  ..3 dias!: say 11,1 le da a11,1 $$1 11,1un 13,1beso tan tierno, calmado y tibio11,1 que dura 3 dias!!!!
+  ..labios: say 2 toca suavemente los labios de 1,4 $$1 2,15 "Con esos labios eres capaz de deribar la montaña más alta y convertir mi cuerpo en un volcan de pasión, Bésame 1, con esos labios maravillosos"
+  ..CremaErotica: say 4,1 derrama crema batida sobre $$1 y pregunta timidamente, Quieres que te la quite con la lengua? ((WOW))
+  ..Hermosa: say 2coloca a 15,4 $$1 2,15 con 3 rosa y 2 margaritas, 2 claveles, 4 crisantemos, 7 lirios en un jarron de oro y de todas la mejor y mas linda es 15,4 $$1
+  ..robé color: say 6,6  12,12  9,9  8,8  4,4  2,2  3,3  0,4Yo robé  6,6  12,12  9,9  8,8  4,4  2,2  3,3 0,12un pequeño  6,6  12,12  9,9  8,8  4,4  2,2  3,3 0,13pedacito del  6,6  12,12  9,9  8,8  4,4  2,2 3,3 0,4arcoiris  6,6  12,12  9,9  8,8  4,4  2,2  3,3  0,12solo  6,6  12,12  9,9  8,8  4,4  2,2  3,3  0,2para tí,  8,1 $$1 !!
+  ..P§§: say 9,1 toca a  $$1 en el hombro y se escucha un "PSSSSSSSssssss" .. Vamos a divertirnos!!!!!!!!!!!!!!!!
+  ..Beso normal: say 9,1 BESA A $$1 COMO AMIGO.
+  ..En los labios: say 4,1 BESA A $$1 DIRECTAMENTE EN LOS LABIOS!
+  ..Buenas noches: say 9,1 besa a $$1 buenas noches!
+  ..En la mano: say  4,1 se arrodilla y besa a  $$1 caballerosamente en la mano. 
+  ..Dulce Beso: say 15,2 besa a $$1... que dulce beso!  :)
+  ..Prohibido: say  9,1 besa a $$1, en sus lugares prohibidos!  4,1 JEJEJEJEJEJE
+  ..De lengua: say 4,1 doy un beso de lengua  a $$1   =8-Þ
+  ..Donde te guste!: say 9,1 manda a  $$1 un BESO, ponlo donde mas te guste !
+  ..Beso de Amor: say 2apaga las luces del canal, toma a 2 $$1 2por la cintura......... y a la luz de una vela.... la besa suavemente en los labios!!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+  ..Besar en la boca: say 9,1 se acerca sigilosamente a $$1, la mira dulcemente y le da un apasionado beso en la boca 4,1 MUUUAAAAAAACCCC!!!  :*
+  ..Apacionado: say 2 Se fija en $$1 y al sentirse atraídos, comienzan a darse 3 un grán beso apacionado delante de toda la gente de 2 $chan
+  ..apasionado II: say 2 Se LLeVa a 4 $$1 2a Lo MáS oSCuRo DeL iRC.. Y Le PLaNTa uN aPaSiOnAdO BeSo.... 
+  ..Ganas: say 2 SiEnTe GaNaS De BeSaR a {{ 4 $$1 2 }}... Y Lo HaCe... 
+  ..Llena: say 2 se lleva a 4 $1 2 a un sitio romántico y tranquilo y se besan con pasión y amor 4*SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!* *SMuaK!*2 ....   no creas que me canse... te dejo respirar un momento... 
+  ..Beso INCREIBLE: say 1le da a $$1 un Realmente 4CALIENTE..4Erotico1..Mueve piso, kema alma 2POR DIOX SI ME DETENGO MUERO 1, Mejor ke el cielo, y mas 4CALIENTE1 ke el  4INFIERNO1, Manoseador, No Dejes de tocar4me1, Hierve la 4Sangre1, 2DIOXDIOXDIOXDIOX Roba Alma1, Crea Sueños, Cerca de Censura 4X1 Increible insuperable, ke detiene el 4corazon 1, Coskilleante, Casi sismico, 1Explota4 Pasiones, 2MOJADO1, Profundo, Duro, Largo, Inolvidable, 4Kiss!!!!!!!!!
+  ..Beso-WOW: say 2toma a4 $$1 2en sus brazos...mira directa y profundamente sus ojos y le da un lento, profundo, caliente, mojado apasionado 12~coskilleante~ 2desestabilizante 4BESO 2ke la vuelve loca, 13Chispas 2vuelan y 11vapor sube! 4<solo akellos con mucha experiencia pueden evitar desmayarse!>
+  ..Beso SHHH: say 0,4BESA APASIONADAMENTE A 8 $* 0para ke se calle!!
+  ..Mas linda: say 6  un beso y un abrazo para la mujer mas hermosa de todo el mundo, es mas , de toda la galaxia, «« $$1 »», te amo, y siempre te amare :)
+  ..Llena: say 2 se lleva a 4 $1 2 a un sitio romántico y tranquilo y la besa con pasión  amor y locura  4*
+  ..besoingles: say 4,1 gives $$1 a Really Hot..Long Super And Really Erotic..Earth Shattering, Soul Burning, Oh My Gawd If I Stop Now I'll Die, Better Than Heaven, Yet Hotter Than Hell, Groping, Don't Stop Touching Me, Blood Boiling, OhOhOhOhGawdOhGawdOhGawd Soul Stealing, Dream Making, Close To XRated, Hand Trembling, Knee Buckling, Heart Stopping, Body Tingling,Earth Quake Making, Passion Exploding, Wet, Deep, Hard, Long, Lingering, Kiss B
+  ..Beso Erotico: say 1da $$1 un hermoso y 4caliente..4beso de lengua1..luego recorre todo su hermoso cuerpo con gran dulzura y pasion, hasta sentirla vibrar, ahi es cuando toma la desicion de quitarce todo la ropa para compartir una noche inolvidable junto a ella.
+  ..beso: say  le da a $$1 un beso increible, super largo, realmente erótico, tan erótico que la tierra tiembla, su alma arde, sus cuerpos se confunden, casi llegan al cielo, aunque estén ardiendo como en el infierno,no paran de tocarse, su sangre hierve, OhOhOhOhahOhoahhaohhhh ,parece un sueño, casi XXX, sus manos tiemblan, sus rodillas se aflojan, su corazón esta pronto a detenerse, sus cuerpos sufren espasmos, la pasión se apodera, están húmedos, sudan mucho, quedan inmóviles. Qué belleza.
+  ..sabanas: say toma a $$1 entre sus brazos, la echa sobre la cama, le va arrancando la ropa a mordiscos, cuando ya no hay nada mas que arrancar, la rodea con sus brazos, y se pierden debajo de las sábanas !!!
+  ..suavemente: say 3suavemente toma 6el rostro de5 $snicks 10entre sus manos, 12y contemplando profundamente 2sus ojos 3ve la enorme 4belleza de su interior 5y la gentileza de 6su espíritu. 10Se pierde en 2la inmensidad, 3la belleza y 4calidez de su alma 6Bichito !!! Te 5Extrañé Tanto !
+  ..Hermosa Rosa: say 2ofrece a  13 $$1 2 la más hermosa rosa del jardín! 4@3-}--}---
+  ..Pellizco: say 9,1 pellizca a $$1 en la mejilla...Ohhhhh...eres muy 4 dulce9,1 !!!!!  1,8;þ
+  ..Beso en la Boca a ella: say se acerca a3 $$1, y cuando ella se da la vuelta le da un beso en la 5 boca
+  ..Beso en la Cara: say besa a $$1 en las mejillas como un buen amigo. :-*
+  ..Beso de Tornillo: say 5 se fija en $$1 y al sentirse atraídos, comienzan a darse 3 un grán beso de tornillo delante de toda la gente de 2 $chan
+  ..Toma Besos: say 12da muchos 4besitos en la direccion de 12»»--4(¯`°´¯)12=4(¯`°´¯)12---»»4 4 $$1 
+  ..Beso Cuello: say da 4{K}*{I}*{S}*{S}*{E}*{S} a $$1 suavemente en el cuello.  12Wow !!, qué maravillosa fragancia! 13 Estoy enamorado...!
+  ..Abrazos y besos: say 13_»º^º»11_»º^º»12_»º^º»_ 6Abrazos y Besos para $$1 12_»º^º»_11»º^º»13_»º^º» 
+  ..Abrazos 1: say 6,8 abraza a  11,6 {¿?{¿?{¿?{¿?{¿?{ $$1 }¿?}¿?}¿?}¿?}¿?} 
+  .-
+  .Piropos
+  ..tk: say $$1 Te QQQuuuuuuiiiiiiiiiieRRRRRRRRRRooooooooooo CaCCCCCCCChoooooRRRRRRRRRRAaaaaaaaaaaaaaa!!
+  ..Asesino: say  9,1 $$1 0,12×××Si Te Acusan De Asesinato, andá Sabiendo Que La Victima fui yo×××. 
+  ..Hora: say 0,2Voy A Tirar El1,8 Reloj $$1 Porque 0,3No Veo La0,4 Hora De Darte Un Beso.0,6MMMMMMMMMMMMMMMMMUACKS!
+  ..Morir: say $$1 0,12 Tu Mirada Me Electriza, 0,6El Motivo No Lo Se. 0,3 Tu Mirada Paraliza 0,13Por Tu Culpa Yo Moriré. 
+  ..Nariz: say 9,1 $$1 0,1Tu Nariz Ez Una Cumbre De Belleza Sin Igual. 4,1Felicito Al Cirujano, Te Quedo Muy Natural.!!!!!!!! 
+  ..Basurita: say 9,1 $$1 11,13 ¿Jugamos a la basurita? Vos Te Tirás Al Suelo Y Yo Te Recojo.
+  ..Pellizco: say 4 $$1 1,4«««« Si Te Pellizco Seguro Que Te Enojas, Pero Si Me Pellizcás Vos Seguro Que Me Despierto »»» 
+  ..Cancion: say 9,1 $$1 4Quisiera Ser Como La Canción Que Te Gusta Más, Para Así Estar En Tus Labios Una Eternidad 
+  ..TuSangre: say  4 $$1 .....Me Gustaría Ser La Sangre Que Recorre Todo Tu Cuerpo Para LLegar A Lo Más Profundo De Tu Corazón Y Conquistarlo Para Siempre. 
+  ..Llaves: say 12Que Dios Te Guarde Mi $$1  , Y Que Las LLaves Me Las De A Mi ... 
+  ..Carcel: say 4,1 $$1 15Si Tu Cuerpo Fuera La Cárcel Y Tus Brazos Cadenas Que Bonito Sitio Para Cumplir Mi Condena 
+  ..Copa: say 5 $$1 Quisiiera Ser Vaso, Quisiera Ser Copa Para PaSar Por Tus Labios Y Darte Un Beso En La Boca 
+  ..Idiota: say 0,6 El Mundo Es Bello El Amor Sincero, Y Tu  $$1 Eres La Idiota Que Yo Mas Quiero !!!!
+  ..Lero: say 0,13 $$1 0,2Zi Mi Boca Fuera Pluma 0,6 Y Mi Corazón Tintero Con 0,4La Sangre De Mis Venas Te  Escribiria 0,13"Te Quiero" 0,3Pero Como Mi Boca No Es Pluma Ni Mi Corazon Tintero No Te Quiero...0,2 lero lero !!!!
+  ..Pata: say 9,1 $$1...Quien Fuera Pirata , No Por El Oro Ni Por La Plata Si No Por Ese Tesoro Que Tienes Entre Pata Y Pata... 4 JEJEJEJEJEJEJEJEJEJE!!!!!!!!! ;-)))   
+  ..Arepa: say 1,8Quisiera Ser Mantequilla $$1  0,2 ...Para Derretirme En Tu Arepa !!!
+  ..Limon: say La Primera Vez que  Vio a $$1  Todo Le Supo A Limón, La Carnita Quedo En Su Cuerpo Y El Juguito En Su Corazón. 
+  ..Primero: say $$1 0,6: Primero Fuiste Una Amiga, 0,7Luego Surgio La Ilucion, 1,8Ahora Eres Lo Mas Bello, 1,9Que Ama Mi Corazon!!! 0,4 Te AMO!!...   $$1
+  ..SiTetuv: say $$1 4Si Tan Solo Pudiera, 1,8Estar Junto A Ti, 12Esto Haria: 0,6Gritar Tu Nombre, 1,11Sentir Tus Labios, Junto A Los Mios, 0,3Rozar Mis Dedos En Tu Piel, 6,0Sentirte Mia, 14Decirte Cuanto Te Quiero, 0,13Cuanto Te Nesecito, 1Cuanto Te Extraño, Y Mirandote A Los Ojos Te Diria, 4,0 Te Amo, Mi Vida 6,0Y Desde Hoy Eres La Dueña De Mi Corazon..!!!!
+  ..Verte: say Le Dice A $$1 :0,5SI EL AMARTE FUERA VERTE, Y EL VERTE FUERA PERDERTE,PREFERIRIA AMARTE SIN VERTE,QUE VERTE PARA PERDERTE.
+  ..Caraotas: say 11,1Zi Cocinas Como Caminas.. $$1 chispeame Caraotas
+  ..Cmecha: say 9,1 $$1 13,1Eres La Carne Mechada Que Rellena La @repit@ De Mi Corazon
+  ..Pastelera: say 9,1 $$1 15,1Tu madre debía de ser pastelera porque un bombón como tú no lo hace cualquiera
+  .-
+  .Mini-Bar 
+  ..Mini-Bar: { 
+    .timer1 1 1  say pregunta a $$1 que si quieres algo para beber, si es asi  abro el Mini Bar: 
+    .timer2 1 1  say De refrescos tenemos: 15,15!1,140,3 Sprite 15,15! 15,15!0,4 CocaCola 1,15  15,15!1,140,3 74,3°0,3UP 15,15! 1,15 0,7 Fanta Naranja 1,15  15,15!0,4 Dr. Pepper 15,15  15,15!4,8 Fanta Piña 15,15! 15,15!10,8 Fanta Limón 15,15! 15,15!4,12 Pepsi 15,15! 15,15!0,7 Royal Crown 15,15! 15,15!0,4 Kola Champagne 15,15! 15,15!0,3 Hawallan Punch 15,15!
+    .timer3 1 3  say De Cerveza tenemos: 15,15!8,5 Coors Light 15,15! 15,15!1,140,3 Heineken 15,15! 15,15!1,8 Budweiser 15,15! 15,15!8,4 Miller 15,15! 15,15!15,3 Corona Extra 15,15! 1515,15!0,12 QuIL15,12MeS 15,15!15,15!8,5 QuIL15,5MeS (light) 15,15!15,15!1,8 BaCaRdI 15,15!
+    .timer4 1 5  say Alcohol tenemos: 15,15!15,5 Jonnie Walker 15,15! 15,15!11,2 Martini Dry 15,15! 15,15!4,8 JB 15,15! 15,15!0,1 Bacardi 15,15! 15,15!4,8 JOSE CUERVO 15,15! 15,15!0,4 Martini 15,15! 1,1!12,15 Absolut 1,1! 15,15!4,14 Vodka Sminorff 15,15! y 15,15!0,1 TEQUILA 15,15! 
+    .timer5 1 7  say Y sobre todo 12HIELO, Mucho Hielo, Asi que sirvete a tu gusto
+  }
+  .-
+  .QuitS
+  ..Gile: { say 4,1 Bueno gentusa chatera!!!!
+    .timer1 1 5 say 9,1 Me despido de todos ustedes!!!!
+    .timer2 1 10 say 0,3 Es q me paso a Buscar 0,4 $snicks
+    .timer3 1 13 say 0,2 Que me importa a mi.... q no me crean!!!!!
+    .timer4 1 15 say 0,5 Shauuuuuuuuu Gilessssssss!!! 
+    .timer5 1 18 say 1,14 Mientras ustedes siguen chateando... YO ME COMO UN RICO POSTRE!!! 	
+  .timer6 1 20 /quit 0,2 >=) 0,3 >=) 0,4 >=) 0,5 >=) 0,6>=) 1,14 byeeeeeeeeeeeeeeeeee }
+  ..Reboot: { say 0,2 Bueno gente, lamento despedirme de ustedes, pero...
+    .timer1 1 5 say 9,1 Mi pc pide reiniciar...
+    .timer2 1 10 say 0,2 es q ando con una maquina viejita, vieron???...
+    .timer3 1 13 say 8,1 es jodido esto de estar en la red con una 286 =)
+    .timer4 1 15 say 4,1 En un rato nos vemoooooooooo!!! 
+  .timer5 1 18 /quit 1,3 maquina de mierda! si sos un Pentium III 866 karajo!!! }
+  .-
+  .sortear
+  ..Escupitajo: { say 0,3 Bueno Gente.... 9,1 Voy a sortear un 0,4 Escupitajo....
+    .timer1 1 5 say 0,12  El numero seleccionado es8,12... 7,1 22  
+    .timer2 1 8 say 0,5 Toma 14,1 $snicks... 0,4 Esto te pertenece... 0,2 JJJJJJJJJJJJJJJJJJJJJJJJJJTU  
+  .timer3 1 11 say 0,2 FELICITACIONES!!!! 0,3 FELICITACIONES!!! 0,4 FELICITACIONES!!!! }
+  ..Beso: { say 0,3 Bueno Gente.... 9,1 Voy a sortear un 0,4 BeSoTe....
+    .timer1 1 5 say 0,12  El numero seleccionado es8,12... 7,1 22  
+    .timer2 1 8 say 0,5 Toma 14,1 $snicks... 0,4 Esto te pertenece... 0,2 Smuackssssssssssssssss  
+  .timer3 1 11 say 0,2 FELICITACIONES!!!! 0,3 FELICITACIONES!!! 0,4 FELICITACIONES!!!! }
+  ..Palaso: { say 0,3 Bueno Gente.... 9,1 Voy a sortear un 0,4 Palaso....
+    .timer1 1 5 say 9,1 SSSShhhhhh, 0,6Alguien tiene todos los numeros....
+    .timer1 1 8 say 0,12  El numero seleccionado es8,12... 7,1 22  
+    .timer2 1 11 say 0,5 Toma 14,1 $snicks... 0,4 Esto te pertenece... 0,2 PPPaaafFFFFFF infeli!!!  
+  .timer3 1 15 say 0,2 FELICITACIONES!!!! 0,3 FELICITACIONES!!! 0,4 FELICITACIONES!!!! }
+  .-
+
+  .Medidores
+  ..medidor de %zmedtema
+  ...cambiar tema:/set %zmedtema $$?="Dime el tema a medir"
+  ...-
+  ...-1-:say 4 $+ $$1 $+  consigue un 1,150(1114)0,0xxx9,113,1 04\0- - - - - - - -3 10  1,0 en el medidor de 4 $+ %zmedtema
+  ...-3-:say 4 $+ $$1 $+  consigue un 1,150(1314)0,0xxx9,113,1 00 - -4\0- - - - - -3 10  1,0 en el medidor de 4 $+ %zmedtema
+  ...-5-:say 4 $+ $$1 $+  consigue un 1,150(1514)0,0xxx9,113,1 00 - - - -4|0- - - -3 10  1,0 en el medidor de 4 $+ %zmedtema | qq Esfuerzate y llegaras al maximo!!
+  ...-7-:say 4 $+ $$1 $+  consigue un 1,150(1714)0,0xxx9,113,1 00 - - - - - -4/0- -3 10  1,0 en el medidor de 4 $+ %zmedtema | qq Muy bien! estas cerca de la cima..
+  ...-10-:say 4 $+ $$1 $+  consigue un 1,150(11014)0,0xxx9,113,1 00 - - - - - - - -4/3 10  1,0 en el medidor de 4 $+ %zmedtema | say 4 $+ $me $+  corona a 12 $+ $$1 $+  como lo 12MAXIMO en el Rubro:4 %zmedtema 7 |\/\/|
+  ..detector de %ztemin
+  ...cambiar deteccion: set %ztemin $$?="Dime el tema a detectar "
+  ...-
+  ...detectar: { say 4  $me enciende el 0,3 detector de %ztemin  15,15.14,14.0,7 * ACME * 14,14.15,15.
+    say 0,1 :::14[]4°1,0----o  12BIP BIP BIP 
+    say 3 $me lo apunta hacia el canal # ... y comienza a detectar... 
+    .timer 1 3 say 3Scanning..... 0,1 :::14[]4°1,0----o0,0 7)))
+    .timer 1 6 say 3Scanning..... 0,1 :::14[]4°1,0----o0,0 7)))4))))
+    .timer 1 9 say 3Blanco localizado!!..... 
+  .timer 1 12 say 8,1D1,8A8,1N1,8G8,1E1,8R 15,15.14,14.9,1 $$1 14,14.15,15.8,1D1,8A8,1N1,8G8,1E1,8R  }           
+
+}
+on 1: LOAD:  cho.info
+alias CHO.info {
+  echo -s .- 
+  echo -s 3,3!8,8!4,4!9,1 [K]ieL[o]^[C]horr[A]S4,1 ADD-ONS0,2 IR8cap0,5 By 0,6El_Zumba[The_Original]4,4!8,8!3,3! 
+  echo -s 8,2 version 1.0
+  echo -s 1,10 Autor: El_Zumba
+  echo -s 1,3 E-mail: zumba@ciudad.com.ar
+  echo -s 0,2 Buenos Aires - Argentina
+  echo -s 0,5 Podes encontrarme en...
+  echo -s 0,6 SERVIDOR IRC: irc.radar.com.ar
+  echo -s 0,12 Canal: #Adultos
+  echo -s .-

@@ -1,0 +1,70 @@
+;TEMA TRIBE PARA X-TORM
+on 1:load: {
+  clear -s
+  fuentes 10 Verdana
+  set.colores pone 16777215,0,10485760,8388608,255,127,1048800,34816,8454143,64512,11053056,16744576,13172624,8421631,8355711,13816530
+  colour action 10 | colour ctcp 4 | colour highlight 15 | colour info 0 | colour info2 0 | colour invite 14 | colour join 0
+  colour kick 0 | colour mode 0 | colour nick 15 | colour normal 0 | colour notice 15 | colour notify 15 | colour other 0 
+  colour own 0 | colour part 0 | colour quit 0 | colour topic 15 | colour wallops 0 | colour whois 10 | colour listbox 1 
+  colour editbox 1 | colour background 1 | colour editbox text 0 | colour listbox text 8 | credit
+  .timer -m 1 500 fuente
+  background -sc $scriptdirstatus.png
+}
+alias nresalt return 15
+alias resalt return 12
+alias logo return 12..:: 10X-ToRm 12::..
+alias alerta { echo -es 4-Alerta- $1- }
+alias info { echo -es 12-Info- $1- }
+alias marc return 15-¤-
+alias _m return 15¤
+alias _ctcp { echo -es 4-CTCP-  $+ $1 $+ : $2- }
+alias _notice { echo -es 15-Notice- $1 $+ : $2- }
+alias bnotice { echo -es 15[ $+ $1 $+ ] $2- }
+alias _join { echo $1 $marc 10Entra $2 10< $+ $3 $+ > $iif($4 != $null,- Entro antes como: $+ $resalt $4) | return }
+alias cjoin { echo $1 $marc 10Entra $2 10< $+ $3 $+ > - Clones: 10 $4- | return }
+alias _part { echo $1 $marc 7Sale $2 7< $+ $3 $+ > }
+alias _quit { 
+  if ($1 == -split) { return $marc 4Desconecta $2 4< $+ $3 $+ > [ $4- ] - Split }
+  if ($3 == $null) { return $marc 4Desconecta $1 4< $+ $2 $+ > }
+  else { return $marc 4Desconecta $1 4< $+ $2 $+ > [ $3- ] }
+}
+alias _nick { return $_m 15Cambio de nick 14<0 $1 11»0 $2 14> }
+alias _mNick { return $_m 15Cambio de nick 14<0 Tu nick es ahora 11»0 $1 14> }
+alias _text { echo $1 11[ $+ $2 $+ 11] $3- }
+alias _mtext { echo $1 12> $2- | .msg $1 $2- }
+alias _discon { echo -es $_m No estas conectado }
+alias _mode { echo $1 $marc 15[ 11Modo - $1 15] 15[11 $2 $4- 15] by 11 $+ $3 }
+alias _kick { echo $1 $marc  $+ $3 11pateado por $2 < $+ $4- $+ > }
+alias _topic { echo $1 $_m 15Topic: $2- }
+alias _ptopic { echo $1 $_m 15Puesto por $2 15el $3 15a las0 $4- 15horas | eblanco $1 }
+alias _ctopic { echo $1 $_m 15[0 Nuevo topic15 [0 por $2 15[0 $3- 15] }
+alias _away {
+  if ($1 == go) {
+    return  esta Away ( %away.msg ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+  if ($1 == back) {
+    return Vuelve ( %away.vuelta-m ) 3,1[9 $replace($duration(%away.tiempo-t),sec,seg) 3]
+  }
+}
+alias credit {
+  echo 15..:: 11X-ToRm 15::.. by MaTyAs666
+  eblanco -s
+  echo -s 15[ Http://www.xtorm-script.cjb.net - Http://www.x-torm.com.ar ]
+  eblanco -s
+  echo -s 0It´s On! - 15K14o15R14n 15T14heme
+  eblanco -s
+}
+alias mjoin { echo $1 $marc $timestamp Has entrado a $+ $resalt $1 | .timer -m 1 500 resumen $1 }
+alias resumen {
+  if (%resumen == no) return
+  eblanco $1
+  echo $1 0,2 $timestamp ..:: Resumen de $1 ::..    
+  echo $1 2,2  $_m Usuarios: $nick($1,0)
+  echo $1 2,2  $_m Ops: $nick($1,0,o)
+  echo $1 2,2  $_m Voz: $nick($1,0,v)
+  echo $1 2,2                                       $1           
+  eblanco $1
+}
+[info]
+autor=MaTyAs666
+comentarios=Tema dedicado al mejor grupo de música.

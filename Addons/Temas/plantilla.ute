@@ -1,0 +1,40 @@
+Español.Raw301 ×    &r2 está away!
+Español.Raw307 ×    El nick &r2 está registrado y protegido.
+Español.Raw311 (?) Whois:&r2!&r3@&r4 Real Name:&r6-
+Español.Raw312 ×    Información de servidor:         &r3,&r4-
+Español.Raw313 ×    &r2 Es un operador de la red
+Español.Raw314 (×) Whowas:&r3[&r4@&r5] Identificado como:&r7-
+Español.Raw315 (?) Fin del who! 
+Español.Raw317 ×    Tiempo inactivo: $duration(&r2)
+Español.Raw318 (?) Fin del whois! 
+Español.Raw319 ×    Canales:                                 &r3- 
+Español.Raw352 (?) Who! &r6!&r3@&r4, en &r2, conectado a &r5, a $remove(&r8,$chr(58))  servidores de distancia de ti, Nombre real:&r9-
+Español.Raw369 (?) Fin del whowas! 
+Español.Raw401 3* Error: No se encuentra el nick &r2 en el irc
+Español.Raw402 3* Error: No se encuentra el servidor &r2 
+Español.Raw403 3* Error: No se encuentra el canal &r2 
+Español.Raw404 3* Error: Imposible hablar en &r2. Canal moderado(+m) o tienes un ban en &r2
+Español.Raw405 3* Error: Estas en demasiados canales, sal de alguno para poder entrar en &r2
+Español.Raw406 ×  Whowas: No hay informacion del nick &r2
+Español.Raw422 3* El Message of the Day (MoTD) no está disponible
+Español.Raw431 3* Error: Has indicado un comando para el que se esperaba un nick. Indica ese nick por favor.
+Español.Raw432 3* Error: &r2 es un nick con caracteres no validos 
+Español.Raw433 3* Error: El nick &r2 está siendo usado en estos momentos
+Español.Raw436 3* Error: Colision de nicks (&r2)
+Español.Raw437 3* Error: No puedes cambiar de nick mientras tengas un ban en un canal
+Español.Raw438 3* Error: Nick cambiado demasiado rapido. Espera &r9 segundos!
+Español.Raw439 3* Error: Objetivo cambiado demasiado rapido. Espera &r9 segundos!
+Español.Raw441 3* Error: El usuario &r2 no esta en el canal 
+Español.Raw442 3* Error: ¡No estás en el canal &r2 ! 
+Español.Raw443 3* Error: ¡&r2 ya está en el canal &r3! 
+Español.Raw465 3* Error: No puedes entrar en este servidor 
+Español.Raw471 3* Error: &r2 está limitado y no puede entrar nadie mas (+l)
+Español.Raw472 3* Error: No conozco el modo &r2  
+Español.Raw473 3* Error: &r2 es solo accesible a invitados (+i) 
+Español.Raw474 3* Error: Estás baneado en &r2.No puedes entrar  
+Español.Raw475 3* Error: El canal &r2 tiene clave y no has indicado esa clave.No puedes entrar (+k)
+Español.Raw478 3* Error: ¡La lista de bans de &r2 está llena!  
+Español.Raw481 3* Error: No eres IRCop.4Acceso denegado
+Español.Raw482 3* Error: No eres operador (@) en &r2. Imposible ejecutar comando.
+Español.Raw501 3* Error: El modo MODE indicado es desconocido por el servidor. 
+Español.Raw502 3* Error: ¡No puedes cambiar el modo de otros usuarios!
